@@ -1,0 +1,331 @@
+Sep 24, 2018 - v.1.5.64
+-moved from subversion to github; fixed phenominer queries due to changes in table structures
+
+Aug 20, 2018 - v.1.5.63
+-daf extractor: updated to AGR schema 1.0.0.6 (changes in dataProvider)
+
+Jul 19, 2018 - v.1.5.62
+-script agrExtract.sh: added extract for expression for rat and human (GO CC)
+
+May 2, 2018 - v.1.5.61
+-script agrExtract.sh: added extract for phenotypes for rat (MP) and human (HP)
+  also json files are now stored in human readable pretty format
+
+Apr 30, 2018 - v.1.5.60
+-daf extractor: updated to AGR schema 1.0.0.3 (changes in dataProvider)
+
+Feb 23, 2018 - v.1.5.59
+-seq extractor: standardized file header and naming for all species
+
+Feb 20, 2018 - v.1.5.58
+-daf extractor: updated to be compatible with AGR schema 1.0.0.0
+
+Feb 12, 2018 - v.1.5.57
+-seq extractor: extract sequences for transcripts
+
+Feb 7, 2018 - v.1.5.56 -per RGDD-1455
+-daf extractor: extract for evidence codes IMP and IDA, instead of IPM and IED
+
+Jan 29, 2018 - v.1.5.55
+-daf extractor: sort data before extraction
+
+Jan 23, 2018 - v.1.5.54
+-assembly comparison extractor: fixed generation of file from reporting genes with chromosomes between assemblies
+  added generation of files between 3.4 and 6.0 assemblies
+-daf extractor: fix for allele objects
+
+Jan 17, 2018 - v.1.5.53
+-daf extractor: for gene alleles, objects of type 'allele' are exported;
+  for human, OMIM IEA annotations are exported with source 'OMIM', in addition to RGD manual annotations 
+
+Jan 10, 2018 - v.1.5.52
+-daf extractor: fix: annotations to DO+ custom terms are no longer exported
+
+Jan 2, 2018 - v.1.5.51
+-daf extractor: fixed code to handle DO+ ontology
+
+Dec 21, 2017 - v.1.5.50
+-agr extractor: script extended to extract alleles in JSON format
+
+Dec 12, 2017 - v.1.5.49
+-agr extractor added: script tuned up
+
+Dec 6, 2017 - v.1.5.48
+-agr extractor added: export BGI (basic gene information) files for AGR
+
+Sep 18, 2017 - v.1.5.47
+-annot gaf extractor: REFERENCES field now
+
+Sep 15, 2017 - v.1.5.46
+-annot gaf extractor: added option to generated human GO extracts in GAF format for AGR
+
+Sep 14, 2017 - v.1.5.45
+-annot daf extractor: updated to conform with current AGR schema
+
+Jul 10, 2017 - v.1.5.44
+-annot extractors: created date for IEA GO annotations brought in by pipelines are set to last modified date;
+ previously the exported created date was correctly set only for GO IEA annotations brought in by olfactory genes load
+
+Jun 5, 2017 - v.1.5.43
+-added array-id extractor
+
+Jun 1, 2017 - v.1.5.42
+-daf extractor: no longer exporting double ids: HGNC:HGNC:xxx -> HGNC:xxx, MGI:MGI:xxx --> MGI:xxx
+
+May 30, 2017 - v.1.5.41
+-tuned up export of objects for other species like dog, bonobo, squirrel
+ fixed taxon column for gaf files
+
+May 24, 2017 - v.1.5.40
+-added export of objects for other species like dog, bonobo, squirrel
+
+May 9, 2017 - v.1.5.39
+-annotDafExtractor: fixed bug when files in json format contained extracts from other species,
+   i.e. human file contained rat+human data, and mouse file contained rat+human+mouse data
+
+May 3, 2017 - v.1.5.38
+-annotExtractor: exports files in the right directory
+
+Apr 18, 2017 - v.1.5.37
+Apr 13, 2017 - v.1.5.36
+Apr 12, 2017 - v.1.5.35
+-annotDafExtractor: exports data in JSON format, as per AGR specification
+    https://github.com/alliance-genome/agr_schemas/tree/development/disease
+
+Apr 4, 2017 - v.1.5.34
+-scripts: fixed typo in chinchilla.sh script, and in generateAllFiles.sh script
+
+Mar 29, 2017 - v.1.5.33
+-annotDafExtractor: additionally exports data in JSON format
+
+Feb 21, 2017 - v.1.5.32
+-annotDafExtractor: exports HGNC id as Object ID for human genes and MGD id for mouse genes
+                    file name complies to format used by AGR: 'RGD_0.3_disease.<taxonId>.daf.txt'
+
+Feb 20, 2017 - v.1.5.31
+-updated build from ANT to GRADLE
+
+Feb 17, 2017 - v.1.5.30
+-annot extractors: enforced GO_AR:0000011 rule for GO ND annotations
+
+Feb 15, 2017 - v.1.5.29
+-gene extractor: discontinued generation of HPRD IDs for human
+
+Feb 2, 2017 - v.1.5.28
+-added generation of DAF file, as per RGDD-1345
+
+Jan 6, 2017 - v.1.5.27
+===
+-gaf annotation file: removed header lines about MESH and OMIM ids, as per RGDD-1314
+
+
+Dec 13, 2016 - v.1.5.26
+===
+-replaced EntrezGene --> NCBI Gene
+
+
+Oct 18, 2016 - v.1.5.25
+===
+-strain extractor, exports LAST-KNOWN-STATUS due to discontinuation of AVAILABILITY field
+
+
+Oct 10, 2016 - v.1.5.24
+===
+-ortholog extractor, improved handling of duplicate HGNC and MGD accession ids
+-annot extractors: fixed export of creation-date for IEA GO annotations for olfactory genes
+
+
+Sep 19, 2016 - v.1.5.23
+===
+-fixed gp2protein extractor, per RGDD-1274
+
+
+Aug 19, 2016 - v.1.5.22
+===
+-created extractor for uniprot bibliography files, per RGDD-1254
+
+
+Jun 22, 2016 - v.1.5.21
+===
+-scripts: chinchilla.sh script was added to 'generateAllFiles.sh' script
+
+
+Jun 21, 2016 - v.1.5.20
+===
+-orthologs: split orthologs file for RATMINE by source
+ (RATMINE is not able to consume one big file)
+
+
+May 31, 2016 - v.1.5.19
+===
+-orthologs: generate separate orthologs file for RATMINE
+
+
+Mar 3, 2016 - v.1.5.18
+===
+- AnnotExtractor, AnnotGafExtractor: GO annotations with IEA evidence: last-modified-date of the annotation
+    is exported as created-date of the annotation into the gaf file -- per RGDD-1194
+
+
+Mar 3, 2016 - v.1.5.17
+===
+- QtlExtractor: ESTS are no longer exported
+
+
+Jan 11, 2016 - v.1.5.16
+===
+- QtlExtractor: for rat qtls with 3 strains crossed, 2 new columns have been added:
+  STRAIN_RGD_ID3 and STRAIN_RGD_SYMBOL3
+
+
+Jan 8, 2016 - v.1.5.15
+===
+- QtlExtractor: due to discontinuation of TRAITS table:
+  discontinued column #17 TRAIT_METHOD; columns TRAIT_NAME and TRAIT_SUBTRAIT updated to show VT and CMO terms
+    if available, otherwise they show notes of type 'qtl_trait' and 'qtl_subtrait'
+- '(UNUSED)' columns are no longer reported as having no or very few values
+
+
+Dec 16, 2015 - v.1.5.14
+===
+- AnnotGafExtractor: generates extracts in gaf 2.1 format
+
+
+Aug 18, 2015 - v.1.5.13
+===
+- AnnotExtractor, AnnotGafExtractor: replaced taxon constraint handling with honoring Not4Curation terms
+  (due to complete tagging of GO terms with Not4Curation by OntologyLoad pipeline,
+   the new code by skipping annotations for Not4Curation terms is much simpler and more logical)
+
+
+Jul 23, 2015 - v.1.5.12
+===
+- added readme file for MiRnaTargetsExtractor
+
+
+Jul 10, 2015 - v.1.5.11
+===
+- added MiRnaTargetsExtractor
+
+
+Jun 10, 2015 - v.1.5.10
+===
+- added AssemblyComparisonExtractor
+
+
+May 29, 2015 - v.1.5.9
+===
+- ChinchillaExtractor: fixed a typo in the header of CHINCHILLA_GENES
+
+
+May 19, 2015 - v.1.5.8
+===
+- AnnotExtractor, AnnotGafExtractor: fixed a bug crashing the pipeline when loading malformed OMIM ids from database
+
+
+Apr 13, 2015 - v.1.5.7
+===
+- VariantExtractor: added extraction of Rnor6.0 variants; updated rgdcore
+
+
+Feb 23, 2015 - v.1.5.6
+===
+- ChinchillaExtractor: fixed misplaced tab in generated GENES file
+
+
+Feb 4, 2015 - v.1.5.5
+===
+- OrthologExtractor: updated description in header
+
+
+Jan 30, 2015 - v.1.5.4
+===
+- Radoslavov extractor - file 'data_release/UserReqFiles/Alleles_to_Genes.txt'
+                     will now be generated as 'data_release/GENES_ALLELES.txt';
+  also a new file, similarly formatted, will be created: 'data_release/GENES_SPLICES.txt'
+
+
+Nov 25, 2014 - v.1.5.3
+===
+- Radoslavov extractor - added column ALLELE_SYNONYMS in the file Alleles_to_Genes.txt - per RGDD-1014
+
+
+Oct 17, 2014 - v.1.5.2
+===
+- added variant extractor - to extract nonsynonymous variants for rat strains - per RGDD-994
+
+
+Oct 2, 2014 - v.1.5.1
+===
+- GENES files consolidated: all positions are now in one GENES file per species - per RGDD-976
+
+
+Aug 26, 2014 - v.1.5.0
+===-
+- revamped AppConfigure.xml file for greater flexibility
+- added generation of GENES_RAT_6.0.txt and GENES_HUMAN_B38.txt files
+
+
+Aug 18, 2014 - v.1.4.16
+===-
+- ortholog extractor: fix for chinchilla
+
+
+Jul 21, 2014 - v.1.4.15
+- ChinchillaExtractor v.1.1: new file: RefSeq genes in bed format are exported into REFSEQ_CHINCHILLA.bed
+
+Jul 16, 2014 - v.1.4.14
+- QtlExtractor v.1.1: generates QTLS_MOUSE_B38.txt with positions on assemblies build 38 and 37
+  (file QTLS_MOUSE.txt have positions on assemblies build 37 and 34)
+
+Jul 14, 2014 - v.1.4.13
+- ChinchillaExtractor v.1.0.0: generates file GENES_CHINCHILLA.txt
+- AnnotGafExtractor v.1.0.3: file naming extended to any species, not only rat/mouse/human
+
+Jul 10, 2014 - v.1.4.12
+- RadoslavovExtractor v.1.1.0: new file alleles_to_genes
+
+Jul 4, 2014 - v.1.4.11
+- StrainExtractor v.2.1.1: replaces all whitespace (like newlines and tabs) with single spaces
+
+Jun 30, 2014 - v.1.4.10
+- RadoslavovExtractor v.1.0.0: generates a custom set of files for use by Dr Radoslavov
+
+May 19, 2014 - v.1.4.9
+- AnnotExtractor v.1.0.2 and AnnotGafExtractor v.1.0.2 - added support to export variant annotations
+
+Jan 24, 2014 - v.1.4.8
+- AnnotExtractor and AnnotGafExtractor - annotations that do not pass GO taxon constraints
+  are no longer exported
+
+Dec 26, 2013 - v.1.4.7
+- SSLPExtract module v.2.4.1: fix of possible NullPointerException - per RGDD-862
+
+Oct 7, 2013 - v.1.4.6
+- ObsoleteIds module: generates report of obsolete RGD IDs for genes - per RGDD-806
+
+Aug 19, 2013 - v.1.4.5
+- GeneReport module: gene descriptions in the files will match description from gene report pages
+  greatly sped up processing for genes by preloading curated pubmed ids
+
+Jul 29, 2013 - v.1.4.4
+- StrainExtractor module: added new fields AVAILABILITY, RESEARCH_USE, ALLELES and ALLELE_RGD_IDS
+
+Apr 18, 2013 - v.1.4.3
+- QtlReport module: for rat rgd ids and symbol of crossed strains are shown in separate columns
+
+Feb 11, 2013 - v.1.4.2
+- Ortholog module: added new field HUMAN_ORTHOLOG_HGNC_ID
+
+Jan 21, 2013 - v. 1.4.1
+- added new module DbSnpExtractor available through new cmdline argument "-db_snps"
+- new method of handling species-specific parameters within a module -- more intuitive
+  SpeciesRecord class should be eventually phased out in favor of new mechanism
+
+Dec 17, 2012 - v. 1.4.0
+- QtlMapper module removed from the pipeline; qtl positioning is now done by ObjectMapper pipeline;
+- fixed a bug in GeneExtractor module to handle genes without external database ids
+- discontinued preloading of XdbIds due to timeouts when retrieving data from Oracle db
+
+Nov 20, 2012 - v. 1.3.7
+- extension to handle preliminary 5.0 sslp positions for rat; qtls and sslps modules affected

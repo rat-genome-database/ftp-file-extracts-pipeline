@@ -1,0 +1,192 @@
+RGD QTLS readme file.
+Last updated - Oct 2014
+
+contact: rgd.developers@mcw.edu
+
+In addition to QTLS_RAT and QTLS_HUMAN files, we are providing QTLS_MOUSE file.
+Mouse QTLs at RGD are downloaded from the Mouse Genome Informatics ftp site
+(http://www.informatics.jax.org/downloads/reports/index.html) on a weekly basis.
+We are providing qtl positions on current and older genomic maps, if available.
+The files are tab-delimited data, one row per QTL record.
+
+MAIN CHANGES:
+
+- Separate files for rat, human and mouse QTLS.
+- Separate columns for mapping data on the 3.4, 5.0 and 6.0 rat genome assemblies.
+- Additional columns specify the method of positioning of the QTL on the genome assembly (see below for details).
+- Columns specific to only one species are only included in that species' file.  Leftmost columns are in common for both files.  See below for specific information on column contents.
+- Within a tab delimited field multiple values are now separated by a semicolon ";" instead of a comma ",". This is to improve rendering of the files when viewed in Excel.
+- RATMAP_ID column is obsolete as of April 1, 2011 and it will be filled with blanks for compatibility
+- As of April 2013, rgd ids and symbol of crossed rat strains are given in separate columns, for easier sorting
+
+
+POSITIONING METHODS:
+
+A QTL is positioned on a genome assembly by using the flanking and peak markers as provided by the paper detailing the QTL. 
+
+For each assembly there are four columns in the QTL file, e.g. for the rat 3.4 assembly:
+3.4_MAP_POS_CHR	- the chromosome, this may in rare cases, due to assembly differences, not match the chromosome given in the column "CHROMOSOME_FROM_REF" which is curated from the original paper.
+3.4_MAP_POS_START - the start position, always for the + strand 
+3.4_MAP_POS_STOP - the stop position, always for the + strand
+3.4_MAP_POS_METHOD - see below
+
+To be used a marker must map to exactly one location on a given assembly and be on the same chromosome as the other markers used for that QTL
+
+Ideally both flanking markers are used. If that is not possible a flank and a peak marker are used and the QTL
+is estimated to be symmetrical about the peak. If that is not possible the peak alone is used with an estimated
+QTL size about the peak (see below for information on size estimation). Finally if only one flank is available
+that is used with an estimated size extending from that flank (there may be directionality errors for this case
+as correct orientation can not be ensured in the absence of another marker). All estimates are bounded by the chromosome sizes.
+
+There is therefore a hierarchy of confidence in QTL position:
+1 - by flanking markers
+2 - by one flank and peak markers
+3 - by peak only
+4 - by one flank marker only
+5 - by peak marker with size adjusted to avg qtl size for species
+6 - position imported from external source
+
+Which method is used is listed in the column xxx_MAP_POS_METHOD.
+Users wishing the highest quality data may wish to filter only for case 1, or case 1 and 2.
+
+In the event that no position can be assigned to a QTL on a given assembly the positioning fields are left blank.
+
+QTL size estimates:
+Until such time as we have better methods to alternatively position uncertain markers the QTL size estimates used
+for "3 - by peak only" and "4 - by one flank marker only" are made from the global distribution of known QTL sizes for the given species.
+
+For human our current estimated QTL size is: 26 Mbp
+For mouse our current estimated QTL size is: 34 Mbp
+For rat our current estimated QTL size is: 45 Mbp
+
+
+COLUMN INFORMATION:
+
+
+First 25 columns in common between rat, mouse and human.
+
+For rat:
+#1  QTL_RGD_ID             the RGD_ID of the QTL
+#2  SPECIES	               species name
+#3  QTL_SYMBOL             official qtl symbol
+#4  QTL_NAME               current qtl name
+#5  CHROMOSOME_FROM_REF    the chromosome from the original paper
+#6  LOD                    maximum LOD score if given in paper
+#7  P_VALUE                p-value for QTL if given in paper
+#8  VARIANCE               variance if given in paper
+#9  FLANK_1_RGD_ID         RGD_ID for flank marker 1, if in paper
+#10 FLANK_1_SYMBOL         symbol for flank marker 1, if in paper
+#11 FLANK_2_RGD_ID         RGD_ID for flank marker 2, if in paper
+#12 FLANK_2_SYMBOL         symbol for flank marker 2, if in paper
+#13 PEAK_RGD_ID            RGD_ID for peak marker, if in paper
+#14 PEAK_MARKER_SYMBOL     symbol for peak marker, if in paper
+#15 TRAIT_NAME             trait created for QTL
+#16 MEASUREMENT_TYPE       measurement type for QTL
+#17 (UNUSED)
+#18 PHENOTYPES             phenotype ontology annotation
+#19 ASSOCIATED_DISEASES    diseases ontology annotation
+#20 CURATED_REF_RGD_ID     RGD_ID of paper(s) on QTL
+#21 CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) on QTL
+#22 CANDIDATE_GENE_RGD_IDS RGD_IDS for genes mentioned by paper author
+#23 CANDIDATE_GENE_SYMBOLS symbols for genes mentioned by paper author
+#24 INHERITANCE_TYPE       dominant, recessive etc.
+#25 RELATED_QTLS	       symbols of related QTLS
+#26 (UNUSED)
+#27 5.0_MAP_POS_CHR       chromosome for previous assembly 5.0
+#28 5.0_MAP_POS_START     start position for previous assembly 5.0
+#29 5.0_MAP_POS_STOP      stop position for previous assembly 5.0
+#30 5.0_MAP_POS_METHOD    qtl positioning method for previous assembly 5.0
+#31 3.4_MAP_POS_CHR       chromosome for old assembly 3.4
+#32 3.4_MAP_POS_START     start position for old assembly 3.4
+#33 3.4_MAP_POS_STOP      stop position for old assembly 3.4
+#34 3.4_MAP_POS_METHOD    qtl positioning method for old assembly 3.4
+#35 CROSS_TYPE            strain cross type
+#36 CROSS_PAIR            pairing of strains for cross
+#37 STRAIN_RGD_ID1        RGD_ID of first strain crossed
+#38 STRAIN_RGD_ID2        RGD_ID of second strain crossed
+#39 STRAIN_RGD_SYMBOL1    symbol of first strain crossed
+#40 STRAIN_RGD_SYMBOL2    symbol of second strain crossed
+#41 6.0_MAP_POS_CHR       chromosome for current assembly 6.0
+#42 6.0_MAP_POS_START     start position for current assembly 6.0
+#43 6.0_MAP_POS_STOP      stop position for current assembly 6.0
+#44 6.0_MAP_POS_METHOD    qtl positioning method for current assembly 6.0
+#45 STRAIN_RGD_ID3        RGD_ID of third strain crossed
+#46 STRAIN_RGD_SYMBOL3    symbol of third strain crossed
+
+For mouse:
+#1  QTL_RGD_ID             the RGD_ID of the QTL
+#2  SPECIES	               species name
+#3  QTL_SYMBOL             official qtl symbol
+#4  QTL_NAME               current qtl name
+#5  CHROMOSOME_FROM_REF    the chromosome from the original paper
+#6  LOD                    maximum LOD score if given in paper
+#7  P_VALUE                p-value for QTL if given in paper
+#8  VARIANCE               variance if given in paper
+#9  FLANK_1_RGD_ID         RGD_ID for flank marker 1, if in paper
+#10 FLANK_1_SYMBOL         symbol for flank marker 1, if in paper
+#11 FLANK_2_RGD_ID         RGD_ID for flank marker 2, if in paper
+#12 FLANK_2_SYMBOL         symbol for flank marker 2, if in paper
+#13 PEAK_RGD_ID            RGD_ID for peak marker, if in paper
+#14 PEAK_MARKER_SYMBOL     symbol for peak marker, if in paper
+#15 TRAIT_NAME             trait created for QTL
+#16 MEASUREMENT_TYPE       measurement type for QTL
+#17 (UNUSED)
+#18 PHENOTYPES             phenotype ontology annotation
+#19 ASSOCIATED_DISEASES    diseases ontology annotation
+#20 CURATED_REF_RGD_ID     RGD_ID of paper(s) on QTL
+#21 CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) on QTL
+#22 CANDIDATE_GENE_RGD_IDS RGD_IDS for genes mentioned by paper author
+#23 CANDIDATE_GENE_SYMBOLS symbols for genes mentioned by paper author
+#24 INHERITANCE_TYPE       dominant, recessive etc.
+#25 RELATED_QTLS	       symbols of related QTLS
+#26 MGI_ID             MGI ID
+#27 37_MAP_POS_CHR     chromosome for previous assembly 37
+#28 37_MAP_POS_START   start position for previous assembly 37
+#29 37_MAP_POS_STOP    stop position for previous assembly 37
+#30 37_MAP_POS_METHOD  qtl positioning method for previous assembly 37
+#31 34_MAP_POS_CHR     chromosome for old assembly 34
+#32 34_MAP_POS_START   start position for old assembly 34
+#33 34_MAP_POS_STOP    stop position for old assembly 34
+#34 34_MAP_POS_METHOD  qtl positioning method for old assembly 34
+#35 CM_MAP_CHR         chromosome on cM map
+#36 CM_MAP_POS         absolute position on cM map
+#37 38_MAP_POS_CHR     chromosome for current assembly 38
+#38 38_MAP_POS_START   start position for current assembly 38
+#39 38_MAP_POS_STOP    stop position for current assembly 38
+#40 38_MAP_POS_METHOD  qtl positioning method for current assembly 38
+
+For human:
+#1  QTL_RGD_ID          the RGD_ID of the QTL
+#2  SPECIES	            species name
+#3  QTL_SYMBOL          official qtl symbol
+#4  QTL_NAME            current qtl name
+#5  CHROMOSOME_FROM_REF the chromosome from the original paper
+#6  LOD                 maximum LOD score if given in paper
+#7  P_VALUE             p-value for QTL if given in paper
+#8  VARIANCE            variance if given in paper
+#9  FLANK_1_RGD_ID      RGD_ID for flank marker 1, if in paper
+#10 FLANK_1_SYMBOL      symbol for flank marker 1, if in paper
+#11 FLANK_2_RGD_ID      RGD_ID for flank marker 2, if in paper
+#12 FLANK_2_SYMBOL      symbol for flank marker 2, if in paper
+#13 PEAK_RGD_ID         RGD_ID for peak marker, if in paper
+#14 PEAK_MARKER_SYMBOL  symbol for peak marker, if in paper
+#15 TRAIT_NAME          trait created for QTL
+#16 MEASUREMENT_TYP     measurement type for QTL
+#17 (UNUSED)
+#18 PHENOTYPES             phenotype ontology annotation
+#19 ASSOCIATED_DISEASES    diseases ontology annotation
+#20 CURATED_REF_RGD_ID     RGD_ID of paper(s) on QTL
+#21 CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) on QTL
+#22 CANDIDATE_GENE_RGD_IDS RGD_IDS for genes mentioned by paper author
+#23 CANDIDATE_GENE_SYMBOLS symbols for genes mentioned by paper author
+#24 INHERITANCE_TYPE       dominant, recessive etc.
+#25 RELATED_QTLS	       symbols of related QTLS
+#26 OMIM_ID            OMIM ID
+#27 37_MAP_POS_CHR     chromosome for current assembly 37
+#28 37_MAP_POS_START   start position for current assembly 37
+#29 37_MAP_POS_STOP    stop position for current assembly 37
+#30 37_MAP_POS_METHOD  qtl positioning method for current assembly 37
+#31 36_MAP_POS_CHR     chromosome for old assembly 36
+#32 36_MAP_POS_START   start position for old assembly 36
+#33 36_MAP_POS_STOP    stop position for old assembly 36
+#34 36_MAP_POS_METHOD  qtl positioning method for old assembly 36

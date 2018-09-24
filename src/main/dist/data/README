@@ -1,0 +1,60 @@
+The file contains few notes about the changes in this directory. Should you
+find something unclear, or buggy, please send an email to rgd.data@mcw.edu.
+Thank you!   -- RGD Developers
+
+Beginning 2017, publication of HPRD ids has been discontinued, because these external db ids have been discontinued at NCBI.
+No longer these ids will be found in the generated files.
+However, the full dump of RGD objects associated with these ids has been made
+and the file ftp://ftp.rgd.mcw.edu/pub/legacy_data/HPRD_IDS.txt has been created and made available.
+
+October 2014 - consolidated FTP files for genes, qtls, sslps and strains, as follows:
+  RAT
+  - Additional columns added to GENES_RAT.txt, QTLS_RAT.txt and SSLPS_RAT.txt files
+    to accommodate position data for the 6.0 assembly, and in the case of GENES_RAT.txt,
+    the 5.0 assembly, so that all position data for reference assemblies that are currently
+    in use (i.e. RGSC Genome Assemblies v3.4, v5.0 and v6.0) are available in a single file for each data type.
+  - GENES_RAT_5.0.txt and GENES_RAT_6.0.txt files are retired
+  - New columns added to the STRAINS.txt file and new tag fields added to the STRAINS.xml file to supply position
+    data for congenic and mutant strains for which such data exist.
+  MOUSE
+  - Additional columns added to the GENES_MOUSE.txt, QTLS_MOUSE.txt and SSLPS_MOUSE.txt files
+    to accommodate position data for all available reference builds (Mouse Genome Assembly Builds 36, 37 and 38).
+  - QTLS_MOUSE_B38.txt and GENES_MOUSE_B36.txt files retired
+  HUMAN
+  - Additional columns added to the GENES_HUMAN.txt, QTLS_HUMAN.txt and SSLPS_HUMAN.txt files
+    to accommodate position data for all available reference builds (Human Genome Assembly Builds 36, 37 and 38).
+  - GENES_HUMAN_B38.txt file retired
+
+In October 2013, publication of PID ids has been discontinued.
+No longer these ids will be found in the generated files.
+However, the full dump of RGD objects associated with these ids has been made
+and the file ftp://ftp.rgd.mcw.edu/pub/legacy_data/pid_ids.txt.gz has been created and made available.
+
+As of August 5, 2013, four new columns are added to STRAINS.txt file:
+AVAILABILITY, RESEARCH_USE, ALLELES, and ALLELE_RGD_IDS. Existing columns
+will remain unchanged. STRAINS.xml file is similarly updated.
+
+In May 2013, publication of IPI ids has been discontinued.
+No longer these ids will be found in the generated files.
+However, the full dump of RGD objects associated with these ids has been made
+and the file ipi_ids.txt has been created and made available.
+
+As of July 10, 2011 generation of RGD_ORTHOLOGS file has been discontinued and
+the pipeline retired. The file won't be updated any longer. RGD_ORTHOLOGS.txt
+file will be generated instead on weekly basis - apart from detailed header,
+the contents will be identical like in the old file.
+
+In July 2011, new set of files with annotated object by ontology has been
+created and it will be updated on weekly basis. The original set of files,
+found in annotated_rgd_objects_by_ontology directory, is in gaf 2.0 format. In
+the subdirectory 'with_terms' you can find the new set files in custom format.
+For example, in addition to ontology term accession ids, you will find a
+column with the ontology term names.
+
+In April 2011, publication of RATMAP_IDs and RHDB_IDs has been discontinued.
+No longer these ids will be found in the generated files. However, the full
+dump of RGD objects associated with these ids has been made and the files
+ratmap_ids.txt and rhdb_ids.txt has been created and made available.
+
+RGD-based ontology files in obo format: clinical measurement, experimental condition, measurement method,
+pathway and rat strain, are found in ftp://ftp.rgd.mcw.edu/pub/ontology/ as of March 15, 2011.

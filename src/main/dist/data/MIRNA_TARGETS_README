@@ -1,0 +1,69 @@
+MIRNA_TARGETS_README
+
+RGD produces 6 miRNA-target files, three containing data for confirmed miRNA target genes and three containing data for predicted miRNA target genes.  The files are as follows:
+
+
+File name	File size
+MIRNA_TARGETS_CONFIRMED_HUMAN.txt.gz	89 KB
+MIRNA_TARGETS_CONFIRMED_MOUSE.txt.gz	36 KB
+MIRNA_TARGETS_CONFIRMED_RAT.txt.gz	4 KB
+MIRNA_TARGETS_PREDICTED_HUMAN.txt.gz	1277052 KB
+MIRNA_TARGETS_PREDICTED_MOUSE.txt.gz	574319 KB
+MIRNA_TARGETS_PREDICTED_RAT.txt.gz	121497 KB
+
+
+miRNA Target Status data is imported from miRGate (http://mirgate.bioinfo.cnio.es/) on a weekly basis and FTP files are correspondingly updated.
+For more information about miRGate, see PMID:25858286 (https://www.ncbi.nlm.nih.gov/pubmed/?term=25858286) or access the full paper at http://database.oxfordjournals.org/content/2015/bav035.full.pdf+html.
+
+
+The column headers are as follows:
+
+Confirmed Targets:
+Column #	Column title	Column Description
+#1   TARGET_GENE_RGD_ID	      the RGD_ID of the miRNA target gene
+#2   TARGET_GENE_SYMBOL         official symbol of miRNA target gene
+#3   MIRNA_GENE_RGD_ID	      the RGD_ID of the miRNA gene
+#4   MIRNA_GENE_SYMBOL          official symbol of miRNA gene
+#5   MATURE_MIRNA               mature miRNA
+#6   METHOD_NAME                method name
+#7   RESULT_TYPE                result type
+#8   DATA_TYPE                 data type
+#9   SUPPORT_TYPE              support type
+#10  PMID                      Pubmed Id
+
+
+
+Predicted Targets:
+Column #	Column title	Column Description
+#1   TARGET_GENE_RGD_ID	      the RGD_ID of the miRNA target gene
+#2   TARGET_GENE_SYMBOL         official symbol of miRNA target gene
+#3   MIRNA_GENE_RGD_ID	      the RGD_ID of the miRNA gene
+#4   MIRNA_GENE_SYMBOL          official symbol of miRNA gene
+#5   MATURE_MIRNA               mature miRNA
+#6   METHOD_NAME                method name
+#7   RESULT_TYPE                result type
+#8   TARGET_TRANSCRIPT_ACC     target transcript accession
+#9   TRANSCRIPT_BIOTYPE        transcript biotype
+#10  ISOFORM                   isoform
+#11  AMPLIFICATION             amplification
+#12  UTR_START                 UTR Start
+#13  UTR_END                   UTR End
+#14  TARGET_SITE               target site
+#15  SCORE                     score
+#16  NORMALIZED_SCORE          normalized score
+#17  ENERGY                    energy
+
+
+Note that the first 7 columns are the same for confirmed and predicted, and all columns are the same regardless of species.
+
+
+
+
+
+
+
+
+
+
+
+

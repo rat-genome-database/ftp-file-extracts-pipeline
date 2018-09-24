@@ -1,0 +1,169 @@
+RGD GENES_xxx readme file.
+Last updated - February 2017
+
+contact: rgd.developers@mcw.edu
+
+GENERAL INFORMATION:
+
+GENES_xxx files contain up-to-date information for rat, mouse and human genes found in RGD database.
+Genomic positions are provided for both the current and the previous reference assemblies, as well as for Celera alternate assembly.
+Leftmost columns are in common for both files. Last columns contain species-specific information.
+GENES_xxx files are in tab delimited format.
+Within a tab delimited field multiple values are now separated by a semicolon ";" instead of a comma "," or bar "|".
+This is to improve rendering of the files when viewed in Excel.
+
+MAIN CHANGES (compared with previous version):
+
+- Removed GDB_ID column.
+- Genomic positions are now given for reference assemblies specific for given species.
+- GENES_MOUSE provides information about MGD IDs and cM positions.
+- GENES_HUMAN provides information about HPRD IDs, HGNC IDs and OMIM IDs.
+- RATMAP_ID and RHDB_ID columns for RAT are discontinued -- blanks will be used for compatibility.
+
+CHANGES:
+Feb-15-2017 - HPRD IDs are discontinued for human genes -- blanks will be used for compatibility.
+Oct-02-2014 - added columns with Rnor_5.0 and Rnor_6.0 positions to GENES_RAT.txt file;
+              GENES_RAT_5.0.txt and GENES_RAT_6.0 files discontinued
+              added columns with assembly build 36 positions to GENES_MOUSE.txt file;
+              GENES_MOUSE_B36.txt file discontinued
+              added columns with assembly build 38 positions to GENES_HUMAN.txt file;
+              GENES_HUMAN_B38.txt file discontinued
+Aug-26-2014 - generation of file GENES_RAT_6.0.txt with positions on assemblies build 6.0 and 5.0;
+              GENES_RAT.txt and GENES_RAT_5.0 files unchanged
+Aug-26-2014 - generation of file GENES_HUMAN_B38.txt with positions on assemblies build 38 and 37;
+              GENES_HUMAN.txt file unchanged
+Oct-11-2013 - initial release of file GENES_OBSOLETE_IDS.txt
+Aug-19-2013 - gene descriptions in the files will match descriptions from gene report pages
+Jul-06-2012 - generation of file GENES_RAT_5.0.txt with positions on assemblies build 3.4 and 5.0
+              GENES_RAT.txt file still unchanged, with positions on assemblies build 3.1 and 3.4
+Jun-26-2012 - generation of file GENES_MOUSE_B36.txt with positions on assemblies build 36 and 37
+              GENES_MOUSE.txt has positions on assemblies build 37 and 38
+Mar-12-2012 - added generation of file GENES_MOUSE_B38.txt with positions on assemblies build 37 and 38
+Dec-20-2011 - no visible changes (fixed file headers, improved internal QC)
+Apr-15-2011 - added column GENE_REFSEQ_STATUS for all species
+Apr-01-2011 - RATMAP_ID and RHDB_ID columns are discontinued --
+  they will be filled with blanks for compatibility
+Mar-02-2011 - fixed the bug so OLD_SYMBOL column is now populated properly
+
+COLUMN INFORMATION:
+
+First 38 columns in common between rat, mouse and human.
+
+1   GENE_RGD_ID	       the RGD_ID of the gene
+2   SYMBOL             official gene symbol
+3   NAME    	       gene name
+4   GENE_DESC          gene description (if available)
+5   CHROMOSOME_CELERA         chromosome for Celera assembly
+6   CHROMOSOME_[oldAssembly#] chromosome for the old reference assembly
+7   CHROMOSOME_[newAssembly#] chromosome for the current reference assembly
+8   FISH_BAND                 fish band information
+9   START_POS_CELERA          start position for Celera assembly
+10  STOP_POS_CELERA           stop position for Celera assembly
+11  STRAND_CELERA             strand information for Celera assembly
+12  START_POS_[oldAssembly#]  start position for old reference assembly
+13  STOP_POS_[oldAssembly#]   stop position for old reference assembly
+14  STRAND_[oldAssembly#]     strand information for old reference assembly
+15  START_POS_[newAssembly#]  start position for current reference assembly
+16  STOP_POS_[newAssembly#]   stop position for current reference assembly
+17  STRAND_[newAssembly#]     strand information for current reference assembly
+18  CURATED_REF_RGD_ID      RGD_ID of paper(s) on gene
+19  CURATED_REF_PUBMED_ID   PUBMED_ID of paper(s) on gene
+20  UNCURATED_PUBMED_ID     other PUBMED ids
+21  NCBI_GENE_ID            NCBI Gene Id
+22  UNIPROT_ID              UniProtKB id(s)
+23  UNCURATED_REF_MEDLINE_ID
+24  GENBANK_NUCLEOTIDE      GenBank Nucleotide ID(s)
+25  TIGR_ID                 TIGR ID(s)
+26  GENBANK_PROTEIN         GenBank Protein ID(s)
+27  UNIGENE_ID              UniGene ID(s)
+28  SSLP_RGD_ID             RGD_ID(s) of SSLPS associated with given gene
+29  SSLP_SYMBOL             SSLP symbol
+30  OLD_SYMBOL              old symbol alias(es)
+31  OLD_NAME                old name alias(es)
+32  QTL_RGD_ID              RGD_ID(s) of QTLs associated with given gene
+33  QTL_SYMBOL              QTL symbol
+34  NOMENCLATURE_STATUS     nomenclature status
+35  SPLICE_RGD_ID           RGD_IDs for gene splices
+36  SPLICE_SYMBOL
+37  GENE_TYPE               gene type
+38  ENSEMBL_ID              Ensembl Gene ID
+
+
+RAT SPECIFIC COLUMNS:
+39  GENE_REFSEQ_STATUS    NCBI gene RefSeq Status
+40  CHROMOSOME_5.0        chromosome for Rnor_5.0 reference assembly
+41  START_POS_5.0         start position for Rnor_5.0 reference assembly
+42  STOP_POS_5.0          stop position for Rnor_5.0 reference assembly
+43  STRAND_5.0            strand information for Rnor_5.0 reference assembly
+44  CHROMOSOME_6.0        chromosome for Rnor_6.0 reference assembly
+45  START_POS_6.0         start position for Rnor_6.0 reference assembly
+46  STOP_POS_6.0          stop position for Rnor_6.0 reference assembly
+47  STRAND_6.0            strand information for Rnor_6.0 reference assembly
+
+HUMAN SPECIFIC COLUMNS:
+39  HGNC_ID               HGNC ID
+40  (UNUSED)
+41  OMIM_ID               OMIM ID
+42  GENE_REFSEQ_STATUS    NCBI gene RefSeq Status
+43  CHROMOSOME_38         chromosome for GRCh38 reference assembly
+44  START_POS_38          start position for GRCh38 reference assembly
+45  STOP_POS_38           stop position for GRCh38 reference assembly
+46  STRAND_38             strand information for GRCh38 reference assembly
+
+MOUSE SPECIFIC COLUMNS:
+39  MGD_ID                MGD ID
+40  CM_POS                mouse cM map absolute position
+41  GENE_REFSEQ_STATUS    NCBI gene RefSeq Status
+42  CHROMOSOME_36         chromosome for reference assembly build 36
+43  START_POS_36          start position for reference assembly build 36
+44  STOP_POS_36           stop position for reference assembly build 36
+45  STRAND_36             strand information for reference assembly build 36
+
+
+GENES_OBSOLETE_IDS.txt
+----------------------
+
+GENES_OBSOLETE_IDS.txt contains a list of the genes in the RGD database which have been either WITHDRAWN or RETIRED
+(designated as "OLD_GENE" in the list).  In RGD, a gene is "WITHDRAWN" when the record is no longer active
+and has not been replaced by or merged into another gene record.  A gene is "RETIRED" when the gene has been merged
+into another record so that the second record (i.e. the "NEW_GENE") is considered "a replacement for" or "equivalent to"
+the retired one.  In some cases, the "NEW_GENE" may have subsequently also been retired or withdrawn, in which case
+a second line where this is designated as the "OLD_GENE" will also appear in the file.  An example appears below
+the list of column headers.  This file is updated approximately weekly to reflect an up-to-date list of the obsoletions.
+
+Columns in the GENES_OBSOLETE_IDS.txt are as follows:
+
+#COLUMN INFORMATION:
+#1 SPECIES name of the species
+#2 OLD_GENE_RGD_ID old gene RGD ID
+#3 OLD_GENE_SYMBOL old gene symbol
+#4 OLD_GENE_STATUS old gene status
+#5 OLD_GENE_TYPE old gene type
+#6 NEW_GENE_RGD_ID new gene RGD ID (if any)
+#7 NEW_GENE_SYMBOL new gene symbol (if any)
+#8 NEW_GENE_STATUS old gene status (if any)
+#9 NEW_GENE_TYPE new gene type (if any)
+
+Example lines:
+WITHDRAWN GENE:
+rat 2005 A39_mapped WITHDRAWN mapped
+
+RETIRED GENE:
+rat 2008 Abl1_mapped RETIRED mapped 1584969 Abl1 ACTIVE protein-coding
+
+NEW_GENE SUBSEQUENTLY WITHDRAWN:
+rat 2105 Amd3 RETIRED gene 2106 Amd-ps_mapped WITHDRAWN mapped
+rat 2106 Amd-ps_mapped WITHDRAWN mapped
+
+
+GENES_ALLELES.txt and GENES_SPLICES.txt
+---------------------------------------
+
+The GENES_RAT.txt file does not contain information about gene alleles or splice variants.  These records
+can be found in the GENES_ALLELES.txt and GENES_SPLICES.txt files, respectively.  Columns in these files
+contain headers, indicating the type of data in each column.  These files contain map data for all three
+currently used rat genome assemblies, RGSC 3.4, 5.0 and 6.0, but unlike records in the GENES_RAT.txt,
+each row in the allele or splice file contains only one map position with the assembly specified in column 9
+(i.e. for a gene allele which maps to all three assemblies, there will be three rows in the GENES_ALLELES.txt file:
+a row containing the v3.4 position of the gene, a row for the v5.0 position and a row for the v6.0 position,
+with all other data the same between those rows.)
