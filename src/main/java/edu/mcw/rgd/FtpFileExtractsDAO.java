@@ -685,9 +685,8 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         String sql =
             "SELECT DISTINCT SUBSTR(oy.synonym_name,9), os.term_acc, os.term, oc.term_acc, oc.term "+
             " ,ec.exp_cond_assoc_value_min, ec.exp_cond_assoc_value_max, ec.exp_cond_assoc_units "+
-            "FROM experiment_record er, cond_group_experiment_cond cgc, experiment_condition ec, ont_terms oc "+
-            " ,sample s, ont_synonyms oy, ont_terms os "+
-            "WHERE cgc.condition_group_id=er.condition_group_id AND ec.experiment_condition_id=cgc.experiment_condition_id AND oc.term_acc=ec.exp_cond_ont_id "+
+            "FROM experiment_record er, experiment_condition ec, ont_terms oc ,sample s, ont_synonyms oy, ont_terms os "+
+            "WHERE ec.experiment_record_id=er.experiment_record_id AND oc.term_acc=ec.exp_cond_ont_id "+
             " AND s.sample_id=er.sample_id AND oy.term_acc=s.strain_ont_id AND os.term_acc=s.strain_ont_id "+
             " AND er.curation_status=40 AND oy.synonym_name LIKE 'RGD_ID:%' "+
             "ORDER BY os.term, oc.term";
