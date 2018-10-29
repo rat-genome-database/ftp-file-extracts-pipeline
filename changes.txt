@@ -1,3 +1,8 @@
+Oct 29, 2018 - v.1.5.65
+-sslp extractor: updated to support new sequence model
+  discontinued column #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID
+  introduced column #8 SSLP_TYPE
+
 Sep 24, 2018 - v.1.5.64
 -moved from subversion to github; fixed phenominer queries due to changes in table structures
 

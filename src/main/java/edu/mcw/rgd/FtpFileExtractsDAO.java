@@ -284,17 +284,6 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 
     /**
-     * get sequences associated with given rgd id
-     *
-     * @param rgdId rgd id of object
-     * @return List of Sequence objects
-     * @throws Exception when wrong things happen in spring framework
-     */
-    List<Sequence> getSslpSequences(int rgdId) throws Exception {
-        return sequenceDAO.getObjectSequences(rgdId);
-    }
-
-    /**
      * return list of aliases
      *
      * @param rgdId rgd id

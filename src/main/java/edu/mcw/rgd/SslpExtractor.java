@@ -13,16 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Nov 29, 2010
- * Time: 12:04:40 PM
+ * @author mtutaj
+ * @since Nov 29, 2010
  */
 public class SslpExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: sslps-version-2.5.1\n"
+    +"# MODULE: sslps-version-2.5.2\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# sslps extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -43,6 +41,7 @@ public class SslpExtractor extends BaseExtractor {
     +"### As of Nov 20 2012 v. 2.4: rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported.\n"
     +"### As of Dec 26 2013 v. 2.4.1: no data changes; improved internal QC.\n"
     +"### As of Sep 8 2014 v. 2.5.0: rat: available positions on assembly Rnor_6.0.\n"
+    +"### As of Oct 29 2018 v. 2.5.2: discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows sslp type.\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 23 columns are in common between rat, mouse and human)\n"
@@ -54,9 +53,9 @@ public class SslpExtractor extends BaseExtractor {
     +"#5   CURATED_REF_RGD_ID      RGD_ID of paper(s) on sslp\n"
     +"#6   CURATED_REF_PUBMED_ID   PUBMED_ID of paper(s) on sslp\n"
     +"#7   UNCURATED_REF_PUBMED_ID other PUBMED_IDs\n"
-    +"#8   CLONE_SEQ_RGD_ID        RGD_ID of clone sequence\n"
+    +"#8   SSLP_TYPE               sslp type, if available\n"
     +"#9   CLONE_SEQUENCE          clone sequence itself\n"
-    +"#10  PRIMER_SEQ_RGD_ID       RGD_ID of primer sequence\n"
+    +"#10  (UNUSED)\n"
     +"#11  FORWARD_SEQ             forward sequence\n"
     +"#12  REVERSE_SEQ             reverse sequence\n"
     +"#13  UNISTS_ID               UniSTS ID\n"
@@ -93,7 +92,7 @@ public class SslpExtractor extends BaseExtractor {
     +"#42  STOP_POS_6.0            stop position for current reference assembly v.6.0\n"
     +"#\n"
     +"SSLP_RGD_ID\tSPECIES\tSSLP_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
-    +"UNCURATED_REF_PUBMED_ID\tCLONE_SEQ_RGD_ID\tCLONE_SEQUENCE\tPRIMER_SEQ_RGD_ID\tFORWARD_SEQ\tREVERSE_SEQ\t"
+    +"UNCURATED_REF_PUBMED_ID\tSSLP_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
     +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
     +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
     +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
@@ -112,7 +111,7 @@ public class SslpExtractor extends BaseExtractor {
    +"#29  STOP_POS_36            stop position for old reference assembly v.36\n"
    +"#\n"
    +"SSLP_RGD_ID\tSPECIES\tSSLP_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
-   +"UNCURATED_REF_PUBMED_ID\tCLONE_SEQ_RGD_ID\tCLONE_SEQUENCE\tPRIMER_SEQ_RGD_ID\tFORWARD_SEQ\tREVERSE_SEQ\t"
+   +"UNCURATED_REF_PUBMED_ID\tSSLP_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
    +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
@@ -130,7 +129,7 @@ public class SslpExtractor extends BaseExtractor {
    +"#31  CM_POS                 mouse cM map absolute position\n"
    +"#\n"
    +"SSLP_RGD_ID\tSPECIES\tSSLP_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
-   +"UNCURATED_REF_PUBMED_ID\tCLONE_SEQ_RGD_ID\tCLONE_SEQUENCE\tPRIMER_SEQ_RGD_ID\tFORWARD_SEQ\tREVERSE_SEQ\t"
+   +"UNCURATED_REF_PUBMED_ID\tSSLP_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
    +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
@@ -228,24 +227,6 @@ public class SslpExtractor extends BaseExtractor {
 
                 rec.curatedRefRGDIDs = getDao().getCuratedRefs(sslpRgdID);
                 rec.curatedRefPubmedIDs = getDao().getCuratedPubmedIds(sslpRgdID);
-
-                List<Sequence> seqs = dao.getSslpSequences(sslpRgdID);
-                for( Sequence seq: seqs ) {
-                    if( seq.getSeqTypeKey()==4 ) {
-                        // primer pair sequence
-                        rec.primerRGDIDs.add(seq.getRgdId());
-                        if( seq.getForwardSeq()!=null )
-                            rec.forwardSeqs.add(seq.getForwardSeq());
-                        if( seq.getReverseSeq()!=null )
-                            rec.reverseSeqs.add(seq.getReverseSeq());
-                    }
-                    if( seq.getSeqTypeKey()==11 ) {
-                        // clone sequence
-                        rec.cloneSeqRGDIDs.add(seq.getRgdId());
-                        if( seq.getCloneSeq()!=null )
-                            rec.cloneSequences.add(seq.getCloneSeq());
-                    }
-                }
 
                 if( speciesType==SpeciesType.RAT ) {
                     // FHH map
@@ -346,19 +327,19 @@ public class SslpExtractor extends BaseExtractor {
         writer.print(checkNull(rec.uncuratedPubmedID));
         writer.print('\t');
 
-        writer.print(checkNull(Utils.concatenate(rec.cloneSeqRGDIDs,";")));
+        writer.print(checkNull(rec.sslp.getSslpType()));
         writer.print('\t');
 
-        writer.print(checkNull(Utils.concatenate(rec.cloneSequences,";")));
+        writer.print(checkNull(rec.sslp.getTemplateSeq()));
         writer.print('\t');
 
-        writer.print(checkNull(Utils.concatenate(rec.primerRGDIDs,";")));
+        // primer rgd ids -- discontinued
         writer.print('\t');
 
-        writer.print(checkNull(Utils.concatenate(rec.forwardSeqs,";")));
+        writer.print(checkNull(rec.sslp.getForwardSeq()));
         writer.print('\t');
 
-        writer.print(checkNull(Utils.concatenate(rec.reverseSeqs,";")));
+        writer.print(checkNull(rec.sslp.getReverseSeq()));
         writer.print('\t');
 
         writer.print(checkNull(rec.uniSTSID));
@@ -513,12 +494,6 @@ public class SslpExtractor extends BaseExtractor {
 
         public String curatedRefRGDIDs;
         public String curatedRefPubmedIDs;
-
-        public List<Integer> cloneSeqRGDIDs = new ArrayList<Integer>();
-        public List<Integer> primerRGDIDs = new ArrayList<Integer>();
-        public List<String> cloneSequences = new ArrayList<String>();
-        public List<String> forwardSeqs = new ArrayList<String>();
-        public List<String> reverseSeqs = new ArrayList<String>();
 
         public List<MapData> mdCelera;
         public List<MapData> mdNewRef;
