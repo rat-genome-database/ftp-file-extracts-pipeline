@@ -17,10 +17,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Oct 11, 2010
- * Time: 2:20:43 PM
+ * @author mtutaj
+ * @since Oct 11, 2010
  */
 public class FtpFileExtractsDAO extends AbstractDAO {
 
@@ -36,8 +34,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     private QTLDAO qtlDAO = associationDAO.getQtlDAO();
     private ReferenceDAO refDAO = associationDAO.getReferenceDAO();
     private RGDManagementDAO rgdIdDAO = new RGDManagementDAO();
-    private SequenceDAO sequenceDAO = new SequenceDAO();
-    private SSLPDAO sslpDAO = associationDAO.getSslpDAO();
+    private SSLPDAO markerDAO = associationDAO.getSslpDAO();
     private TranscriptDAO tdao = new TranscriptDAO();
     private XdbIdDAO xdbIdDAO = new XdbIdDAO();
 
@@ -76,7 +73,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 
     /**
-     * given list of all map positions for given sslp, return the chromosome this SSLP is located; chromosome
+     * given list of all map positions for given marker, return the chromosome this SSLP is located; chromosome
      * on the current primary reference assembly takes preference; also return
      * fishband from cytogenetic map, if available
      *
@@ -230,8 +227,8 @@ public class FtpFileExtractsDAO extends AbstractDAO {
      * @return list of all sslps for given gene
      * @throws Exception
      */
-    List<SSLP> getSslps(int geneKey) throws Exception {
-        return sslpDAO.getSSLPsForGene(geneKey);
+    List<SSLP> getMarkers(int geneKey) throws Exception {
+        return markerDAO.getSSLPsForGene(geneKey);
     }
 
     /**
@@ -255,32 +252,28 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     private Map<String, List<Gene>> _cacheActiveGenes = new HashMap<>();
 
-    public List<MappedGene> getActiveMappedGenes(int mapKey) throws Exception {
-        return geneDAO.getActiveMappedGenes(mapKey);
-    }
-
     /**
-     * get a gene object given sslp key
+     * get a gene object given marker key
      *
-     * @param sslpKey sslp key
-     * @return gene object given sllp key or null if no association
+     * @param markerKey marker key
+     * @return gene object given marker key or null if no association
      * @throws Exception when wrong things happen in spring framework
      */
-    public Gene getGeneBySslpKey(int sslpKey) throws Exception {
+    public Gene getGeneByMarkerKey(int markerKey) throws Exception {
         String sql = "select g.*,0 species_type_key from GENES g where GENE_KEY IN (SELECT GENE_KEY FROM RGD_GENE_SSLP WHERE SSLP_KEY=?)";
-        List<Gene> genes = GeneQuery.execute(geneDAO, sql, sslpKey);
+        List<Gene> genes = GeneQuery.execute(geneDAO, sql, markerKey);
         return genes == null || genes.isEmpty() ? null : genes.get(0);
     }
 
     /**
-     * get list of active SSLPs for given species
+     * get list of active markers for given species
      *
      * @param speciesType species type
      * @return list of active SSLPs for given species
      * @throws Exception when wrong things happen in spring framework
      */
-    public List<SSLP> getActiveSSLPs(int speciesType) throws Exception {
-        return sslpDAO.getActiveSSLPs(speciesType);
+    public List<SSLP> getActiveMarkers(int speciesType) throws Exception {
+        return markerDAO.getActiveSSLPs(speciesType);
     }
 
     /**
@@ -345,7 +338,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 
     /**
-     * get marker symbol; since marker could be sslp, gene or sequence,
+     * get marker symbol; since marker could be marker, gene or genomic element,
      * we first examine the rgd object type, and then retrieve the symbol from corresponding table
      *
      * @param markerRgdId marker rgd id
@@ -363,21 +356,9 @@ public class FtpFileExtractsDAO extends AbstractDAO {
             case 1: // GENES
                 return getSymbolForGene(rgdId.getRgdId());
 
-            case 3: // SSLPS
-                SSLP sslp = sslpDAO.getSSLP(rgdId.getRgdId());
-                return sslp != null ? sslp.getName() : null;
-
-            case 9: // SEQUENCES
-                String sql = "SELECT sequence_desc FROM sequences WHERE rgd_id=?";
-                JdbcTemplate jt = new JdbcTemplate(this.getDataSource());
-                final String[] seqDesc = new String[1];
-                jt.query(sql, new Object[]{rgdId.getRgdId()}, new int[]{Types.INTEGER}, new RowMapper() {
-                    public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-                        seqDesc[0] = resultSet.getString(1);
-                        return null;
-                    }
-                });
-                return seqDesc[0] != null ? seqDesc[0] : null;
+            case 3: // MARKERS
+                SSLP marker = markerDAO.getSSLP(rgdId.getRgdId());
+                return marker != null ? marker.getName() : null;
 
             default:
                 GenomicElement ge = genomicElementDAO.getElement(rgdId.getRgdId());
@@ -464,7 +445,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 
     /**
-     * get list of all sslp alleles for every active sslp of given species
+     * get list of all marker alleles for every active marker of given species
      *
      * @param speciesType species type key
      * @param strainNames set of all strain names
@@ -482,24 +463,24 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         jt.query(sql, new Object[]{speciesType}, new int[]{Types.INTEGER}, new RowCallbackHandler() {
             public void processRow(ResultSet rs) throws SQLException {
                 // extract data from result set
-                int sslpRgdId = rs.getInt(1);
-                String sslpName = rs.getString(2);
+                int markerRgdId = rs.getInt(1);
+                String markerName = rs.getString(2);
                 int alleleSize = rs.getInt(3);
                 String strainSymbol = rs.getString(4);
                 strainNames.add(strainSymbol);
 
-                // is the sslp already in the list?
+                // is the marker already in the list?
                 SslpAlleles rec = null;
                 if (!list.isEmpty()) {
                     rec = list.get(list.size() - 1);
-                    if (rec.sslpRgdId != sslpRgdId)
-                        rec = null; // different sslp
+                    if (rec.markerRgdId != markerRgdId)
+                        rec = null; // different marker
                 }
                 // create new SslpAlleles object if necessary
                 if (rec == null) {
                     rec = new SslpAlleles();
-                    rec.sslpRgdId = sslpRgdId;
-                    rec.sslpName = sslpName;
+                    rec.markerRgdId = markerRgdId;
+                    rec.markerName = markerName;
                     list.add(rec);
                 }
                 // update the allele size and strain symbol
@@ -786,10 +767,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 }
 
-// represents sslp alleles for one sslp
+// represents marker alleles for one marker
 class SslpAlleles {
-    public int sslpRgdId;
-    public String sslpName;
+    public int markerRgdId;
+    public String markerName;
     public HashMap<String, Integer> strainNamesToAlleleSizes = new HashMap<>(73);
 }
 

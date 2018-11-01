@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager build 1.5.65 as of Oct 29, 2018" />
+        <property name="version" value="FtpFileExtractManager build 1.5.66 as of Nov 1, 2018" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -20,21 +20,21 @@
 
     <bean id="humanInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="1" />
-        <property name="newRefAssemblyMapKeyForSslps" value="17" />
-        <property name="oldRefAssemblyMapKeyForSslps" value="13" />
+        <property name="newRefAssemblyMapKeyForMarkers" value="17" />
+        <property name="oldRefAssemblyMapKeyForMarkers" value="13" />
         <property name="celeraAssemblyMapKey" value="16" />
         <property name="cytoMapKey" value="11" />
 
         <property name="qtlFileName" value="QTLS_HUMAN.txt" />
         <property name="qtlSizeEstimate" value="26000000" />
 
-        <property name="sslpsFileName" value="SSLPS_HUMAN.txt"/>
+        <property name="markerFileName" value="SSLPS_HUMAN.txt"/>
     </bean>
 
     <bean id="mouseInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="2" />
-        <property name="newRefAssemblyMapKeyForSslps" value="18" />
-        <property name="oldRefAssemblyMapKeyForSslps" value="14" />
+        <property name="newRefAssemblyMapKeyForMarkers" value="18" />
+        <property name="oldRefAssemblyMapKeyForMarkers" value="14" />
         <property name="celeraAssemblyMapKey" value="20" />
         <property name="cytoMapKey" value="12" />
         <property name="cmMapKey" value="31" />
@@ -42,20 +42,20 @@
         <property name="qtlFileName" value="QTLS_MOUSE.txt" />
         <property name="qtlSizeEstimate" value="34000000" />
 
-        <property name="sslpsFileName" value="SSLPS_MOUSE.txt"/>
+        <property name="markerFileName" value="SSLPS_MOUSE.txt"/>
     </bean>
 
     <bean id="ratInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="3" />
-        <property name="newRefAssemblyMapKeyForSslps" value="70" />
-        <property name="oldRefAssemblyMapKeyForSslps" value="60" />
+        <property name="newRefAssemblyMapKeyForMarkers" value="70" />
+        <property name="oldRefAssemblyMapKeyForMarkers" value="60" />
         <property name="celeraAssemblyMapKey" value="15" />
         <property name="cytoMapKey" value="99" />
 
         <property name="qtlFileName" value="QTLS_RAT.txt" />
         <property name="qtlSizeEstimate" value="45000000" />
 
-        <property name="sslpsFileName" value="SSLPS_RAT.txt"/>
+        <property name="markerFileName" value="SSLPS_RAT.txt"/>
         <property name="sslpAllelesFileName" value="SSLPS_ALLELES_RAT.txt"/>
 
         <property name="gp2ProteinFileName" value="gp2protein.rgd.gz"/>
@@ -90,7 +90,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor">
-        <property name="version" value="Gene Extractor v.2.2.5 as of May 24, 2017"/>
+        <property name="version" value="Gene Extractor v.2.2.6 as of Nov 1, 2018"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
@@ -175,7 +175,7 @@
     </bean>
 
     <bean id="sslpExtractor" class="edu.mcw.rgd.SslpExtractor">
-        <property name="version" value="SSLPExtractor v.2.5.2 as of Oct 29, 2018" />
+        <property name="version" value="SSLPExtractor v.2.5.3 as of Nov 1, 2018" />
         <property name="qcThreadCount" value="5" />
     </bean>
 

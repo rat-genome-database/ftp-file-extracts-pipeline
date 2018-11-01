@@ -53,8 +53,8 @@ public class GeneExtractRecord extends PipelineRecord {
     Set<String> spliceRgdIds = new TreeSet<String>();
     Set<String> spliceSymbols = new TreeSet<String>();
 
-    Set<String> sslpRgdIds = new TreeSet<String>();
-    Set<String> sslpNames = new TreeSet<String>();
+    Set<String> markerRgdIds = new TreeSet<String>();
+    Set<String> markerNames = new TreeSet<String>();
 
     Set<String> oldGeneSymbols = new TreeSet<String>();
     Set<String> oldGeneNames = new TreeSet<String>();
@@ -247,22 +247,22 @@ public class GeneExtractRecord extends PipelineRecord {
             this.spliceSymbols.add(spliceSymbols);
     }
 
-    public String getSslpRgdIds() {
-        return getString(sslpRgdIds);
+    public String getMarkerRgdIds() {
+        return getString(markerRgdIds);
     }
 
-    public void addSslpRgdIds(String sslpRgdIds) {
-        if( sslpRgdIds!=null )
-            this.sslpRgdIds.add(sslpRgdIds);
+    public void addMarkerRgdIds(String markerRgdIds) {
+        if( markerRgdIds!=null )
+            this.markerRgdIds.add(markerRgdIds);
     }
 
-    public String getSslpNames() {
-        return getString(sslpNames);
+    public String getMarkerNames() {
+        return getString(markerNames);
     }
 
-    public void addSslpNames(String sslpNames) {
-        if( sslpNames!=null )
-            this.sslpNames.add(sslpNames);
+    public void addMarkerNames(String markerNames) {
+        if( markerNames!=null )
+            this.markerNames.add(markerNames);
     }
 
     public String getOldGeneSymbols() {

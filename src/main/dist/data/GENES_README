@@ -76,8 +76,8 @@ First 38 columns in common between rat, mouse and human.
 25  TIGR_ID                 TIGR ID(s)
 26  GENBANK_PROTEIN         GenBank Protein ID(s)
 27  UNIGENE_ID              UniGene ID(s)
-28  SSLP_RGD_ID             RGD_ID(s) of SSLPS associated with given gene
-29  SSLP_SYMBOL             SSLP symbol
+28  MARKER_RGD_ID           RGD_ID(s) of markers associated with given gene
+29  MARKER_SYMBOL           marker symbol
 30  OLD_SYMBOL              old symbol alias(es)
 31  OLD_NAME                old name alias(es)
 32  QTL_RGD_ID              RGD_ID(s) of QTLs associated with given gene

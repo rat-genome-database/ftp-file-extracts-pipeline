@@ -14,10 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Oct 11, 2010
- * Time: 1:56:16 PM
+ * @author mtutaj
+ * @since Oct 11, 2010
  */
 public class FtpFileExtractsManager {
 
@@ -75,6 +73,7 @@ public class FtpFileExtractsManager {
                     break;
 
                 case "-sslps":
+                case "-markers":
                     beanId = "sslpExtractor";
                     break;
 
@@ -202,7 +201,7 @@ public class FtpFileExtractsManager {
 
         String USAGE = "java -Dspring.config=$APPHOME/../properties/default_db.xml -Dlog4j.configuration=$APPHOME/properties/log4j.properties"+
             " -jar ./lib/ftpFileExtracts.jar [MODULE] [OPTIONS]\n"+
-        "[MODULE] one of: -genes | -strains | -qtls | -gp2protein | -sslps | -sslp_alleles | -orthologs | -annotations | -daf_annotations "+
+        "[MODULE] one of: -genes | -strains | -qtls | -gp2protein | -markers | -sslp_alleles | -orthologs | -annotations | -daf_annotations "+
             "| -gaf_annotations | -gaf_agr_annotations | -uniprot_annotations | -db_snps | -radoslavov | -chinchilla | -assembly_comparison "+
             "| -mirna_targets | -array_ids | -sequences | -obsolete\n"+
         "[OPTIONS] optional species name: -species=rat|mouse|human|...|all (default) (all:rat,mouse,human,...)\n"+

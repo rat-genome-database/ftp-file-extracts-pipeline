@@ -5,16 +5,14 @@ import edu.mcw.rgd.datamodel.SpeciesType;
 import java.text.SimpleDateFormat;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Oct 11, 2010
- * Time: 2:59:08 PM
+ * @author mtutaj
+ * @since Oct 11, 2010
  * All configurable information for given species
  */
 public class SpeciesRecord {
     private int speciesType;
-    private int newRefAssemblyMapKeyForSslps;
-    private int oldRefAssemblyMapKeyForSslps;
+    private int newRefAssemblyMapKeyForMarkers;
+    private int oldRefAssemblyMapKeyForMarkers;
     private int celeraAssemblyMapKey;
     private int cytoMapKey;
     private int cmMapKey; // for mouse only
@@ -22,7 +20,7 @@ public class SpeciesRecord {
     private String qtlFileName;
     private int qtlSizeEstimate;
     private String gp2ProteinFileName;
-    private String sslpsFileName;
+    private String markerFileName;
     private String sslpAllelesFileName;
 
     /**
@@ -87,12 +85,12 @@ public class SpeciesRecord {
         this.cmMapKey = cmMapKey;
     }
 
-    public String getSslpsFileName() {
-        return sslpsFileName;
+    public String getMarkerFileName() {
+        return markerFileName;
     }
 
-    public void setSslpsFileName(String sslpsFileName) {
-        this.sslpsFileName = sslpsFileName;
+    public void setMarkerFileName(String fileName) {
+        this.markerFileName = fileName;
     }
 
     public String getSslpAllelesFileName() {
@@ -111,19 +109,19 @@ public class SpeciesRecord {
         this.gp2ProteinFileName = gp2ProteinFileName;
     }
 
-    public void setNewRefAssemblyMapKeyForSslps(int newRefAssemblyMapKeyForSslps) {
-        this.newRefAssemblyMapKeyForSslps = newRefAssemblyMapKeyForSslps;
+    public void setNewRefAssemblyMapKeyForMarkers(int newRefAssemblyMapKeyForMarkers) {
+        this.newRefAssemblyMapKeyForMarkers = newRefAssemblyMapKeyForMarkers;
     }
 
-    public int getNewRefAssemblyMapKeyForSslps() {
-        return newRefAssemblyMapKeyForSslps;
+    public int getNewRefAssemblyMapKeyForMarkers() {
+        return newRefAssemblyMapKeyForMarkers;
     }
 
-    public void setOldRefAssemblyMapKeyForSslps(int oldRefAssemblyMapKeyForSslps) {
-        this.oldRefAssemblyMapKeyForSslps = oldRefAssemblyMapKeyForSslps;
+    public void setOldRefAssemblyMapKeyForMarkers(int oldRefAssemblyMapKeyForMarkers) {
+        this.oldRefAssemblyMapKeyForMarkers = oldRefAssemblyMapKeyForMarkers;
     }
 
-    public int getOldRefAssemblyMapKeyForSslps() {
-        return oldRefAssemblyMapKeyForSslps;
+    public int getOldRefAssemblyMapKeyForMarkers() {
+        return oldRefAssemblyMapKeyForMarkers;
     }
 }

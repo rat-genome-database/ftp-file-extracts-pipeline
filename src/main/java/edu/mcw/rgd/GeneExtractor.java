@@ -14,17 +14,15 @@ import java.io.PrintWriter;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Nov 29, 2010
- * Time: 12:29:12 PM
+ * @author mtutaj
+ * @since Nov 29, 2010
  */
 public class GeneExtractor extends BaseExtractor {
 
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes-version-2.2.5\n"
+    +"# MODULE: genes-version-2.2.6\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
@@ -48,6 +46,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### As of Feb 15, 2017 ver 2.2.2: HPRD_IDs are discontinued for human genes.\n"
     +"### As of May 25, 2017 ver 2.2.5: GENE_REFSEQ_STATUS is now published in column 23 for all species\n"
     +"###   during transition period, for rat, mouse and human, GENE_REFSEQ_STATUS will continue to be laso published in columns 39, 41 and 42 respectively\n"
+    +"### As of Nov 1, 2018 ver 2.2.6: renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -79,8 +78,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#25  TIGR_ID                TIGR ID(s)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
     +"#27  UNIGENE_ID             UniGene ID(s)\n"
-    +"#28  SSLP_RGD_ID            RGD_ID(s) of SSLPS associated with given gene\n"
-    +"#29  SSLP_SYMBOL            SSLP symbol\n"
+    +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
+    +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
     +"#31  OLD_NAME               old name alias(es)\n"
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
@@ -93,7 +92,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES_ONE_ASSEMBLY =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: genes-version-2.2.5\n"
+        +"# MODULE: genes-version-2.2.6\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -130,8 +129,8 @@ public class GeneExtractor extends BaseExtractor {
         +"#25  TIGR_ID                TIGR ID(s)\n"
         +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
         +"#27  UNIGENE_ID             UniGene ID(s)\n"
-        +"#28  SSLP_RGD_ID            RGD_ID(s) of SSLPS associated with given gene\n"
-        +"#29  SSLP_SYMBOL            SSLP symbol\n"
+        +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
+        +"#29  MARKER_SYMBOL          marker symbol\n"
         +"#30  OLD_SYMBOL             old symbol alias(es)\n"
         +"#31  OLD_NAME               old name alias(es)\n"
         +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
@@ -146,7 +145,7 @@ public class GeneExtractor extends BaseExtractor {
         +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
         +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
         +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-        +"GENBANK_PROTEIN\tUNIGENE_ID\tSSLP_RGD_ID\tSSLP_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+        +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
         +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID";
 
 
@@ -165,7 +164,7 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tSSLP_RGD_ID\tSSLP_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tGENE_REFSEQ_STATUS\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#";
@@ -184,7 +183,7 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tSSLP_RGD_ID\tSSLP_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tHGNC_ID\t(UNUSED)\tOMIM_ID\tGENE_REFSEQ_STATUS\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#";
 
@@ -201,7 +200,7 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tSSLP_RGD_ID\tSSLP_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tMGD_ID\tCM_POS\tGENE_REFSEQ_STATUS\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#";
 
@@ -404,10 +403,10 @@ public class GeneExtractor extends BaseExtractor {
                     rec.addSpliceSymbols(splice.getSymbol());
                 }
 
-                // get rgd id and sslp names for sslps
-                for( SSLP sslp: dao.getSslps(rec.getGeneKey()) ) {
-                    rec.addSslpRgdIds(Integer.toString(sslp.getRgdId()));
-                    rec.addSslpNames(sslp.getName());
+                // get rgd id and marker names for markers
+                for( SSLP marker: dao.getMarkers(rec.getGeneKey()) ) {
+                    rec.addMarkerRgdIds(Integer.toString(marker.getRgdId()));
+                    rec.addMarkerNames(marker.getName());
                 }
 
                 // get aliases
@@ -518,9 +517,9 @@ public class GeneExtractor extends BaseExtractor {
             .append(checkNull(rec.getUniGeneIds()))
             .append('\t')
 
-            .append(checkNull(rec.getSslpRgdIds()))
+            .append(checkNull(rec.getMarkerRgdIds()))
             .append('\t')
-            .append(checkNull(rec.getSslpNames()))
+            .append(checkNull(rec.getMarkerNames()))
             .append('\t')
             .append(checkNull(rec.getOldGeneSymbols()))
             .append('\t')

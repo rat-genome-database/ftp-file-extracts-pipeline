@@ -322,7 +322,7 @@ public class QtlReporter {
                     writer.print(qtl.getVariance());
                 writer.print('\t');
 
-                // marker symbols: markers could be SSLPS, GENES, SEQUENCES
+                // marker symbols: markers could be MARKERS, GENES
                 if( qtl.getFlank1RgdId()!=null ) {
                     // 9. RGD_ID for flank marker 1, if in paper
                     writer.print(qtl.getFlank1RgdId());

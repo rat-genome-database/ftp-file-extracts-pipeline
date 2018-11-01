@@ -20,9 +20,9 @@ public class SslpExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: sslps-version-2.5.2\n"
+    +"# MODULE: markers-version-2.5.3\n"
     +"# GENERATED-ON: #DATE#\n"
-    +"# PURPOSE: information about active #SPECIES# sslps extracted from RGD database\n"
+    +"# PURPOSE: information about active #SPECIES# markers extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
     +"# FORMAT: tab delimited text\n"
     +"# NOTES: multiple values in a single column are separated by ';'\n"
@@ -41,19 +41,20 @@ public class SslpExtractor extends BaseExtractor {
     +"### As of Nov 20 2012 v. 2.4: rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported.\n"
     +"### As of Dec 26 2013 v. 2.4.1: no data changes; improved internal QC.\n"
     +"### As of Sep 8 2014 v. 2.5.0: rat: available positions on assembly Rnor_6.0.\n"
-    +"### As of Oct 29 2018 v. 2.5.2: discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows sslp type.\n"
+    +"### As of Oct 29 2018 v. 2.5.2: discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows marker type.\n"
+    +"### As of Nov 1 2018 v. 2.5.3: renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 23 columns are in common between rat, mouse and human)\n"
     +"#\n"
-    +"#1   SSLP_RGD_ID	           RGD_ID of the sslp\n"
+    +"#1   MARKER_RGD_ID	       RGD_ID of the marker\n"
     +"#2   SPECIES                 species name\n"
-    +"#3   SSLP_SYMBOL             sslp symbol\n"
-    +"#4   EXPECTED_SIZE           sslp expected size (PCR product size)\n"
-    +"#5   CURATED_REF_RGD_ID      RGD_ID of paper(s) on sslp\n"
-    +"#6   CURATED_REF_PUBMED_ID   PUBMED_ID of paper(s) on sslp\n"
+    +"#3   MARKER_SYMBOL           marker symbol\n"
+    +"#4   EXPECTED_SIZE           marker expected size (PCR product size)\n"
+    +"#5   CURATED_REF_RGD_ID      RGD_ID of paper(s) about marker\n"
+    +"#6   CURATED_REF_PUBMED_ID   PUBMED_ID of paper(s) about marker\n"
     +"#7   UNCURATED_REF_PUBMED_ID other PUBMED_IDs\n"
-    +"#8   SSLP_TYPE               sslp type, if available\n"
+    +"#8   MARKER_TYPE             marker type, if available\n"
     +"#9   CLONE_SEQUENCE          clone sequence itself\n"
     +"#10  (UNUSED)\n"
     +"#11  FORWARD_SEQ             forward sequence\n"
@@ -61,9 +62,9 @@ public class SslpExtractor extends BaseExtractor {
     +"#13  UNISTS_ID               UniSTS ID\n"
     +"#14  GENBANK_NUCLEOTIDE      GenBank Nucleotide ID(s)\n"
     +"#15  UNIGENE_ID              UniGene ID(s)\n"
-    +"#16  ALIAS_VALUE             known aliases for this SSLP\n"
-    +"#17  ASSOCIATED_GENE_RGD_ID  RGD_IDs for gene associated with this SSLP\n"
-    +"#18  ASSOCIATED_GENE_SYMBOL  symbol for gene associated with this SSLP\n"
+    +"#16  ALIAS_VALUE             known aliases for this marker\n"
+    +"#17  ASSOCIATED_GENE_RGD_ID  RGD_IDs for gene associated with this marker\n"
+    +"#18  ASSOCIATED_GENE_SYMBOL  symbol for gene associated with this marker\n"
     +"#19  CHROMOSOME              chromosome\n"
     +"#20  FISH_BAND               fish band\n"
     +"#21  CHROMOSOME_CELERA       chromosome for Celera assembly\n"
@@ -91,8 +92,8 @@ public class SslpExtractor extends BaseExtractor {
     +"#41  START_POS_6.0           start position for current reference assembly v.6.0\n"
     +"#42  STOP_POS_6.0            stop position for current reference assembly v.6.0\n"
     +"#\n"
-    +"SSLP_RGD_ID\tSPECIES\tSSLP_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
-    +"UNCURATED_REF_PUBMED_ID\tSSLP_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
+    +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
+    +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
     +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
     +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
     +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
@@ -110,8 +111,8 @@ public class SslpExtractor extends BaseExtractor {
    +"#28  START_POS_36           start position for old reference assembly v.36\n"
    +"#29  STOP_POS_36            stop position for old reference assembly v.36\n"
    +"#\n"
-   +"SSLP_RGD_ID\tSPECIES\tSSLP_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
-   +"UNCURATED_REF_PUBMED_ID\tSSLP_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
+   +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
+   +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
    +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
@@ -128,8 +129,8 @@ public class SslpExtractor extends BaseExtractor {
    +"#30  MGD_ID                 MGD ID\n"
    +"#31  CM_POS                 mouse cM map absolute position\n"
    +"#\n"
-   +"SSLP_RGD_ID\tSPECIES\tSSLP_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
-   +"UNCURATED_REF_PUBMED_ID\tSSLP_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
+   +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
+   +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
    +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
@@ -145,7 +146,7 @@ public class SslpExtractor extends BaseExtractor {
         System.out.println(getVersion()+" - "+speciesInfo.getSpeciesName());
 
         final SpeciesRecord speciesRec = speciesInfo;
-        String outputFile = speciesInfo.getSslpsFileName();
+        String outputFile = speciesInfo.getMarkerFileName();
         if( outputFile==null )
             return;
         outputFile = getExtractDir()+'/'+outputFile;
@@ -172,11 +173,11 @@ public class SslpExtractor extends BaseExtractor {
         manager.addPipelineWorkgroup(new RecordPreprocessor() {
             // parser: break source into a stream of record-s
             public void process() throws Exception {
-                // process active sslps for given species
+                // process active markers for given species
                 int recNo = 0;
-                for( SSLP sslp: dao.getActiveSSLPs(speciesType) ) {
-                    SslpRecord rec = new SslpRecord();
-                    rec.sslp = sslp;
+                for( SSLP marker: dao.getActiveMarkers(speciesType) ) {
+                    MarkerRecord rec = new MarkerRecord();
+                    rec.marker = marker;
                     rec.setRecNo(++recNo);
                     getSession().putRecordToFirstQueue(rec);
                 }
@@ -189,16 +190,16 @@ public class SslpExtractor extends BaseExtractor {
 
             // gather data from database
             public void process(PipelineRecord r) throws Exception {
-                SslpRecord rec = (SslpRecord) r;
+                MarkerRecord rec = (MarkerRecord) r;
 
                 if( rec.getRecNo()%100==0 )
                     log.debug("QC recno="+rec.getRecNo());
 
-                rec.gene = dao.getGeneBySslpKey(rec.sslp.getKey());
-                int sslpRgdID = rec.sslp.getRgdId();
+                rec.gene = dao.getGeneByMarkerKey(rec.marker.getKey());
+                int markerRgdID = rec.marker.getRgdId();
 
-                // get chromosome and fish band information for given sslp
-                rec.mds = dao.getMapData(sslpRgdID);
+                // get chromosome and fish band information for given marker
+                rec.mds = dao.getMapData(markerRgdID);
                 rec.chrAndFishBand = dao.getChromosomeAndFishBand(rec.mds, speciesRec.getCytoMapKey());
 
                 // get other maps
@@ -206,27 +207,27 @@ public class SslpExtractor extends BaseExtractor {
                 if( mds.size()>0 ) {
                     rec.mdCelera = mds;
                 }
-                mds = rec.getMapData(speciesRec.getNewRefAssemblyMapKeyForSslps());
+                mds = rec.getMapData(speciesRec.getNewRefAssemblyMapKeyForMarkers());
                 if( mds.size()>0 ) {
                     rec.mdNewRef = mds;
                 }
-                mds = rec.getMapData(speciesRec.getOldRefAssemblyMapKeyForSslps());
+                mds = rec.getMapData(speciesRec.getOldRefAssemblyMapKeyForMarkers());
                 if( mds.size()>0 ) {
                     rec.mdOldRef = mds;
                 }
 
-                // get sllp aliases (separated by ';' if there are multiple)
-                rec.sslpAliases = getAliases(sslpRgdID);
+                // get marker aliases (separated by ';' if there are multiple)
+                rec.aliases = getAliases(markerRgdID);
 
-                rec.xdbIds = getXdbIdList(sslpRgdID);
+                rec.xdbIds = getXdbIdList(markerRgdID);
 
-                rec.uncuratedPubmedID = getDao().getUncuratedPubmedIds(sslpRgdID);
+                rec.uncuratedPubmedID = getDao().getUncuratedPubmedIds(markerRgdID);
                 rec.uniSTSID = rec.getAccessionIds(XdbId.XDB_KEY_UNISTS);
                 rec.genBankNucleotideID = rec.getAccessionIds(XdbId.XDB_KEY_GENEBANKNU);
                 rec.uniGeneIDs = rec.getLinkText(XdbId.XDB_KEY_UNIGENE);
 
-                rec.curatedRefRGDIDs = getDao().getCuratedRefs(sslpRgdID);
-                rec.curatedRefPubmedIDs = getDao().getCuratedPubmedIds(sslpRgdID);
+                rec.curatedRefRGDIDs = getDao().getCuratedRefs(markerRgdID);
+                rec.curatedRefPubmedIDs = getDao().getCuratedPubmedIds(markerRgdID);
 
                 if( speciesType==SpeciesType.RAT ) {
                     // FHH map
@@ -234,7 +235,7 @@ public class SslpExtractor extends BaseExtractor {
                     if( mds.size()>0 ) {
                         rec.mdFHHxACI = mds.get(0);
                         if( mds.size()>1 )
-                            log.debug("multiple positions for FHH map: sslp_rgd_id=" + sslpRgdID);
+                            log.debug("multiple positions for FHH map: marker_rgd_id=" + markerRgdID);
                     }
 
                     // SHRSP map
@@ -242,7 +243,7 @@ public class SslpExtractor extends BaseExtractor {
                     if( mds.size()>0 ) {
                         rec.mdSHRSPxBN = mds.get(0);
                         if( mds.size()>1 )
-                            log.debug("multiple positions for SHRSP map: sslp_rgd_id=" + sslpRgdID);
+                            log.debug("multiple positions for SHRSP map: marker_rgd_id=" + markerRgdID);
                     }
 
                     // RH 2.0 map
@@ -250,7 +251,7 @@ public class SslpExtractor extends BaseExtractor {
                     if( mds.size()>0 ) {
                         rec.mdRH_2_0 = mds.get(0);
                         if( mds.size()>1 )
-                            log.debug("multiple positions for RH 2.0 map: sslp_rgd_id=" + sslpRgdID);
+                            log.debug("multiple positions for RH 2.0 map: marker_rgd_id=" + markerRgdID);
                     }
 
                     // RH 3.4 map
@@ -258,7 +259,7 @@ public class SslpExtractor extends BaseExtractor {
                     if( mds.size()>0 ) {
                         rec.mdRH_3_4 = mds.get(0);
                         if( mds.size()>1 )
-                            log.debug("multiple positions for RH 3.4 map: sslp_rgd_id=" + sslpRgdID);
+                            log.debug("multiple positions for RH 3.4 map: marker_rgd_id=" + markerRgdID);
                     }
 
                     mds = rec.getMapData(360);
@@ -271,7 +272,7 @@ public class SslpExtractor extends BaseExtractor {
                     if( mds.size()>0 ) {
                         rec.cmPos = mds.get(0).getAbsPosition();
                         if( mds.size()>1 )
-                            log.debug("multiple positions for cM map sslp rgd_Id=" + sslpRgdID);
+                            log.debug("multiple positions for cM map marker_rgd_id rgd_Id=" + markerRgdID);
                     }
                     rec.mgdID = rec.getAccessionIds(XdbId.XDB_KEY_MGD);
                 }
@@ -284,7 +285,7 @@ public class SslpExtractor extends BaseExtractor {
         manager.addPipelineWorkgroup(new RecordProcessor() {
             // write record to a line in output file
             public void process(PipelineRecord r) throws Exception {
-                SslpRecord rec = (SslpRecord) r;
+                MarkerRecord rec = (MarkerRecord) r;
 
                 // write out all the parameters to the file
                 writeLine(rec, writer, speciesType);
@@ -301,20 +302,20 @@ public class SslpExtractor extends BaseExtractor {
         FtpFileExtractsManager.qcFileContent(outputFile, "sslps", speciesType);
     }
 
-    void writeLine(SslpRecord rec, PrintWriter writer, int speciesType) throws Exception {
+    void writeLine(MarkerRecord rec, PrintWriter writer, int speciesType) throws Exception {
 
-        // SSLP_RGD_ID
-        writer.print(rec.sslp.getRgdId());
+        // MARKER_RGD_ID
+        writer.print(rec.marker.getRgdId());
         writer.print('\t');
         // species name
         writer.print(SpeciesType.getCommonName(speciesType).toLowerCase());
         writer.print('\t');
-        // SSLP symbol
-        writer.print(checkNull(rec.sslp.getName()));
+        // marker symbol
+        writer.print(checkNull(rec.marker.getName()));
         writer.print('\t');
         // expected size
-        if (rec.sslp.getExpectedSize() != 0) {
-            writer.print(rec.sslp.getExpectedSize());
+        if (rec.marker.getExpectedSize() != 0) {
+            writer.print(rec.marker.getExpectedSize());
         }
         writer.print('\t');
 
@@ -327,19 +328,19 @@ public class SslpExtractor extends BaseExtractor {
         writer.print(checkNull(rec.uncuratedPubmedID));
         writer.print('\t');
 
-        writer.print(checkNull(rec.sslp.getSslpType()));
+        writer.print(checkNull(rec.marker.getSslpType()));
         writer.print('\t');
 
-        writer.print(checkNull(rec.sslp.getTemplateSeq()));
+        writer.print(checkNull(rec.marker.getTemplateSeq()));
         writer.print('\t');
 
         // primer rgd ids -- discontinued
         writer.print('\t');
 
-        writer.print(checkNull(rec.sslp.getForwardSeq()));
+        writer.print(checkNull(rec.marker.getForwardSeq()));
         writer.print('\t');
 
-        writer.print(checkNull(rec.sslp.getReverseSeq()));
+        writer.print(checkNull(rec.marker.getReverseSeq()));
         writer.print('\t');
 
         writer.print(checkNull(rec.uniSTSID));
@@ -351,7 +352,7 @@ public class SslpExtractor extends BaseExtractor {
         writer.print(checkNull(rec.uniGeneIDs));
         writer.print('\t');
 
-        writer.print(checkNull(rec.sslpAliases));
+        writer.print(checkNull(rec.aliases));
         writer.print('\t');
 
         // associated gene RGDID
@@ -419,7 +420,7 @@ public class SslpExtractor extends BaseExtractor {
         writer.println();
     }
 
-    // concatenate all sslp aliases using ';' as separator
+    // concatenate all marker aliases using ';' as separator
     String getAliases(int rgdId) throws Exception {
         List<Alias> aliases = getDao().getAliases(rgdId);
         return Utils.concatenate(";", aliases, "getValue");
@@ -481,12 +482,12 @@ public class SslpExtractor extends BaseExtractor {
         return qcThreadCount;
     }
 
-    class SslpRecord extends PipelineRecord {
+    class MarkerRecord extends PipelineRecord {
 
-        public SSLP sslp;
+        public SSLP marker;
         public Gene gene;
         public String[] chrAndFishBand;
-        public String sslpAliases;
+        public String aliases;
         public String uncuratedPubmedID;
         public String uniSTSID;
         public String genBankNucleotideID;

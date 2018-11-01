@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Nov 29, 2010
- * Time: 12:29:30 PM
+ * @author mtutaj
+ * @since Nov 29, 2010
  */
 public class SslpAlleleExtractor extends BaseExtractor {
 
@@ -28,7 +26,7 @@ public class SslpAlleleExtractor extends BaseExtractor {
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"#\n"
-    +"#1   SSLP_RGD_ID	           RGD_ID of the sslp allele\n"
+    +"#1   SSLP_RGD_ID	       RGD_ID of the sslp allele\n"
     +"#2   RGD_NAME                name of the sslp allele in RGD\n"
     +"#3   STRAIN_SSLP_SIZE        sslp size for given strain\n"
     +"SSLP_RGD_ID\tRGD_NAME";
@@ -42,7 +40,7 @@ public class SslpAlleleExtractor extends BaseExtractor {
             return;
         outputFile = getExtractDir()+'/'+outputFile;
 
-        // retrieve from database all sslps with allele sizes and strain names
+        // retrieve from database all markers with allele sizes and strain names
         Set<String> strainNamesSet = new HashSet<String>();
         List<SslpAlleles> sslpAlleles = getDao().getSslpAlleles(speciesRec.getSpeciesType(), strainNamesSet);
 
@@ -61,9 +59,9 @@ public class SslpAlleleExtractor extends BaseExtractor {
         }
         writer.println();
 
-        // iterate every sslp with alleles and output allele size at correct column
+        // iterate every marker with alleles and output allele size at correct column
         for( SslpAlleles rec: sslpAlleles ) {
-            writer.print(rec.sslpRgdId + "\t" + checkNull(rec.sslpName));
+            writer.print(rec.markerRgdId + "\t" + checkNull(rec.markerName));
 
             // iterate all strain names - columns and output any allele size matching the strain name
             for( String strainName: strainNames ) {

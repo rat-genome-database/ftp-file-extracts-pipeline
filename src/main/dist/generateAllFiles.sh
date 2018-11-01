@@ -8,7 +8,7 @@ $APPHOME/agrExtract.sh
 $APPHOME/arrayIdExtract.sh
 $APPHOME/radoslavov.sh
 $APPHOME/sslpAlleleExtract.sh
-$APPHOME/sslpExtract.sh
+$APPHOME/markerExtract.sh
 $APPHOME/qtlExtract.sh
 $APPHOME/geneExtract.sh
 $APPHOME/orthologExtract.sh
