@@ -25,10 +25,10 @@ repositories {
 dependencies {
     compile 'commons-dbcp:commons-dbcp:1.4'
     compile 'commons-net:commons-net:3.6'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
     compile 'log4j:log4j:1.2.17'
-    compile 'org.springframework:spring-beans:5.1.2.RELEASE'
-    compile 'org.springframework:spring-jdbc:5.1.2.RELEASE'
+    compile 'org.springframework:spring-beans:5.1.4.RELEASE'
+    compile 'org.springframework:spring-jdbc:5.1.4.RELEASE'
     compile 'com.oracle:ojdbc6:11.2.0.4.0-atlassian-hosted'
 
     compile fileTree(dir: 'lib', include: '*.jar')
@@ -41,7 +41,7 @@ jar {
             'Built-By': System.getProperty('user.name'),
             'Built-Date': new Date(),
             'Built-JDK': System.getProperty('java.version'),
-            'Class-Path': 'lib/' + configurations.compile.collect { it.getName() }.join(' lib/'),
+            'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
             'Main-Class': mainClassName
         )
     }
@@ -53,9 +53,11 @@ distributions {
     }
 }
 
-installDist {
-    doLast {
-        String appDir = 'build/install/' + myAppName + '/';
-        file(appDir + 'lib/' + myAppName + '.jar').renameTo(appDir + myAppName + '.jar')
-    }
+task createDistro(type: Copy) {
+    def zipFile = file('build/distributions/'+myAppName+'.zip')
+    def outputDir = file("build/install")
+
+    from zipTree(zipFile)
+    into outputDir
 }
+createDistro.dependsOn assembleDist

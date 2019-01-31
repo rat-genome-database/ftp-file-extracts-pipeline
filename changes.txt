@@ -1,3 +1,6 @@
+Jan 31, 2019 - v.1.5.67
+-gene extractor: added support for PIG
+
 Nov 1, 2018 - v.1.5.66
 -sslp extractor: renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE
 -gene extractor: renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL

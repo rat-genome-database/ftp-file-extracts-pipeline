@@ -27,7 +27,7 @@ wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/9606 -O $TMPJSON
 python -m json.tool $TMPJSON > $OUTDIR/phenotypes.9606.json
 wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/10116 -O $TMPJSON
 python -m json.tool $TMPJSON > $OUTDIR/phenotypes.10116.json
-echo "=== AGR BGI files OK ==="
+echo "=== AGR phenotype files OK ==="
 echo ""
 
 echo "=== AGR BGI files ... ==="
