@@ -16,7 +16,7 @@ public class SslpAlleleExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: sslp-alleles-version-2.0.2\n"
+    +"# MODULE: sslp-alleles-version-2.0.3\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# sslp alleles extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -35,6 +35,9 @@ public class SslpAlleleExtractor extends BaseExtractor {
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 
+        if( speciesRec==null ) {
+            return;
+        }
         String outputFile = speciesRec.getSslpAllelesFileName();
         if( outputFile==null )
             return;
