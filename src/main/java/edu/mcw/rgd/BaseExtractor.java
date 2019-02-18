@@ -29,8 +29,10 @@ public abstract class BaseExtractor {
 
     public void go(SpeciesRecord speciesInfo) throws Exception {
 
-        // run the extractor
-        run(speciesInfo);
+        if( speciesInfo!=null ) {
+            // run the extractor
+            run(speciesInfo);
+        }
     }
 
     public void loadConfig(int speciesTypeKey) {

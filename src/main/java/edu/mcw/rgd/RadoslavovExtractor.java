@@ -51,10 +51,6 @@ public class RadoslavovExtractor extends BaseExtractor {
     @Override
     public void run(SpeciesRecord speciesInfo) throws Exception {
 
-        if( speciesInfo==null ) {
-            return;
-        }
-
         // make sure output dir does exist
         String dirBase = this.getExtractDir()+"/"+getOutputDir();
         new File(dirBase).mkdirs();
