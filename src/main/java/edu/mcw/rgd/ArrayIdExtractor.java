@@ -9,7 +9,7 @@ public class ArrayIdExtractor extends BaseExtractor {
 
     private static final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: array-ids-version-1.0.1\n"
+        +"# MODULE: array-ids-version-1.0.2\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: microarray probe IDs to gene RGD ID mapping data\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -26,6 +26,10 @@ public class ArrayIdExtractor extends BaseExtractor {
      * @throws Exception
      */
     public void run(SpeciesRecord speciesRec) throws Exception {
+
+        if( speciesRec==null ) {
+            return;
+        }
 
         System.out.println(getVersion());
 

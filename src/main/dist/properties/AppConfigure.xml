@@ -285,7 +285,7 @@
     </bean>
 
     <bean id="arrayIdExtractor" class="edu.mcw.rgd.ArrayIdExtractor">
-        <property name="version" value="ArrayIdExtractor v.1.0.1 as of Jun 6, 2017" />
+        <property name="version" value="ArrayIdExtractor v.1.0.2 as of Feb 18, 2019" />
         <property name="outputDir" value="data" />
         <property name="fileNamePrefix" value="ARRAY_IDS_ENSEMBL_" />
     </bean>
