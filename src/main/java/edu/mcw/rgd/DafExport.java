@@ -1,5 +1,6 @@
 package edu.mcw.rgd;
 
+import edu.mcw.rgd.datamodel.EvidenceCode;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 
 import java.text.ParseException;
@@ -17,7 +18,7 @@ public class DafExport {
     class DafMetadata {
         public HashMap dataProvider = getDataProviderForMetaData();
         public String dateProduced;
-        public String release = "RGD Daf Extractor v. 1.2.6, AGR schema 1.0.0.6, build Aug 20, 2018";
+        public String release = "RGD Daf Extractor v. 1.2.7, AGR schema 1.0.0.8, build Feb 20, 2019";
 
         public DafMetadata() {
             dateProduced = sdf_agr.format(new Date());
@@ -35,7 +36,7 @@ public class DafExport {
 
         public String objectName;
         public String qualifier;
-        public List<String> with;
+        //public List<String> with;
     }
 
     class DafObjectRelation {
@@ -50,8 +51,8 @@ public class DafExport {
     }
 
     class DafPublication {
-        public String modPublicationId;
-        public String pubMedId;
+        public Map<String,Object> crossReference;
+        public String publicationId;
     }
 
     public void addData(DafAnnotation a, int refRgdId) {
@@ -70,7 +71,17 @@ public class DafExport {
         data.DOid = a.getDoId();
         data.dataProvider = getDataProviders(a.getDataProviders());
 
-        data.evidence.evidenceCodes.add(a.getEvidenceCode());
+        String ecoId;
+        try {
+            ecoId = EvidenceCode.getEcoId(a.getEvidenceCode());
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+        if( ecoId==null ) {
+            System.out.println("WARN no ECO_ID for evidence code "+a.getEvidenceCode());
+            return;
+        }
+        data.evidence.evidenceCodes.add(ecoId);
 
         handlePublication(a.getDbReference(), refRgdId, data.evidence.publication);
 
@@ -89,14 +100,15 @@ public class DafExport {
             data.qualifier = a.getQualifier().toLowerCase();
         }
 
-        if( a.getWithInfo()!=null ) {
-            data.with = new ArrayList<>();
-            for( String with: a.getWithInfo().split("[\\|]") ) {
-                data.with.add(with);
-            }
-        }
+        // 'with' discontinued as of schema 1.0.0.8 (March 2019)
+        //if( a.getWithInfo()!=null ) {
+        //    data.with = new ArrayList<>();
+        //    for( String with: a.getWithInfo().split("[\\|]") ) {
+        //        data.with.add(with);
+        //    }
+        //}
 
-        if( data.evidence.publication.pubMedId==null && data.evidence.publication.modPublicationId==null ) {
+        if( data.evidence.publication.publicationId==null ) {
             System.out.println("annot skipped because publicationRef is empty");
         } else {
             this.data.add(data);
@@ -146,9 +158,16 @@ public class DafExport {
         String[] dbRefs = dbRefStr.split("[\\|]");
         for( String ref : dbRefs ) {
             if (ref.startsWith("PMID:")) {
-                if( dafPublication.pubMedId==null ) {
-                    dafPublication.pubMedId = ref;
-                    dafPublication.modPublicationId = "RGD:" + refRgdId;
+                if( dafPublication.publicationId==null ) {
+                    dafPublication.publicationId = ref;
+
+                    if( refRgdId>0 ) {
+                        dafPublication.crossReference = new HashMap<>();
+                        dafPublication.crossReference.put("id", "RGD:" + refRgdId);
+                        List<String> pages = new ArrayList<>();
+                        pages.add("reference");
+                        dafPublication.crossReference.put("pages", pages);
+                    }
                     return;
                 } else {
                     System.out.println("*** WARN *** multiple PMIDs for this reference");
@@ -159,12 +178,19 @@ public class DafExport {
         // no PMID available -- set reference to REF_RGD_ID
         for( String ref : dbRefs ) {
             if( ref.isEmpty() && refRgdId>0 ) {
-                dafPublication.modPublicationId = "RGD:" + refRgdId;
+                dafPublication.publicationId = "RGD:" + refRgdId;
+
+                dafPublication.crossReference = new HashMap<>();
+                dafPublication.crossReference.put("id", "RGD:" + refRgdId);
+                List<String> pages = new ArrayList<>();
+                pages.add("reference");
+                dafPublication.crossReference.put("pages", pages);
             } else {
                 System.out.println("*** WARN *** unexpected reference type: "+ref);
             }
         }
     }
+
 
     HashMap getDataProviderForMetaData() {
 
