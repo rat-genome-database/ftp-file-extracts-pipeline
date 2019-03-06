@@ -1,3 +1,6 @@
+Mar 06, 2019 - v.1.5.70
+-agrExtract: added export of variants
+
 Feb 18, 2019 - v.1.5.68
 -fixes due to adding wormbase, yeast and fruitfly to the database
 

@@ -1,4 +1,4 @@
-# extract rat alleles  and  BGI (basic gene information) files for AGR
+# extract files for submission to AGR (Alliance of Genome Resources)
 #
 # abort the script if any of stages below will fail
 set -e
@@ -12,6 +12,12 @@ echo "=== AGR alleles for rat ... ==="
 wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/alleles/10116 -O $TMPJSON
 python -m json.tool $TMPJSON > $OUTDIR/alleles.10116.json
 echo "=== AGR alleles for rat OK"
+echo ""
+
+echo "=== AGR variants for rat ... ==="
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/variants/10116 -O $TMPJSON
+python -m json.tool $TMPJSON > $OUTDIR/variants.10116.json
+echo "=== AGR variants for rat OK"
 echo ""
 
 echo "=== AGR expression for rat and human ... ==="
