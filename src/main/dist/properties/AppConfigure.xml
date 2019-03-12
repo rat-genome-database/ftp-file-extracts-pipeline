@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager build 1.5.70 as of Mar 6, 2019" />
+        <property name="version" value="FtpFileExtractManager build 1.5.71 as of Mar 12, 2019" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -219,23 +219,23 @@
     </bean>
 
     <bean id="annotExtractor" class="edu.mcw.rgd.AnnotExtractor" parent="annotBaseExtractor">
-        <property name="version" value="AnnotExtractor v.1.0.9 as of Jul 10, 2017" />
+        <property name="version" value="AnnotExtractor v.1.0.10 as of Mar 12, 2019" />
         <property name="annotDir" value="data/annotated_rgd_objects_by_ontology/with_terms" />
     </bean>
 
     <bean id="annotGafExtractor" class="edu.mcw.rgd.AnnotGafExtractor" parent="annotBaseExtractor">
-        <property name="version" value="AnnotGafExtractor v.1.1.4 as of Sep 18, 2017" />
+        <property name="version" value="AnnotGafExtractor v.1.1.5 as of Mar 12, 2019" />
         <property name="annotDir" value="data/annotated_rgd_objects_by_ontology" />
         <property name="annotAgrDir" value="../agr/" />
     </bean>
 
     <bean id="annotUniProtExtractor" class="edu.mcw.rgd.AnnotUniProtExtractor" parent="annotBaseExtractor">
-        <property name="version" value="AnnotUniProtExtractor v.1.0.2 as of Jul 10, 2017" />
+        <property name="version" value="AnnotUniProtExtractor v.1.0.3 as of Mar 12, 2019" />
         <property name="annotDir" value="data/uniprot_bibliography" />
     </bean>
 
     <bean id="annotDafExtractor" class="edu.mcw.rgd.AnnotDafExtractor" parent="annotBaseExtractor">
-        <property name="version" value="AnnotDafExtractor v.1.1.10 as of Feb 20, 2019" />
+        <property name="version" value="AnnotDafExtractor v.1.1.11 as of Mar 12, 2019" />
         <property name="annotDir" value="data/agr" />
         <property name="fileJsonPrefix" value="disease." />
         <property name="fileJsonSuffix" value=".daf.json" />

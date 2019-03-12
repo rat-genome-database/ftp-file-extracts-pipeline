@@ -3,6 +3,7 @@ package edu.mcw.rgd;
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.dao.spring.GeneQuery;
+import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
@@ -113,6 +114,18 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         }
 
         return new String[]{chr, fishBand};
+    }
+
+    public Map<Integer,String> loadPmidMap() throws Exception {
+        List<IntStringMapQuery.MapPair> pmidList = refDAO.getPubmedIdsAndRefRgdIds();
+        Map<Integer,String> pmidMap = new HashMap<>(pmidList.size());
+        for (IntStringMapQuery.MapPair pair : pmidList) {
+            String pmid = pmidMap.put(pair.keyValue, pair.stringValue);
+            if( pmid != null ) {
+                System.out.println("multiple PMIDs for REF_RGD_ID:"+pair.keyValue+", PMID:"+pmid);
+            }
+        }
+        return pmidMap;
     }
 
     /**

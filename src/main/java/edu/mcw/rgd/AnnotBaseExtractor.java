@@ -39,6 +39,23 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     private String version;
     private Set<Integer> refRgdIdsForGoPipelines;
 
+    // map of REF_RGD_IDs to PMID acc ids: used to significantly reduce database overhead
+    // (issue one sql query vs millions of queries previously)
+    static private Map<Integer, String> pmidMap;
+
+    public String getPmid(int refRgdId) {
+        return pmidMap.get(refRgdId);
+    }
+
+    void loadPmidMap() throws Exception {
+        synchronized(AnnotBaseExtractor.class) {
+            if( pmidMap==null ) {
+                pmidMap = getDao().loadPmidMap();
+            }
+        }
+    }
+
+
     boolean onInit() {return true; }
     boolean acceptAnnotation(Annotation a) {
         return true;
@@ -58,6 +75,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     }
 
     public void run(SpeciesRecord si) throws Exception {
+
+        loadPmidMap();
 
         speciesTypeKey = si.getSpeciesType();
 
@@ -195,8 +214,9 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             if( refRgdId>0 ) {
                 //(|DB:Reference) 	RGD:47763|PMID:2676709
                 rec.references = "RGD:" + refRgdId;
-                for( XdbId xdbId: getDao().getXdbIds(refRgdId, XdbId.XDB_KEY_PUBMED) ) {
-                    rec.references += "|PMID:" + xdbId.getAccId();
+                String pmid = getPmid(refRgdId);
+                if( pmid!=null ){
+                    rec.references += "|PMID:" + pmid;
                 }
             } else {
                 // ref_rgd_id is null -- use non-null XREF_SOURCE as dbReference
