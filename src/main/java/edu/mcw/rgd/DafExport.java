@@ -18,7 +18,7 @@ public class DafExport {
     class DafMetadata {
         public HashMap dataProvider = getDataProviderForMetaData();
         public String dateProduced;
-        public String release = "RGD Daf Extractor v. 1.2.7, AGR schema 1.0.0.8, build Feb 20, 2019";
+        public String release = "RGD Daf Extractor v. 1.2.7, AGR schema 1.0.0.8, build Mar 14, 2019";
 
         public DafMetadata() {
             dateProduced = sdf_agr.format(new Date());
@@ -36,7 +36,7 @@ public class DafExport {
 
         public String objectName;
         public String qualifier;
-        //public List<String> with;
+        public List<String> with;
     }
 
     class DafObjectRelation {
@@ -100,13 +100,12 @@ public class DafExport {
             data.qualifier = a.getQualifier().toLowerCase();
         }
 
-        // 'with' discontinued as of schema 1.0.0.8 (March 2019)
-        //if( a.getWithInfo()!=null ) {
-        //    data.with = new ArrayList<>();
-        //    for( String with: a.getWithInfo().split("[\\|]") ) {
-        //        data.with.add(with);
-        //    }
-        //}
+        if( a.getWithInfo()!=null ) {
+            data.with = new ArrayList<>();
+            for( String with: a.getWithInfo().split("[\\|]") ) {
+                data.with.add(with);
+            }
+        }
 
         if( data.evidence.publication.publicationId==null ) {
             System.out.println("annot skipped because publicationRef is empty");
