@@ -18,7 +18,7 @@ public class DafExport {
     class DafMetadata {
         public HashMap dataProvider = getDataProviderForMetaData();
         public String dateProduced;
-        public String release = "RGD Daf Extractor v. 1.2.7, AGR schema 1.0.0.8, build Mar 14, 2019";
+        public String release = "RGD Daf Extractor v. 1.2.8, AGR schema 1.0.0.8, build Mar 19, 2019";
 
         public DafMetadata() {
             dateProduced = sdf_agr.format(new Date());

@@ -4,6 +4,7 @@ import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.dao.spring.GeneQuery;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
@@ -589,6 +590,22 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 
     static final Map<String, Boolean> _isForCurationMap = new HashMap<>();
+
+    public String getOmimPSTermAccForChildTerm(String childTermAcc) throws Exception {
+        String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name IN\n" +
+            "(SELECT 'OMIM:'||phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN\n"+
+            " (SELECT substr(synonym_name,6) mim_id FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
+            ")";
+        List<String> termAccIds = StringListQuery.execute(ontologyDAO, sql, childTermAcc);
+        if( termAccIds.isEmpty() ) {
+            return null;
+        }
+        if( termAccIds.size()>1 ) {
+            System.out.println("multiple OMIM:PS parents for child term "+childTermAcc+": "+Utils.concatenate(termAccIds,","));
+            return null;
+        }
+        return termAccIds.get(0);
+    }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesType) throws Exception {
         return annotationDAO.getAnnotationsBySpecies(speciesType);

@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 import edu.mcw.rgd.datamodel.SpeciesType;
@@ -27,6 +28,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
     Logger log = Logger.getLogger(AnnotDafExtractor.class);
 
     int recordsExported;
+    int omimPSConversions;
     ObjectMapper json;
     DafExport dafExport;
 
@@ -43,6 +45,8 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         }
 
         recordsExported = 0;
+        omimPSConversions = 0;
+
         dafExport = new DafExport();
 
         // setup a JSON object array to collect all DafAnnotation objects
@@ -78,7 +82,26 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         }
         // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
         if( rec.termAccId.startsWith("DOID:90") && rec.termAccId.length()==12 ) {
-            return;
+
+            // see if this term could be mapped to an OMIM PS id
+            String parentTermAcc = null;
+            try {
+                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId);
+            } catch( Exception e ) {
+                throw new RuntimeException(e);
+            }
+            if( parentTermAcc==null ) {
+                return;
+            }
+
+            if( parentTermAcc.startsWith("DOID:90") && parentTermAcc.length()==12 ) {
+                System.out.println("  OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
+                return;
+            } else {
+                System.out.println("  OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
+                rec.termAccId = parentTermAcc;
+                omimPSConversions++;
+            }
         }
 
         // for human genes, HGNC id; for mouse, MGD id; for other species, RGD id
@@ -183,6 +206,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     void onDone() {
         log.info("Records exported: "+recordsExported);
+        log.info("DO+ records exported thanks to OMIM:PS conversions: "+omimPSConversions);
 
         // sort data, alphabetically by object symbols
         dafExport.sort();

@@ -1,3 +1,6 @@
+Mar 19, 2019 - v.1.5.73
+-dafExtractor: added OMIM:PS conversions of DO+ custom terms
+
 Mar 14, 2019 - v.1.5.72
 -dafExtractor: updated to comply with updated 1.0.0.8 schema
 
