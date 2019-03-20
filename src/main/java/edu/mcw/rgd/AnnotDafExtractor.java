@@ -80,29 +80,6 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         if( !rec.termAccId.startsWith("DOID:") ) {
             return;
         }
-        // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
-        if( rec.termAccId.startsWith("DOID:90") && rec.termAccId.length()==12 ) {
-
-            // see if this term could be mapped to an OMIM PS id
-            String parentTermAcc = null;
-            try {
-                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId);
-            } catch( Exception e ) {
-                throw new RuntimeException(e);
-            }
-            if( parentTermAcc==null ) {
-                return;
-            }
-
-            if( parentTermAcc.startsWith("DOID:90") && parentTermAcc.length()==12 ) {
-                System.out.println("  OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
-                return;
-            } else {
-                System.out.println("  OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
-                rec.termAccId = parentTermAcc;
-                omimPSConversions++;
-            }
-        }
 
         // for human genes, HGNC id; for mouse, MGD id; for other species, RGD id
         String objectID;
@@ -134,6 +111,31 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             default:
                 return; // not a manual evidence code
         }
+
+        // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
+        if( rec.termAccId.startsWith("DOID:90") && rec.termAccId.length()==12 ) {
+
+            // see if this term could be mapped to an OMIM PS id
+            String parentTermAcc = null;
+            try {
+                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId);
+            } catch( Exception e ) {
+                throw new RuntimeException(e);
+            }
+            if( parentTermAcc==null ) {
+                return;
+            }
+
+            if( parentTermAcc.startsWith("DOID:90") && parentTermAcc.length()==12 ) {
+                System.out.println("  OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
+                return;
+            } else {
+                System.out.println("  OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
+                rec.termAccId = parentTermAcc;
+                omimPSConversions++;
+            }
+        }
+
         recordsExported++;
 
         // remove 'RGD:xxx' from reference list
