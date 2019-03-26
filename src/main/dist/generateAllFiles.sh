@@ -13,6 +13,7 @@ $APPHOME/qtlExtract.sh
 $APPHOME/geneExtract.sh
 $APPHOME/orthologExtract.sh
 $APPHOME/strainsExtract.sh
+$APPHOME/interactionsExtract.sh
 $APPHOME/gp2proteinExtract.sh
 $APPHOME/annotationsExtract.sh
 $APPHOME/annotationsDafExtract.sh
