@@ -31,7 +31,7 @@ public class InteractionsExtractor extends BaseExtractor {
         int speciesTypeKey= SpeciesType.parse(speciesInfo.getSpeciesName());
         List<Integer> proteinRgdIds= getProteinRgdIds(speciesTypeKey);
         List<Interaction> interactions= getInteractionsByRgdIdsList(proteinRgdIds);
-        String tsvFilePath = getExtractDir()+'/'+outputSubDir+"/"+"interactions_"+speciesInfo.getSpeciesName();
+        String tsvFilePath = getExtractDir()+'/'+outputSubDir+"/"+"interactions_"+speciesInfo.getSpeciesName().toLowerCase()+".txt";
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
