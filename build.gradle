@@ -23,6 +23,8 @@ repositories {
 }
 
 dependencies {
+  compile group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+
     compile 'org.apache.commons:commons-dbcp2:2.5.0'
     compile 'commons-net:commons-net:3.6'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'

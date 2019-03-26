@@ -95,6 +95,7 @@ public class FtpFileExtractsManager {
 
                 case "-gaf_agr_annotations":
                     agr = true;
+                    break;
                 case "-gaf_annotations":
                     beanId = "annotGafExtractor";
                     break;
@@ -133,6 +134,9 @@ public class FtpFileExtractsManager {
 
                 case "-sequences":
                     beanId = "seqExtractor";
+                    break;
+                case "-interactions":
+                    beanId = "intExtractor";
                     break;
 
                 // other
