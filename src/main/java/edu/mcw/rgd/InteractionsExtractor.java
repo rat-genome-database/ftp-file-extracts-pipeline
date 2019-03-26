@@ -41,7 +41,10 @@ public class InteractionsExtractor extends BaseExtractor {
                         +"# GENERATED-ON: "+dateFormat.format(date)+"\n"
                         +"# CONTACT: rgd.data@mcw.edu\n"
                         +"# FORMAT: tab delimited text\n"
-                        +"# NOTES: multiple values in a single column are separated by ';'\n"
+                        +"# NOTES:\n\tThis file provides a set of protein-protein binary interactions for species ("+speciesInfo.getSpeciesName() +").\n\tThe file is in the tab-delimited format.\n\tThe interaction data is sourced from the IMEx consortium."
+                        +"\n\tMultiple values in a single column are separated by ';'\n"
+                        +"# SPECIES: "+ speciesInfo.getSpeciesName()+"\n"
+                        +"# COUNT: "+ interactions.size()+" interactions\n"
                         +"Interactor A \tInteractor A Gene\tInteractor A Gene RGD_ID\tInteractor B\tInteractor B Gene\tInteractor B Gene RGD_ID\tSpecies A\tSpecies B\tInteraction Type\tAttributes\n"
 
         );
