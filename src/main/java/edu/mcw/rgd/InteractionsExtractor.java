@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.process.Utils;
 
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -136,8 +137,9 @@ public class InteractionsExtractor extends BaseExtractor {
         }
         return interactions;
     }
+
     public Protein getProtein(int rgdId) throws Exception {
-        Protein p= new Protein();
+        Protein p;
         if(proteins.get(rgdId)!=null){
            p=proteins.get(rgdId);
         }else{
@@ -146,8 +148,9 @@ public class InteractionsExtractor extends BaseExtractor {
         }
        return p;
     }
+
     public List<Gene> getGeneByProteinRgdId(int proteinRgdId) throws Exception {
-        List<Gene> genes= new ArrayList<>();
+        List<Gene> genes;
         if(geneProteinMap.get(proteinRgdId)!=null){
             genes=geneProteinMap.get(proteinRgdId);
         }else{
@@ -156,36 +159,17 @@ public class InteractionsExtractor extends BaseExtractor {
         }
        return genes;
     }
-    public String getGeneSymbol(List<Gene> genes){
-        StringBuilder sb= new StringBuilder();
-        boolean first=true;
-        for(Gene g:genes){
-            if(first) {
-                sb.append(g.getSymbol());
-                first=false;
-            }else{
-                sb.append("; ").append(g.getSymbol());
-            }
 
-        }
-        return sb.toString();
+    public String getGeneSymbol(List<Gene> genes) throws Exception {
+        return Utils.concatenate("; ", genes, "getSymbol");
     }
-    public String getGeneRgdId(List<Gene> genes){
-        StringBuilder sb= new StringBuilder();
-        boolean first=true;
-        for(Gene g:genes){
-            if(first) {
-                sb.append(g.getRgdId());
-                first=false;
-            }else{
-                sb.append("; ").append(g.getRgdId());
-            }
 
-        }
-        return sb.toString();
+    public String getGeneRgdId(List<Gene> genes) throws Exception {
+        return Utils.concatenate("; ", genes, "getRgdId");
     }
+
     public String getInteractionType(String accId) {
-        String interactionType = new String();
+        String interactionType = "";
         if (intTypes.get(accId) != null) {
             interactionType = intTypes.get(accId);
         } else {

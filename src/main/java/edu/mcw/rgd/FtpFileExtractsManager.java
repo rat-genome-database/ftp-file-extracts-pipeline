@@ -95,7 +95,7 @@ public class FtpFileExtractsManager {
 
                 case "-gaf_agr_annotations":
                     agr = true;
-                    break;
+                    // Note! Do *not* add 'break;' here -- it must fall through
                 case "-gaf_annotations":
                     beanId = "annotGafExtractor";
                     break;
