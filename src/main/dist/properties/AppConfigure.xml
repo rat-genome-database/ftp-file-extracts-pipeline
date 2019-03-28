@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager build 1.5.73 as of Mar 19, 2019" />
+        <property name="version" value="FtpFileExtractManager build 1.5.74 as of Mar 28, 2019" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -245,8 +245,9 @@
         <property name="version" value="VariantExtractor v.1.0.1 as of Apr 13, 2015" />
         <property name="outputSubDir" value="nonsynonymous_variants" />
     </bean>
+
     <bean id="intExtractor" class="edu.mcw.rgd.InteractionsExtractor">
-        <property name="version" value="InteractionsExtractor v.1.0.0 as of Mar 22, 2019" />
+        <property name="version" value="InteractionsExtractor v.1.0.0 as of Mar 28, 2019" />
         <property name="outputSubDir" value="interactions" />
     </bean>
 

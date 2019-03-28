@@ -1,3 +1,6 @@
+Mar 28, 2019 - v.1.5.74
+-interactionsExtractor: created
+
 Mar 19, 2019 - v.1.5.73
 -dafExtractor: added OMIM:PS conversions of DO+ custom terms
 
