@@ -1,3 +1,6 @@
+Mar 29, 2019 - v.1.5.75
+-daf extractor: updated sql for phenotypic series
+
 Mar 28, 2019 - v.1.5.74
 -interactionsExtractor: created
 
