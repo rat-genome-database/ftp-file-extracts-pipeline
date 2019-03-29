@@ -594,7 +594,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     public String getOmimPSTermAccForChildTerm(String childTermAcc) throws Exception {
         String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name IN\n" +
             "(SELECT phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN\n"+
-            " (SELECT synonym_namel FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
+            " (SELECT synonym_name FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
             ")";
         List<String> termAccIds = StringListQuery.execute(ontologyDAO, sql, childTermAcc);
         if( termAccIds.isEmpty() ) {
