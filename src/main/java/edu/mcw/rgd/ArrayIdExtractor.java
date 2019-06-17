@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -9,7 +10,7 @@ public class ArrayIdExtractor extends BaseExtractor {
 
     private static final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: array-ids-version-1.0.1\n"
+        +"# MODULE: array-ids  build 2019-06-17\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: microarray probe IDs to gene RGD ID mapping data\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -43,13 +44,17 @@ public class ArrayIdExtractor extends BaseExtractor {
         System.out.println("  gene symbols loaded: "+geneSymbols.size());
 
         // create csv file and write the header
-        String filePath = getOutputDir()+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
+        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
+        new File(outputDir).mkdirs();
+        String filePath = outputDir+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
         PrintWriter writer = new PrintWriter(filePath);
+
         String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
         writer.print(header);
         System.out.println("  processing file: "+filePath);
 
-        int dataLineCount = 0;
+        Set<String> lineSet = new TreeSet<>();
+
         for( Alias alias: aliases ) {
 
             Collection<String> geneIds = getXdbIds(alias.getRgdId(), XdbId.XDB_KEY_NCBI_GENE);
@@ -64,20 +69,24 @@ public class ArrayIdExtractor extends BaseExtractor {
 
             for( String geneId: geneIds ) {
                 for( String ensemblId: ensemblIds ) {
-                    writer.print(alias.getRgdId()+"\t");
-                    writer.print(geneSymbols.get(alias.getRgdId())+"\t");
-                    writer.print(geneId+"\t");
-                    writer.print(ensemblId+"\t");
-                    writer.print(arrayId+"\t");
-                    writer.print(alias.getValue()+"\n");
-                    dataLineCount++;
+                    String line =
+                        alias.getRgdId()+"\t"+
+                        geneSymbols.get(alias.getRgdId())+"\t"+
+                        geneId+"\t"+
+                        ensemblId+"\t"+
+                        arrayId+"\t"+
+                        alias.getValue()+"\n";
+                    lineSet.add(line);
                 }
             }
         }
 
+        for( String line: lineSet ) {
+            writer.append(line);
+        }
         writer.close();
 
-        System.out.println("  data lines written: "+dataLineCount);
+        System.out.println("  data lines written: "+lineSet.size());
     }
 
     java.util.Map<Integer, List<XdbId>> xdbIdMap = new HashMap<>();
