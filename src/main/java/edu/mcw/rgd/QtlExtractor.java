@@ -1,10 +1,10 @@
 package edu.mcw.rgd;
 
+import java.io.File;
+
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Nov 29, 2010
- * Time: 12:29:53 PM
+ * @author mtutaj
+ * @since Nov 29, 2010
  */
 public class QtlExtractor  extends BaseExtractor {
 
@@ -16,8 +16,12 @@ public class QtlExtractor  extends BaseExtractor {
 
         System.out.println(getVersion());
 
+        // create species specific output dir
+        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
+        new File(outputDir).mkdirs();
+
         QtlReporter qtlReporter = new QtlReporter();
         qtlReporter.setDao(getDao());
-        qtlReporter.runReporter(speciesRec, getExtractDir());
+        qtlReporter.runReporter(speciesRec, outputDir);
     }
 }

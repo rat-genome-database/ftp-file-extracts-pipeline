@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager build 1.5.75 as of Mar 29, 2019" />
+        <property name="version" value="FtpFileExtractManager  build 2019-06-17" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -29,7 +29,7 @@
         <property name="qtlFileName" value="QTLS_HUMAN.txt" />
         <property name="qtlSizeEstimate" value="26000000" />
 
-        <property name="markerFileName" value="SSLPS_HUMAN.txt"/>
+        <property name="markerFileName" value="MARKERS_HUMAN.txt"/>
     </bean>
 
     <bean id="mouseInfo" class="edu.mcw.rgd.SpeciesRecord">
@@ -43,7 +43,7 @@
         <property name="qtlFileName" value="QTLS_MOUSE.txt" />
         <property name="qtlSizeEstimate" value="34000000" />
 
-        <property name="markerFileName" value="SSLPS_MOUSE.txt"/>
+        <property name="markerFileName" value="MARKERS_MOUSE.txt"/>
     </bean>
 
     <bean id="ratInfo" class="edu.mcw.rgd.SpeciesRecord">
@@ -56,8 +56,8 @@
         <property name="qtlFileName" value="QTLS_RAT.txt" />
         <property name="qtlSizeEstimate" value="45000000" />
 
-        <property name="markerFileName" value="SSLPS_RAT.txt"/>
-        <property name="sslpAllelesFileName" value="SSLPS_ALLELES_RAT.txt"/>
+        <property name="markerFileName" value="MARKERS_RAT.txt"/>
+        <property name="sslpAllelesFileName" value="MARKER_ALLELES_RAT.txt"/>
 
         <property name="gp2ProteinFileName" value="gp2protein.rgd.gz"/>
     </bean>
@@ -96,7 +96,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor">
-        <property name="version" value="Gene Extractor v.2.2.7 as of Jan 31, 2019"/>
+        <property name="version" value="Gene Extractor  build 2019-06-17"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
@@ -154,7 +154,7 @@
 
 
     <bean id="qtlExtractor" class="edu.mcw.rgd.QtlExtractor">
-        <property name="version" value="Qtl Extractor v.2.4.4 as of Feb 21, 2017"/>
+        <property name="version" value="Qtl Extractor  build 2019-06-17"/>
     </bean>
 
     <bean id="dbSnpExtractor" class="edu.mcw.rgd.DbSnpExtractor">
@@ -187,8 +187,7 @@
     </bean>
 
     <bean id="sslpExtractor" class="edu.mcw.rgd.SslpExtractor">
-        <property name="version" value="SSLPExtractor v.2.5.3 as of Nov 1, 2018" />
-        <property name="qcThreadCount" value="5" />
+        <property name="version" value="MarkerExtractor  build 2019-06-17" />
     </bean>
 
     <bean id="sslpAlleleExtractor" class="edu.mcw.rgd.SslpAlleleExtractor">

@@ -2,45 +2,43 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
-import edu.mcw.rgd.pipelines.PipelineManager;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordPreprocessor;
-import edu.mcw.rgd.pipelines.RecordProcessor;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.io.Writer;
+import java.util.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Oct 15, 2010
- * Time: 1:36:05 PM
- * <p>
+ * @author mtutaj
+ * @since Oct 15, 2010
  * analyze all qtls for given species and generate report in tab separated format
  */
 public class QtlReporter {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: qtls-version-2.4.4\n"
+    +"# MODULE: qtls  build 2019-06-17\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# qtls extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
     +"# FORMAT: tab delimited text\n"
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
-    +"### Apr  1 2011 v.2.1.1: RATMAP_IDs and RHDB_IDs are discontinued\n"
-    +"### Dec 19 2011 v.2.1.2: no data changes; improved internal QC\n"
-    +"### Oct 22 2012 v.2.1.3: fixed export of positional information for mouse qtls (positions on assembly build 38 were exported as positions on assembly 37)\n"
-    +"### Oct 23 2012 v.2.1.4: fixed description of columns for human qtls\n"
-    +"### Nov 20 2012 v.2.2.0: rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported\n"
-    +"### Apr 18 2013 v.2.3.0: rat: crossed strains are reported in separate columns for easier sorting\n"
-    +"### Jul 16 2014 v.2.3.1: mouse: added generation of file QTLS_MOUSE_B38.txt with positions on assemblies 38 and 37\n"
-    +"### Sep 09 2014 v.2.4.0: rat: added positions on Rnor_6.0 assembly\n"
-    +"### Sep 09 2014 v.2.4.1: mouse: QTLS_MOUSE_B38.txt discontinued; 4 columns added to QTLS_MOUSE.txt file to accommodate assembly 38 positions\n"
-    +"### Jan 08 2016 v.2.4.2: TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE\n"
-    +"### Jan 11 2016 v.2.4.3: rat: added columns STRAIN_RGD_ID3 and STRAIN_RGD_SYMBOL3 for qtls that have 3+ crossed strains\n"
+    +"### Apr  1 2011  RATMAP_IDs and RHDB_IDs are discontinued\n"
+    +"### Dec 19 2011  no data changes; improved internal QC\n"
+    +"### Oct 22 2012  fixed export of positional information for mouse qtls (positions on assembly build 38 were exported as positions on assembly 37)\n"
+    +"### Oct 23 2012  fixed description of columns for human qtls\n"
+    +"### Nov 20 2012  rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported\n"
+    +"### Apr 18 2013  rat: crossed strains are reported in separate columns for easier sorting\n"
+    +"### Jul 16 2014  mouse: added generation of file QTLS_MOUSE_B38.txt with positions on assemblies 38 and 37\n"
+    +"### Sep 09 2014  rat: added positions on Rnor_6.0 assembly\n"
+    +"### Sep 09 2014  mouse: QTLS_MOUSE_B38.txt discontinued; 4 columns added to QTLS_MOUSE.txt file to accommodate assembly 38 positions\n"
+    +"### Jan 08 2016  TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE\n"
+    +"### Jan 11 2016  rat: added columns STRAIN_RGD_ID3 and STRAIN_RGD_SYMBOL3 for qtls that have 3+ crossed strains\n"
+    +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 25 columns are in common between rat, mouse and human)\n"
@@ -191,34 +189,21 @@ public class QtlReporter {
         }
         writer.println(header.replace("#COLUMNS#", HEADER_COMMON));
 
-        // create pipeline managing framework
-        PipelineManager manager = new PipelineManager();
+        List<QTL> inRgdQtls = dao.getActiveQtls(speciesType);
+        List<QtlRecord> qtls = new ArrayList<>(inRgdQtls.size());
+        for( QTL qtl: inRgdQtls ) {
+            QtlRecord rec = new QtlRecord();
+            rec.qtl = qtl;
+            qtls.add(rec);
+        }
 
-        // setup pipeline parser "DB" - 1 thread -- max 1000 QtlRecords in output queue
-        manager.addPipelineWorkgroup(new RecordPreprocessor() {
-            // parser: break source into a stream of QtlRecord-s
-            public void process() throws Exception {
-                // process active qtls for given species
-                int recNo = 0;
-                for( QTL qtl: dao.getActiveQtls(speciesType) ) {
-                    QtlRecord rec = new QtlRecord();
-                    rec.setRecNo(++recNo);
-                    rec.qtl = qtl;
-                    getSession().putRecordToFirstQueue(rec);
-                }
-            }
-        }, "DB", 1, 1000);
+        final java.util.Map<Integer, String> lineMap = new ConcurrentHashMap<>(qtls.size());
 
-        // setup pipeline "QC" - 9 parallel threads -- max 100 QtlRecords in output queue
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                QtlRecord rec = (QtlRecord) r;
+        qtls.parallelStream().forEach( rec -> {
+            try {
+
                 QTL qtl = rec.qtl;
 
-                if( rec.getRecNo()%100==0 )
-                    log.debug("QC recno="+rec.getRecNo());
-                
                 if( qtl.getFlank1RgdId()!=null ) {
                     rec.flank1MarkerSymbol = dao.getSymbolForMarker(qtl.getFlank1RgdId());
                 }
@@ -277,223 +262,17 @@ public class QtlReporter {
                         rec.notes[0] = newNotes;
                     }
                 }
+
+                String line = generateDataLine(rec, speciesType);
+                lineMap.put(rec.qtl.getRgdId(), line);
+
+            } catch( Exception e ) {
+                throw new RuntimeException(e);
             }
-        }, "QC", 9, 0);
+        });
 
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                QtlRecord rec = (QtlRecord) r;
-                QTL qtl = rec.qtl;
-
-                // 1. the RGD_ID of the QTL
-                writer.print(qtl.getRgdId());
-                writer.print('\t');
-
-                // 2. species
-                writer.print(SpeciesType.getCommonName(qtl.getSpeciesTypeKey()).toLowerCase());
-                writer.print('\t');
-
-                // 3. qtl symbol
-                writer.print(checkNull(qtl.getSymbol()));
-                writer.print('\t');
-
-                // 4. qtl name
-                writer.print(checkNull(qtl.getName()));
-                writer.print('\t');
-
-                // 5. the chromosome from the original paper
-                writer.print(checkNull(qtl.getChromosome()));
-                writer.print('\t');
-
-                // 6. maximum LOD score if given in paper
-                if( qtl.getLod()!=null )
-                    writer.print(qtl.getLod());
-                writer.print('\t');
-
-                // 7. p-value for QTL if given in paper
-                if( qtl.getPValue()!=null )
-                    writer.print(qtl.getPValue());
-                writer.print('\t');
-
-                // 8. variance if given in paper
-                if( qtl.getVariance()!=null )
-                    writer.print(qtl.getVariance());
-                writer.print('\t');
-
-                // marker symbols: markers could be MARKERS, GENES
-                if( qtl.getFlank1RgdId()!=null ) {
-                    // 9. RGD_ID for flank marker 1, if in paper
-                    writer.print(qtl.getFlank1RgdId());
-                    writer.print('\t');
-
-                    // 10. symbol for flank marker 1, if in paper
-                    writer.print(checkNull(rec.flank1MarkerSymbol));
-                    writer.print('\t');
-                }
-                else // 9. 10.
-                    writer.print("\t\t");
-
-                if( qtl.getFlank2RgdId()!=null ) {
-                    // 11. RGD_ID for flank marker 2, if in paper
-                    writer.print(qtl.getFlank2RgdId());
-                    writer.print('\t');
-
-                    // 12. symbol for flank marker 2, if in paper
-                    writer.print(checkNull(rec.flank2MarkerSymbol));
-                    writer.print('\t');
-                }
-                else // 11. 12.
-                    writer.print("\t\t");
-
-                if( qtl.getPeakRgdId()!=null ) {
-                    // 13. RGD_ID for peak marker, if in paper
-                    writer.print(qtl.getPeakRgdId());
-                    writer.print('\t');
-
-                    // 14. symbol for peak marker, if in paper
-                    writer.print(checkNull(rec.peakMarkerSymbol));
-                    writer.print('\t');
-                }
-                else // 13. 14.
-                    writer.print("\t\t");
-
-                // 15. trait name -- use VT term name if available, otherwise use note of type qtl_trait
-                if( rec.terms[2]!=null ) {
-                    writer.print(checkNull(rec.terms[2]));
-                } else {
-                    writer.print(checkNull(rec.notes[3]));
-                }
-                writer.print('\t');
-
-                // 16. measurement type -- use CMO term name if available, otherwise use note of type qtl_subtrait
-                if( rec.terms[3]!=null ) {
-                    writer.print(checkNull(rec.terms[3]));
-                } else {
-                    writer.print(checkNull(rec.notes[4]));
-                }
-                writer.print('\t');
-
-                // 17. unused
-                writer.print('\t');
-
-                // 18. phenotype ontology annotation
-                writer.print(checkNull(rec.terms[0]));
-                writer.print('\t');
-
-                // 19. diseases ontology annotation
-                writer.print(checkNull(rec.terms[1]));
-                writer.print('\t');
-
-                // 20. curated ref rgd ids: RGD_ID of paper(s) on QTL
-                if( rec.curatedRefs!=null && rec.curatedRefs.length()> 0 ) {
-                    writer.print(checkNull(rec.curatedRefs.replace(',', ';')));
-                }
-                writer.print('\t');
-
-                // 21. curated pumbed ids: PUBMED_ID of paper(s) on QTL
-                if( rec.curatedPubmedIds!=null && rec.curatedPubmedIds.length()> 0 ) {
-                    writer.print(checkNull(rec.curatedPubmedIds.replace(',', ';')));
-                }
-                writer.print('\t');
-
-                // 22. CANDIDATE_GENE_RGD_IDS - RGD_IDS genes mentioned by paper author
-                writer.print(checkNull(rec.candidateGenes[0]));
-                writer.print('\t');
-
-                // 23. CANDIDATE_GENE_SYMBOLS
-                writer.print(checkNull(rec.candidateGenes[1]));
-                writer.print('\t');
-
-                // 24. INHERITANCE_TYPE - dominant, recessive etc.
-                writer.print(checkNull(qtl.getInheritanceType()));
-                writer.print('\t');
-
-                // 25. RELATED_QTLS	       symbols of related QTLS
-                writer.print(checkNull(rec.relQtls));
-
-                // warn about any associated notes of type "qtl_rel_qtls" -- this is obsolete
-                if( rec.notes[0]!=null && rec.notes[0].length()>0  )
-                    log.info("NOTE: qtl "+qtl.getSymbol()+" with qtl_key="+qtl.getKey()+" has unmatching public qtl_rel_qtls notes:"+rec.notes[0]);
-
-                writer.print('\t');
-
-                // 26. (UNUSED) for rat
-                // 26. OMIM_ID for human, if available
-                // 26. MGI_ID for mouse, if available
-                writer.print(checkNull(rec.xdbIds));
-                writer.print('\t');
-
-                // 27-30 for rat, 5.0 assembly position (see explanation above)
-                // 27-30 for human, 37 assembly position
-                // 27-30 for mouse, 37 assembly position
-                writeMapData(writer, rec.mapData1);
-
-                // 31-34 for rat, 3.4 assembly position
-                // 31-34 for human, 36 assembly position
-                // 31-34 for mouse, 36 assembly position
-                writeMapData(writer, rec.mapData2);
-
-                String[] strains = rec.strains;
-                if( speciesType==SpeciesType.RAT ) {
-                    // 35. CROSS_TYPE self explanatory
-                    writer.print(checkNull(rec.notes[2]));
-                    writer.print('\t');
-                    // 36. CROSS_PAIR pairing of strains for cross
-                    writer.print(checkNull(rec.notes[1]));
-                    writer.print('\t');
-
-                    // 37. STRAIN_RGD_ID1 RGD_ID of first strain crossed
-                    writer.write(checkNull(strains[0]));
-                    writer.write('\t');
-                    // 38. STRAIN_RGD_ID1 RGD_ID of second strain crossed
-                    writer.write(checkNull(strains[1]));
-                    writer.write('\t');
-                    // 39. STRAIN_RGD_SYMBOL1 symbol of first strain crossed
-                    writer.write(checkNull(strains[3]));
-                    writer.write('\t');
-                    // 40. STRAIN_RGD_SYMBOL2 symbol of second strain crossed
-                    writer.write(checkNull(strains[4]));
-                    writer.write('\t');
-                }
-                else if( speciesType==SpeciesType.MOUSE ) {
-                    if( rec.mapData4.isEmpty() )
-                        writer.print("\t\t");
-                    else {
-                        MapData md = rec.mapData4.get(0);
-                        // 35. cM map chromosome, for mouse
-                        writer.print(checkNull(md.getChromosome()));
-                        writer.print('\t');
-                        // 36. cM map absolute position, for mouse
-                        if( md.getAbsPosition()!=null )
-                            writer.print(md.getAbsPosition());
-                        writer.print('\t');
-                    }
-                }
-
-                // rat, Rnor_6.0 assembly position
-                // mouse, 38 assembly position
-                if( rec.mapData3!=null )
-                    writeMapData(writer, rec.mapData3);
-
-                // RGD_ID and symbol of 3rd strain crossed
-                if( speciesType==SpeciesType.RAT ) {
-                    // 45. STRAIN_RGD_ID3 RGD_ID of third strain crossed
-                    writer.write(checkNull(strains[2]));
-                    writer.write('\t');
-                    // 46. STRAIN_RGD_SYMBOL3 symbol of third strain crossed
-                    writer.write(checkNull(strains[5]));
-                    writer.write('\t');
-                }
-
-                // terminate the line
-                writer.println();
-            }
-        }, "DL", 1, 0);
-
-        // run pipelines
-        manager.run();
+        // write data lines sorted by RGD ID
+        writeDataLines(writer, lineMap);
 
         // close the output file
         writer.close();
@@ -502,28 +281,238 @@ public class QtlReporter {
         FtpFileExtractsManager.qcFileContent(fileName, "qtls", speciesType);
     }
 
-    void writeMapData(PrintWriter writer, List<MapData> mds) {
+    String generateDataLine(QtlRecord rec, int speciesType) {
+        QTL qtl = rec.qtl;
+        StringBuilder buf = new StringBuilder();
+
+        // 1. the RGD_ID of the QTL
+        buf.append(qtl.getRgdId());
+        buf.append('\t');
+
+        // 2. species
+        buf.append(SpeciesType.getCommonName(qtl.getSpeciesTypeKey()).toLowerCase());
+        buf.append('\t');
+
+        // 3. qtl symbol
+        buf.append(checkNull(qtl.getSymbol()));
+        buf.append('\t');
+
+        // 4. qtl name
+        buf.append(checkNull(qtl.getName()));
+        buf.append('\t');
+
+        // 5. the chromosome from the original paper
+        buf.append(checkNull(qtl.getChromosome()));
+        buf.append('\t');
+
+        // 6. maximum LOD score if given in paper
+        if( qtl.getLod()!=null )
+            buf.append(qtl.getLod());
+        buf.append('\t');
+
+        // 7. p-value for QTL if given in paper
+        if( qtl.getPValue()!=null )
+            buf.append(qtl.getPValue());
+        buf.append('\t');
+
+        // 8. variance if given in paper
+        if( qtl.getVariance()!=null )
+            buf.append(qtl.getVariance());
+        buf.append('\t');
+
+        // marker symbols: markers could be MARKERS, GENES
+        if( qtl.getFlank1RgdId()!=null ) {
+            // 9. RGD_ID for flank marker 1, if in paper
+            buf.append(qtl.getFlank1RgdId());
+            buf.append('\t');
+
+            // 10. symbol for flank marker 1, if in paper
+            buf.append(checkNull(rec.flank1MarkerSymbol));
+            buf.append('\t');
+        }
+        else // 9. 10.
+            buf.append("\t\t");
+
+        if( qtl.getFlank2RgdId()!=null ) {
+            // 11. RGD_ID for flank marker 2, if in paper
+            buf.append(qtl.getFlank2RgdId());
+            buf.append('\t');
+
+            // 12. symbol for flank marker 2, if in paper
+            buf.append(checkNull(rec.flank2MarkerSymbol));
+            buf.append('\t');
+        }
+        else // 11. 12.
+            buf.append("\t\t");
+
+        if( qtl.getPeakRgdId()!=null ) {
+            // 13. RGD_ID for peak marker, if in paper
+            buf.append(qtl.getPeakRgdId());
+            buf.append('\t');
+
+            // 14. symbol for peak marker, if in paper
+            buf.append(checkNull(rec.peakMarkerSymbol));
+            buf.append('\t');
+        }
+        else // 13. 14.
+            buf.append("\t\t");
+
+        // 15. trait name -- use VT term name if available, otherwise use note of type qtl_trait
+        if( rec.terms[2]!=null ) {
+            buf.append(checkNull(rec.terms[2]));
+        } else {
+            buf.append(checkNull(rec.notes[3]));
+        }
+        buf.append('\t');
+
+        // 16. measurement type -- use CMO term name if available, otherwise use note of type qtl_subtrait
+        if( rec.terms[3]!=null ) {
+            buf.append(checkNull(rec.terms[3]));
+        } else {
+            buf.append(checkNull(rec.notes[4]));
+        }
+        buf.append('\t');
+
+        // 17. unused
+        buf.append('\t');
+
+        // 18. phenotype ontology annotation
+        buf.append(checkNull(rec.terms[0]));
+        buf.append('\t');
+
+        // 19. diseases ontology annotation
+        buf.append(checkNull(rec.terms[1]));
+        buf.append('\t');
+
+        // 20. curated ref rgd ids: RGD_ID of paper(s) on QTL
+        if( rec.curatedRefs!=null && rec.curatedRefs.length()> 0 ) {
+            buf.append(checkNull(rec.curatedRefs.replace(',', ';')));
+        }
+        buf.append('\t');
+
+        // 21. curated pumbed ids: PUBMED_ID of paper(s) on QTL
+        if( rec.curatedPubmedIds!=null && rec.curatedPubmedIds.length()> 0 ) {
+            buf.append(checkNull(rec.curatedPubmedIds.replace(',', ';')));
+        }
+        buf.append('\t');
+
+        // 22. CANDIDATE_GENE_RGD_IDS - RGD_IDS genes mentioned by paper author
+        buf.append(checkNull(rec.candidateGenes[0]));
+        buf.append('\t');
+
+        // 23. CANDIDATE_GENE_SYMBOLS
+        buf.append(checkNull(rec.candidateGenes[1]));
+        buf.append('\t');
+
+        // 24. INHERITANCE_TYPE - dominant, recessive etc.
+        buf.append(checkNull(qtl.getInheritanceType()));
+        buf.append('\t');
+
+        // 25. RELATED_QTLS	       symbols of related QTLS
+        buf.append(checkNull(rec.relQtls));
+
+        // warn about any associated notes of type "qtl_rel_qtls" -- this is obsolete
+        if( rec.notes[0]!=null && rec.notes[0].length()>0  )
+            log.info("NOTE: qtl "+qtl.getSymbol()+" with qtl_key="+qtl.getKey()+" has unmatching public qtl_rel_qtls notes:"+rec.notes[0]);
+
+        buf.append('\t');
+
+        // 26. (UNUSED) for rat
+        // 26. OMIM_ID for human, if available
+        // 26. MGI_ID for mouse, if available
+        buf.append(checkNull(rec.xdbIds));
+        buf.append('\t');
+
+        // 27-30 for rat, 5.0 assembly position (see explanation above)
+        // 27-30 for human, 37 assembly position
+        // 27-30 for mouse, 37 assembly position
+        writeMapData(buf, rec.mapData1);
+
+        // 31-34 for rat, 3.4 assembly position
+        // 31-34 for human, 36 assembly position
+        // 31-34 for mouse, 36 assembly position
+        writeMapData(buf, rec.mapData2);
+
+        String[] strains = rec.strains;
+        if( speciesType==SpeciesType.RAT ) {
+            // 35. CROSS_TYPE self explanatory
+            buf.append(checkNull(rec.notes[2]));
+            buf.append('\t');
+            // 36. CROSS_PAIR pairing of strains for cross
+            buf.append(checkNull(rec.notes[1]));
+            buf.append('\t');
+
+            // 37. STRAIN_RGD_ID1 RGD_ID of first strain crossed
+            buf.append(checkNull(strains[0]));
+            buf.append('\t');
+            // 38. STRAIN_RGD_ID1 RGD_ID of second strain crossed
+            buf.append(checkNull(strains[1]));
+            buf.append('\t');
+            // 39. STRAIN_RGD_SYMBOL1 symbol of first strain crossed
+            buf.append(checkNull(strains[3]));
+            buf.append('\t');
+            // 40. STRAIN_RGD_SYMBOL2 symbol of second strain crossed
+            buf.append(checkNull(strains[4]));
+            buf.append('\t');
+        }
+        else if( speciesType==SpeciesType.MOUSE ) {
+            if( rec.mapData4.isEmpty() )
+                buf.append("\t\t");
+            else {
+                MapData md = rec.mapData4.get(0);
+                // 35. cM map chromosome, for mouse
+                buf.append(checkNull(md.getChromosome()));
+                buf.append('\t');
+                // 36. cM map absolute position, for mouse
+                if( md.getAbsPosition()!=null )
+                    buf.append(md.getAbsPosition());
+                buf.append('\t');
+            }
+        }
+
+        // rat, Rnor_6.0 assembly position
+        // mouse, 38 assembly position
+        if( rec.mapData3!=null )
+            writeMapData(buf, rec.mapData3);
+
+        // RGD_ID and symbol of 3rd strain crossed
+        if( speciesType==SpeciesType.RAT ) {
+            // 45. STRAIN_RGD_ID3 RGD_ID of third strain crossed
+            buf.append(checkNull(strains[2]));
+            buf.append('\t');
+            // 46. STRAIN_RGD_SYMBOL3 symbol of third strain crossed
+            buf.append(checkNull(strains[5]));
+            buf.append('\t');
+        }
+
+        // terminate the line
+        buf.append("\n");
+
+        return buf.toString();
+    }
+
+    void writeMapData(StringBuilder buf, List<MapData> mds) {
         if( mds==null || mds.isEmpty() )
-            writer.print("\t\t\t\t");
+            buf.append("\t\t\t\t");
         else {
             MapData md = mds.get(0);
             if( mds.size()>1 ) {
                 System.out.println("***MULTIS for RGDID:"+md.getRgdId()+", map_key:"+md.getMapKey());
             }
             // chromosome
-            writer.print(checkNull(md.getChromosome()));
-            writer.print('\t');
+            buf.append(checkNull(md.getChromosome()));
+            buf.append('\t');
             // start pos
             if( md.getStartPos()!=null )
-                writer.print(md.getStartPos());
-            writer.print('\t');
+                buf.append(md.getStartPos());
+            buf.append('\t');
             // stop pos
             if( md.getStopPos()!=null )
-                writer.print(md.getStopPos());
-            writer.print('\t');
+                buf.append(md.getStopPos());
+            buf.append('\t');
             // method
-            writer.print(checkNull(md.getMapPositionMethod()));
-            writer.print('\t');
+            buf.append(checkNull(md.getMapPositionMethod()));
+            buf.append('\t');
         }
     }
 
@@ -684,8 +673,19 @@ public class QtlReporter {
         this.dao = dao;
     }
 
+    void writeDataLines(Writer out, Map<Integer,String> lineMap) throws IOException {
 
-    class QtlRecord extends PipelineRecord {
+        // the original data map is unsorted -- let's sort it by rgd id
+        Map<Integer, String> sortedLineMap = new TreeMap<>();
+        for( Map.Entry<Integer,String> entry: lineMap.entrySet() ) {
+            sortedLineMap.put(entry.getKey(), entry.getValue());
+        }
+        for( Map.Entry<Integer,String> entry: sortedLineMap.entrySet() ) {
+            out.write(entry.getValue());
+        }
+    }
+
+    class QtlRecord {
 
         public QTL qtl;
         public String flank1MarkerSymbol;
