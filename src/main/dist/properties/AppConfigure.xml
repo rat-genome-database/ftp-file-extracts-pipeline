@@ -87,7 +87,7 @@
 
 
     <bean id="strainExtractor" class="edu.mcw.rgd.StrainExtractor">
-        <property name="version" value="Strain Extractor v.2.1.3 as of Feb 21, 2017"/>
+        <property name="version" value="Strain Extractor  build 2019-06-17"/>
         <property name="tsvFileName" value="STRAINS.txt"/>
         <property name="xmlFileName" value="STRAINS.xml"/>
     </bean>
