@@ -217,11 +217,7 @@ public class GeneExtractor extends BaseExtractor {
 
     String generate(final SpeciesRecord si) throws Exception {
 
-        String ucSpeciesName = si.getSpeciesName().toUpperCase();
-        String outputDir = getExtractDir()+'/'+ucSpeciesName;
-        new File(outputDir).mkdirs();
-
-        String outputFileName = outputDir+'/'+getFileNamePrefix()+ucSpeciesName+".txt";
+        String outputFileName = getSpeciesSpecificExtractDir(si)+'/'+getFileNamePrefix()+si.getSpeciesName().toUpperCase()+".txt";
         log.info("started extraction to "+outputFileName);
 
         final FtpFileExtractsDAO dao = getDao();

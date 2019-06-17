@@ -6,7 +6,6 @@ import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.process.Utils;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,8 +35,7 @@ public class StrainExtractor extends BaseExtractor {
         System.out.println(getVersion());
 
         // create species specific output dir
-        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
-        new File(outputDir).mkdirs();
+        String outputDir = getSpeciesSpecificExtractDir(speciesRec);
 
         // create tsv and xml files
         String tsvFilePath = outputDir+'/'+tsvFileName;

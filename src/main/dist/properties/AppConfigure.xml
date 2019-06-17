@@ -57,7 +57,7 @@
         <property name="qtlSizeEstimate" value="45000000" />
 
         <property name="markerFileName" value="MARKERS_RAT.txt"/>
-        <property name="sslpAllelesFileName" value="MARKER_ALLELES_RAT.txt"/>
+        <property name="markerAllelesFileName" value="MARKER_ALLELES_RAT.txt"/>
 
         <property name="gp2ProteinFileName" value="gp2protein.rgd.gz"/>
     </bean>
@@ -186,11 +186,11 @@
         </property>
     </bean>
 
-    <bean id="sslpExtractor" class="edu.mcw.rgd.SslpExtractor">
+    <bean id="markerExtractor" class="edu.mcw.rgd.SslpExtractor">
         <property name="version" value="MarkerExtractor  build 2019-06-17" />
     </bean>
 
-    <bean id="sslpAlleleExtractor" class="edu.mcw.rgd.SslpAlleleExtractor">
+    <bean id="markerAlleleExtractor" class="edu.mcw.rgd.SslpAlleleExtractor">
     </bean>
 
     <bean id="orthologExtractor" class="edu.mcw.rgd.OrthologExtractor">

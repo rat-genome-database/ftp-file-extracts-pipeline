@@ -21,7 +21,7 @@ public class SpeciesRecord {
     private int qtlSizeEstimate;
     private String gp2ProteinFileName;
     private String markerFileName;
-    private String sslpAllelesFileName;
+    private String markerAllelesFileName;
 
     /**
      * get today date formatted as yyyy/mm/dd
@@ -93,14 +93,6 @@ public class SpeciesRecord {
         this.markerFileName = fileName;
     }
 
-    public String getSslpAllelesFileName() {
-        return sslpAllelesFileName;
-    }
-
-    public void setSslpAllelesFileName(String sslpAllelesFileName) {
-        this.sslpAllelesFileName = sslpAllelesFileName;
-    }
-
     public String getGp2ProteinFileName() {
         return gp2ProteinFileName;
     }
@@ -123,5 +115,13 @@ public class SpeciesRecord {
 
     public int getOldRefAssemblyMapKeyForMarkers() {
         return oldRefAssemblyMapKeyForMarkers;
+    }
+
+    public void setMarkerAllelesFileName(String markerAllelesFileName) {
+        this.markerAllelesFileName = markerAllelesFileName;
+    }
+
+    public String getMarkerAllelesFileName() {
+        return markerAllelesFileName;
     }
 }

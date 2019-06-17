@@ -4,7 +4,6 @@ import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,11 +22,7 @@ public class QtlExtractor  extends BaseExtractor {
 
         System.out.println(getVersion());
 
-        // create species specific output dir
-        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
-        new File(outputDir).mkdirs();
-
-        run(speciesRec, outputDir);
+        run(speciesRec, getSpeciesSpecificExtractDir(speciesRec));
     }
 
     final String HEADER_COMMON_LINES =

@@ -72,13 +72,14 @@ public class FtpFileExtractsManager {
                     beanId = "gp2ProteinExtractor";
                     break;
 
-                case "-sslps":
                 case "-markers":
-                    beanId = "sslpExtractor";
+                case "-sslps": // formerly
+                    beanId = "markerExtractor";
                     break;
 
-                case "-sslp_alleles":
-                    beanId = "sslpAlleleExtractor";
+                case "-marker_alleles":
+                case "-sslp_alleles": // formerly
+                    beanId = "markerAlleleExtractor";
                     break;
 
                 case "-orthologs":
@@ -205,7 +206,7 @@ public class FtpFileExtractsManager {
 
         String USAGE = "java -Dspring.config=$APPHOME/../properties/default_db.xml -Dlog4j.configuration=$APPHOME/properties/log4j.properties"+
             " -jar ./lib/ftpFileExtracts.jar [MODULE] [OPTIONS]\n"+
-        "[MODULE] one of: -genes | -strains | -qtls | -gp2protein | -markers | -sslp_alleles | -orthologs | -annotations | -daf_annotations "+
+        "[MODULE] one of: -genes | -strains | -qtls | -gp2protein | -markers | -marker_alleles | -orthologs | -annotations | -daf_annotations "+
             "| -gaf_annotations | -gaf_agr_annotations | -uniprot_annotations | -db_snps | -radoslavov | -chinchilla | -assembly_comparison "+
             "| -mirna_targets | -array_ids | -sequences | -obsolete\n"+
         "[OPTIONS] optional species name: -species=rat|mouse|human|...|all (default) (all:rat,mouse,human,...)\n"+

@@ -7,7 +7,7 @@ set -e
 $APPHOME/agrExtract.sh
 $APPHOME/arrayIdExtract.sh
 $APPHOME/radoslavov.sh
-$APPHOME/sslpAlleleExtract.sh
+$APPHOME/markerAlleleExtract.sh
 $APPHOME/markerExtract.sh
 $APPHOME/qtlExtract.sh
 $APPHOME/geneExtract.sh

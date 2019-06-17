@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,7 +17,7 @@ public class SslpAlleleExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: sslp-alleles-version-2.0.2\n"
+    +"# MODULE: marker-alleles-version-2.0.2\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# sslp alleles extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -35,9 +36,11 @@ public class SslpAlleleExtractor extends BaseExtractor {
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 
-        String outputFile = speciesRec.getSslpAllelesFileName();
+        String outputFile = speciesRec.getMarkerAllelesFileName();
         if( outputFile==null )
             return;
+        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
+        new File(outputDir).mkdirs();
         outputFile = getExtractDir()+'/'+outputFile;
 
         // retrieve from database all markers with allele sizes and strain names

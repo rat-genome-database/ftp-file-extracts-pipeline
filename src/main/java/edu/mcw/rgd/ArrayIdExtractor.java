@@ -2,7 +2,6 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -19,7 +18,6 @@ public class ArrayIdExtractor extends BaseExtractor {
         +"GENE_RGD_ID\tGENE_SYMBOL\tNCBI_GENE_ID\tENSEMBL_GENE_ID\tARRAY_ID\tPROBE_SET_ID\n";
 
     private String version;
-    private String outputDir;
     private String fileNamePrefix;
 
     /**
@@ -44,9 +42,7 @@ public class ArrayIdExtractor extends BaseExtractor {
         System.out.println("  gene symbols loaded: "+geneSymbols.size());
 
         // create csv file and write the header
-        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
-        new File(outputDir).mkdirs();
-        String filePath = outputDir+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
+        String filePath = getSpeciesSpecificExtractDir(speciesRec)+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
         PrintWriter writer = new PrintWriter(filePath);
 
         String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
@@ -124,14 +120,6 @@ public class ArrayIdExtractor extends BaseExtractor {
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public void setOutputDir(String outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public String getOutputDir() {
-        return outputDir;
     }
 
     public void setFileNamePrefix(String fileNamePrefix) {

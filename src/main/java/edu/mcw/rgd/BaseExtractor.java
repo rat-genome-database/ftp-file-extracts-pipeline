@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -59,6 +60,11 @@ public abstract class BaseExtractor {
         }
     }
 
+    public String getSpeciesSpecificExtractDir(SpeciesRecord si) {
+        String outputDir = getExtractDir()+'/'+si.getSpeciesName().toUpperCase();
+        new File(outputDir).mkdirs(); // ensure the species specific directory does exist
+        return outputDir;
+    }
 
     public FtpFileExtractsDAO getDao() {
         return dao;

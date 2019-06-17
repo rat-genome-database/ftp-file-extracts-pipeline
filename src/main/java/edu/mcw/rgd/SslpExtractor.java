@@ -4,7 +4,6 @@ import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -148,9 +147,7 @@ public class SslpExtractor extends BaseExtractor {
             return;
 
         // create species specific output dir
-        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
-        new File(outputDir).mkdirs();
-        outputFile = outputDir+'/'+outputFile;
+        outputFile = getSpeciesSpecificExtractDir(speciesInfo)+'/'+outputFile;
 
         final FtpFileExtractsDAO dao = getDao();
         String species = speciesInfo.getSpeciesName();
