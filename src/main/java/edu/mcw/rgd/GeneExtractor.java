@@ -411,18 +411,6 @@ public class GeneExtractor extends BaseExtractor {
         return outputFileName;
     }
 
-    void writeDataLines(Writer out, Map<Integer,String> lineMap) throws IOException {
-
-        // the original data map is unsorted -- let's sort it by rgd id
-        Map<Integer, String> sortedLineMap = new TreeMap<>();
-        for( Map.Entry<Integer,String> entry: lineMap.entrySet() ) {
-            sortedLineMap.put(entry.getKey(), entry.getValue());
-        }
-        for( Map.Entry<Integer,String> entry: sortedLineMap.entrySet() ) {
-            out.write(entry.getValue());
-        }
-    }
-
     List<GeneExtractRecord> loadGeneRecords(int speciesTypeKey) throws Exception {
         List<Gene> genesInRgd = getDao().getActiveGenes(speciesTypeKey);
         List<GeneExtractRecord> result = new ArrayList<>(genesInRgd.size());

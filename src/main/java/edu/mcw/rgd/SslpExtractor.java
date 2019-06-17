@@ -1,16 +1,13 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
-import edu.mcw.rgd.pipelines.PipelineManager;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordPreprocessor;
-import edu.mcw.rgd.pipelines.RecordProcessor;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
+import java.io.File;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author mtutaj
@@ -20,7 +17,7 @@ public class SslpExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: markers-version-2.5.3\n"
+    +"# MODULE: markers  build 2019-06-17\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# markers extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -32,17 +29,18 @@ public class SslpExtractor extends BaseExtractor {
     +"#   is how it is presented in the columns CHROMOSOME_3.4, START_POS_3.4 and STOP_POS_3.4:\n"
     +"#   1;1  <tab>   78134192;78153000   <tab>  78134522;78153323\n"
     +"#\n"
-    +"### As of Apr 1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.\n"
-    +"### As of Jul 1, 2011 fixed generation of UNCURATED_REF_PUBMED_IDs.\n"
-    +"### As of Nov 23, 2011 v. 2.3.1: no format changes (UniGene Ids are extracted from db in different way).\n"
-    +"### As of Dec 19 2011 v. 2.3.2: no data changes; improved internal QC.\n"
-    +"### As of May 31 2012 v. 2.3.3: no data changes; (optimized retrieval of maps data from database)\n"
-    +"### As of Oct 22 2012 v. 2.3.4: fixed export of positional information for mouse (positions on assembly build 38 were exported as positions on assembly 37).\n"
-    +"### As of Nov 20 2012 v. 2.4: rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported.\n"
-    +"### As of Dec 26 2013 v. 2.4.1: no data changes; improved internal QC.\n"
-    +"### As of Sep 8 2014 v. 2.5.0: rat: available positions on assembly Rnor_6.0.\n"
-    +"### As of Oct 29 2018 v. 2.5.2: discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows marker type.\n"
-    +"### As of Nov 1 2018 v. 2.5.3: renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.\n"
+    +"### Apr 1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.\n"
+    +"### Jul 1, 2011 fixed generation of UNCURATED_REF_PUBMED_IDs.\n"
+    +"### Nov 23, 2011 no format changes (UniGene Ids are extracted from db in different way).\n"
+    +"### Dec 19 2011 no data changes; improved internal QC.\n"
+    +"### May 31 2012 no data changes; (optimized retrieval of maps data from database)\n"
+    +"### Oct 22 2012 fixed export of positional information for mouse (positions on assembly build 38 were exported as positions on assembly 37).\n"
+    +"### Nov 20 2012 rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported.\n"
+    +"### Dec 26 2013 no data changes; improved internal QC.\n"
+    +"### Sep 8 2014 rat: available positions on assembly Rnor_6.0.\n"
+    +"### Oct 29 2018 discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows marker type.\n"
+    +"### Nov 1 2018 renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.\n"
+    +"### Jun 17 2019 data sorted by RGD ID; files exported into species specific directories\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 23 columns are in common between rat, mouse and human)\n"
@@ -139,7 +137,6 @@ public class SslpExtractor extends BaseExtractor {
    +"MGD_ID\tCM_POS";
 
     Logger log = Logger.getLogger(getClass());
-    private int qcThreadCount;
 
     public void run(SpeciesRecord speciesInfo) throws Exception {
 
@@ -149,7 +146,11 @@ public class SslpExtractor extends BaseExtractor {
         String outputFile = speciesInfo.getMarkerFileName();
         if( outputFile==null )
             return;
-        outputFile = getExtractDir()+'/'+outputFile;
+
+        // create species specific output dir
+        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
+        new File(outputDir).mkdirs();
+        outputFile = outputDir+'/'+outputFile;
 
         final FtpFileExtractsDAO dao = getDao();
         String species = speciesInfo.getSpeciesName();
@@ -166,34 +167,13 @@ public class SslpExtractor extends BaseExtractor {
                 speciesType==SpeciesType.HUMAN ? HEADER_LINE_HUMAN :
                 HEADER_LINE_MOUSE);
 
-        // create pipeline managing framework
-        PipelineManager manager = new PipelineManager();
 
-        // setup pipeline parser "DB" - 1 thread -- max 1000 records in output queue
-        manager.addPipelineWorkgroup(new RecordPreprocessor() {
-            // parser: break source into a stream of record-s
-            public void process() throws Exception {
-                // process active markers for given species
-                int recNo = 0;
-                for( SSLP marker: dao.getActiveMarkers(speciesType) ) {
-                    MarkerRecord rec = new MarkerRecord();
-                    rec.marker = marker;
-                    rec.setRecNo(++recNo);
-                    getSession().putRecordToFirstQueue(rec);
-                }
-            }
-        }, "DB", 1, 1000);
+        List<MarkerRecord> markers = getMarkerList(speciesType);
 
+        final java.util.Map<Integer, String> lineMap = new ConcurrentHashMap<>(markers.size());
 
-        // setup pipeline "QC" - several parallel threads -- max 1000 records in output queue
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                MarkerRecord rec = (MarkerRecord) r;
-
-                if( rec.getRecNo()%100==0 )
-                    log.debug("QC recno="+rec.getRecNo());
+        markers.parallelStream().forEach( rec -> {
+            try {
 
                 rec.gene = dao.getGeneByMarkerKey(rec.marker.getKey());
                 int markerRgdID = rec.marker.getRgdId();
@@ -278,22 +258,15 @@ public class SslpExtractor extends BaseExtractor {
                 }
                 else if( speciesType==SpeciesType.HUMAN ) {
                 }
+
+                lineMap.put(rec.marker.getRgdId(), generateLine(rec, speciesType));
+
+            } catch( Exception e ) {
+                throw new RuntimeException(e);
             }
-        }, "QC", getQcThreadCount(), 0);
+        });
 
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                MarkerRecord rec = (MarkerRecord) r;
-
-                // write out all the parameters to the file
-                writeLine(rec, writer, speciesType);
-            }
-        }, "DL", 1, 0);
-
-        // run pipelines
-        manager.run();
+        writeDataLines(writer, lineMap);
 
         // close the output file
         writer.close();
@@ -302,122 +275,140 @@ public class SslpExtractor extends BaseExtractor {
         FtpFileExtractsManager.qcFileContent(outputFile, "sslps", speciesType);
     }
 
-    void writeLine(MarkerRecord rec, PrintWriter writer, int speciesType) throws Exception {
+    List<MarkerRecord> getMarkerList(int speciesType) throws Exception {
+
+        List<SSLP> markersInRgd = getDao().getActiveMarkers(speciesType);
+        List<MarkerRecord> records = new ArrayList<>(markersInRgd.size());
+
+        for( SSLP marker: markersInRgd ) {
+            MarkerRecord rec = new MarkerRecord();
+            rec.marker = marker;
+            records.add(rec);
+        }
+
+        return records;
+    }
+
+    String generateLine(MarkerRecord rec, int speciesType) throws Exception {
+
+        StringBuilder buf = new StringBuilder();
 
         // MARKER_RGD_ID
-        writer.print(rec.marker.getRgdId());
-        writer.print('\t');
+        buf.append(rec.marker.getRgdId());
+        buf.append('\t');
         // species name
-        writer.print(SpeciesType.getCommonName(speciesType).toLowerCase());
-        writer.print('\t');
+        buf.append(SpeciesType.getCommonName(speciesType).toLowerCase());
+        buf.append('\t');
         // marker symbol
-        writer.print(checkNull(rec.marker.getName()));
-        writer.print('\t');
+        buf.append(checkNull(rec.marker.getName()));
+        buf.append('\t');
         // expected size
         if (rec.marker.getExpectedSize() != 0) {
-            writer.print(rec.marker.getExpectedSize());
+            buf.append(rec.marker.getExpectedSize());
         }
-        writer.print('\t');
+        buf.append('\t');
 
-        writer.print(checkNull(rec.curatedRefRGDIDs));
-        writer.print('\t');
+        buf.append(checkNull(rec.curatedRefRGDIDs));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.curatedRefPubmedIDs));
-        writer.print('\t');
+        buf.append(checkNull(rec.curatedRefPubmedIDs));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.uncuratedPubmedID));
-        writer.print('\t');
+        buf.append(checkNull(rec.uncuratedPubmedID));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.marker.getSslpType()));
-        writer.print('\t');
+        buf.append(checkNull(rec.marker.getSslpType()));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.marker.getTemplateSeq()));
-        writer.print('\t');
+        buf.append(checkNull(rec.marker.getTemplateSeq()));
+        buf.append('\t');
 
         // primer rgd ids -- discontinued
-        writer.print('\t');
+        buf.append('\t');
 
-        writer.print(checkNull(rec.marker.getForwardSeq()));
-        writer.print('\t');
+        buf.append(checkNull(rec.marker.getForwardSeq()));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.marker.getReverseSeq()));
-        writer.print('\t');
+        buf.append(checkNull(rec.marker.getReverseSeq()));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.uniSTSID));
-        writer.print('\t');
+        buf.append(checkNull(rec.uniSTSID));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.genBankNucleotideID));
-        writer.print('\t');
+        buf.append(checkNull(rec.genBankNucleotideID));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.uniGeneIDs));
-        writer.print('\t');
+        buf.append(checkNull(rec.uniGeneIDs));
+        buf.append('\t');
 
-        writer.print(checkNull(rec.aliases));
-        writer.print('\t');
+        buf.append(checkNull(rec.aliases));
+        buf.append('\t');
 
         // associated gene RGDID
         if( rec.gene != null ) {
-            writer.print(rec.gene.getRgdId());
+            buf.append(rec.gene.getRgdId());
         }
-        writer.print('\t');
+        buf.append('\t');
 
         // associated gene symbol
         if( rec.gene != null ) {
-            writer.print(checkNull(rec.gene.getSymbol()));
+            buf.append(checkNull(rec.gene.getSymbol()));
         }
-        writer.print('\t');
+        buf.append('\t');
 
         // print chromosome
         if( rec.chrAndFishBand[0]!=null ) {
-            writer.print(checkNull(rec.chrAndFishBand[0]));
+            buf.append(checkNull(rec.chrAndFishBand[0]));
         }
-        writer.print('\t');
+        buf.append('\t');
 
         // print fish band
         if( rec.chrAndFishBand[1]!=null ) {
-            writer.print(checkNull(rec.chrAndFishBand[1]));
+            buf.append(checkNull(rec.chrAndFishBand[1]));
         }
-        writer.print('\t');
+        buf.append('\t');
 
         // print chromosome, start and stop position for celera
-        writeGenomicPositions(rec.mdCelera, writer);
+        writeGenomicPositions(rec.mdCelera, buf);
 
         // print chromosome, start and stop position for primary reference assembly
-        writeGenomicPositions(rec.mdNewRef, writer);
+        writeGenomicPositions(rec.mdNewRef, buf);
 
         // print chromosome, start and stop position for old reference assembly
-        writeGenomicPositions(rec.mdOldRef, writer);
+        writeGenomicPositions(rec.mdOldRef, buf);
 
         if( speciesType==SpeciesType.RAT ) {
 
-            writer.append("\t\t"); // two unused columns
+            buf.append("\t\t"); // two unused columns
 
             // write chromosome and absolute pos for FHH map
-            writeGeneticPositions(rec.mdFHHxACI, writer);
+            writeGeneticPositions(rec.mdFHHxACI, buf);
 
             // write chromosome and absolute pos for SHRSP map
-            writeGeneticPositions(rec.mdSHRSPxBN, writer);
+            writeGeneticPositions(rec.mdSHRSPxBN, buf);
 
             // write chromosome and absolute pos for RH 2.0 map
-            writeGeneticPositions(rec.mdRH_2_0, writer);
+            writeGeneticPositions(rec.mdRH_2_0, buf);
 
             // write chromosome and absolute pos for RH 3.4 map
-            writeGeneticPositions(rec.mdRH_3_4, writer);
+            writeGeneticPositions(rec.mdRH_3_4, buf);
 
             // print chromosome, start and stop position for Rnor_6.0 assembly
-            writeGenomicPositions(rec.mdRnor6, writer);
+            writeGenomicPositions(rec.mdRnor6, buf);
         }
         else if( speciesType==SpeciesType.HUMAN ) {
 
         }
         else if( speciesType==SpeciesType.MOUSE ) {
-            writer.append(checkNull(rec.mgdID))
+            buf.append(checkNull(rec.mgdID))
                   .append('\t')
                   .append(rec.cmPos!=null ? Double.toString(rec.cmPos) : "");
         }
 
         // terminate the line
-        writer.println();
+        buf.append("\n");
+
+        return buf.toString();
     }
 
     // concatenate all marker aliases using ';' as separator
@@ -427,43 +418,43 @@ public class SslpExtractor extends BaseExtractor {
     }
 
     // print chromosome, start and stop position
-    void writeGenomicPositions(List<MapData> mds, PrintWriter writer) throws Exception {
+    void writeGenomicPositions(List<MapData> mds, StringBuilder buf) throws Exception {
         // if there is no data
         if( mds==null || mds.isEmpty() ) {
-            writer.print("\t\t\t");
+            buf.append("\t\t\t");
             return;
         }
 
         // print chromosomes
-        writer.print(checkNull(Utils.concatenate(";", mds, "getChromosome")));
-        writer.print('\t');
+        buf.append(checkNull(Utils.concatenate(";", mds, "getChromosome")));
+        buf.append('\t');
 
         // print start pos
-        writer.print(checkNull(Utils.concatenate(";", mds, "getStartPos")));
-        writer.print('\t');
+        buf.append(checkNull(Utils.concatenate(";", mds, "getStartPos")));
+        buf.append('\t');
 
         // print stop pos
-        writer.print(checkNull(Utils.concatenate(";", mds, "getStopPos")));
-        writer.print('\t');
+        buf.append(checkNull(Utils.concatenate(";", mds, "getStopPos")));
+        buf.append('\t');
     }
 
     // print chromosome and absolute position(s)
-    void writeGeneticPositions(MapData md, PrintWriter writer) throws Exception {
+    void writeGeneticPositions(MapData md, StringBuilder buf) throws Exception {
         // if there is no data
         if( md==null ) {
-            writer.print("\t\t");
+            buf.append("\t\t");
             return;
         }
 
         // print chromosome
         if( md.getChromosome()!=null )
-            writer.print(checkNull(md.getChromosome()));
-        writer.print('\t');
+            buf.append(checkNull(md.getChromosome()));
+        buf.append('\t');
 
         // print absolute pos
         if( md.getAbsPosition()!=null )
-            writer.print(md.getAbsPosition());
-        writer.print('\t');
+            buf.append(md.getAbsPosition());
+        buf.append('\t');
     }
 
     private String checkNull(String str) {
@@ -474,15 +465,7 @@ public class SslpExtractor extends BaseExtractor {
         return getDao().getXdbIds(rgdId);
     }
 
-    public void setQcThreadCount(int qcThreadCount) {
-        this.qcThreadCount = qcThreadCount;
-    }
-
-    public int getQcThreadCount() {
-        return qcThreadCount;
-    }
-
-    class MarkerRecord extends PipelineRecord {
+    class MarkerRecord {
 
         public SSLP marker;
         public Gene gene;
