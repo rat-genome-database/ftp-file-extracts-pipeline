@@ -4,10 +4,10 @@ import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author mtutaj
@@ -18,7 +18,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes-version-2.2.7\n"
+    +"# MODULE: genes  build 2019-06-17\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
@@ -41,6 +41,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### May 25, 2017 GENE_REFSEQ_STATUS is now published in column 23 for all species\n"
     +"###   during transition period, for rat, mouse and human, GENE_REFSEQ_STATUS will continue to be laso published in columns 39, 41 and 42 respectively\n"
     +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
+    +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -216,8 +217,11 @@ public class GeneExtractor extends BaseExtractor {
 
     String generate(final SpeciesRecord si) throws Exception {
 
-        String outputFileName = getFileNamePrefix()+si.getSpeciesName().toUpperCase()+".txt";
-        outputFileName = getExtractDir()+'/'+outputFileName;
+        String ucSpeciesName = si.getSpeciesName().toUpperCase();
+        String outputDir = getExtractDir()+'/'+ucSpeciesName;
+        new File(outputDir).mkdirs();
+
+        String outputFileName = outputDir+'/'+getFileNamePrefix()+ucSpeciesName+".txt";
         log.info("started extraction to "+outputFileName);
 
         final FtpFileExtractsDAO dao = getDao();
@@ -284,6 +288,8 @@ public class GeneExtractor extends BaseExtractor {
         pubmedIdsManager.loadCuratedPubmedIds(dao, RgdId.OBJECT_KEY_GENES, si.getSpeciesType());
 
         List<GeneExtractRecord> geneRecords = loadGeneRecords(speciesType);
+
+        final Map<Integer, String> lineMap = new ConcurrentHashMap<>(geneRecords.size());
 
         geneRecords.parallelStream().forEach( rec -> {
 
@@ -390,17 +396,31 @@ public class GeneExtractor extends BaseExtractor {
 
                 // write out all the parameters to the file
                 String line = generateLineContents(rec, speciesType);
-                writeLine(writer, line);
+                lineMap.put(rec.getRgdId(), line);
 
             } catch(Exception e) {
                 throw new RuntimeException(e);
             }
         });
 
+        writeDataLines(writer, lineMap);
+
         // close the output file
         writer.close();
 
         return outputFileName;
+    }
+
+    void writeDataLines(Writer out, Map<Integer,String> lineMap) throws IOException {
+
+        // the original data map is unsorted -- let's sort it by rgd id
+        Map<Integer, String> sortedLineMap = new TreeMap<>();
+        for( Map.Entry<Integer,String> entry: lineMap.entrySet() ) {
+            sortedLineMap.put(entry.getKey(), entry.getValue());
+        }
+        for( Map.Entry<Integer,String> entry: sortedLineMap.entrySet() ) {
+            out.write(entry.getValue());
+        }
     }
 
     List<GeneExtractRecord> loadGeneRecords(int speciesTypeKey) throws Exception {
@@ -421,152 +441,148 @@ public class GeneExtractor extends BaseExtractor {
         return result;
     }
 
-    synchronized void writeLine(PrintWriter writer, String line) throws Exception {
-        writer.append(line);
-    }
-
     String generateLineContents(GeneExtractRecord rec, int speciesType) throws Exception {
 
         StringBuilder buf = new StringBuilder();
-        buf.append(rec.getRgdId());
-        buf.append('\t')
-                .append(checkNull(rec.getGeneSymbol()))
-                .append('\t')
-                .append(checkNull(rec.getGeneFullName()))
-                .append('\t')
-                .append(checkNull(rec.getGeneDesc()))
-                .append('\t')
+        buf.append(rec.getRgdId())
+            .append('\t')
+            .append(checkNull(rec.getGeneSymbol()))
+            .append('\t')
+            .append(checkNull(rec.getGeneFullName()))
+            .append('\t')
+            .append(checkNull(rec.getGeneDesc()))
+            .append('\t')
 
-                .append(getString(rec.celeraMap, "getChromosome"))
-                .append('\t')
-                .append(getString(rec.assembly1Map, "getChromosome"))
-                .append('\t')
-                .append(getString(rec.assembly2Map, "getChromosome"))
-                .append('\t')
-                .append(getString(rec.cytoMap, "getFishBand"))
-                .append('\t')
+            .append(getString(rec.celeraMap, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.assembly1Map, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.assembly2Map, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.cytoMap, "getFishBand"))
+            .append('\t')
 
-                .append(getString(rec.celeraMap, "getStartPos"))
-                .append('\t')
-                .append(getString(rec.celeraMap, "getStopPos"))
-                .append('\t')
-                .append(getString(rec.celeraMap, "getStrand"))
-                .append('\t')
+            .append(getString(rec.celeraMap, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.celeraMap, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.celeraMap, "getStrand"))
+            .append('\t')
 
-                .append(getString(rec.assembly1Map, "getStartPos"))
-                .append('\t')
-                .append(getString(rec.assembly1Map, "getStopPos"))
-                .append('\t')
-                .append(getString(rec.assembly1Map, "getStrand"))
-                .append('\t')
+            .append(getString(rec.assembly1Map, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.assembly1Map, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.assembly1Map, "getStrand"))
+            .append('\t')
 
-                .append(getString(rec.assembly2Map, "getStartPos"))
-                .append('\t')
-                .append(getString(rec.assembly2Map, "getStopPos"))
-                .append('\t')
-                .append(getString(rec.assembly2Map, "getStrand"))
-                .append('\t')
+            .append(getString(rec.assembly2Map, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.assembly2Map, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.assembly2Map, "getStrand"))
+            .append('\t')
 
-                .append(checkNull(rec.getCuratedRefRgdIds()))
-                .append('\t')
-                .append(checkNull(rec.getCuratedPubmedIds()))
-                .append('\t')
-                .append(checkNull(rec.getUncuratedPubmedIds()))
-                .append('\t')
-                .append(checkNull(rec.getNcbiGeneIds()))
-                .append('\t')
-                .append(checkNull(rec.getUniprotIds()))
-                .append('\t')
+            .append(checkNull(rec.getCuratedRefRgdIds()))
+            .append('\t')
+            .append(checkNull(rec.getCuratedPubmedIds()))
+            .append('\t')
+            .append(checkNull(rec.getUncuratedPubmedIds()))
+            .append('\t')
+            .append(checkNull(rec.getNcbiGeneIds()))
+            .append('\t')
+            .append(checkNull(rec.getUniprotIds()))
+            .append('\t')
 
-                .append(checkNull(rec.getRefSeqStatus()))
-                .append('\t')
-                .append(checkNull(rec.getGeneBankNucleoIds()))
-                .append('\t')
-                .append(checkNull(rec.getTigerIds()))
-                .append('\t')
-                .append(checkNull(rec.getGeneBankProteinIds()))
-                .append('\t')
-                .append(checkNull(rec.getUniGeneIds()))
-                .append('\t')
+            .append(checkNull(rec.getRefSeqStatus()))
+            .append('\t')
+            .append(checkNull(rec.getGeneBankNucleoIds()))
+            .append('\t')
+            .append(checkNull(rec.getTigerIds()))
+            .append('\t')
+            .append(checkNull(rec.getGeneBankProteinIds()))
+            .append('\t')
+            .append(checkNull(rec.getUniGeneIds()))
+            .append('\t')
 
-                .append(checkNull(rec.getMarkerRgdIds()))
-                .append('\t')
-                .append(checkNull(rec.getMarkerNames()))
-                .append('\t')
-                .append(checkNull(rec.getOldGeneSymbols()))
-                .append('\t')
-                .append(checkNull(rec.getOldGeneNames()))
-                .append('\t')
-                .append(checkNull(rec.getQtlRgdIds()))
-                .append('\t')
-                .append(checkNull(rec.getQtlNames()))
-                .append('\t')
-                .append(checkNull(rec.getNomenEvents()))
-                .append('\t')
-                .append(checkNull(rec.getSpliceRgdIds()))
-                .append('\t')
-                .append(checkNull(rec.getSpliceSymbols()))
-                .append('\t')
-                .append(checkNull(rec.getGeneType()))
-                .append('\t')
-                .append(checkNull(rec.getEnsemblGeneIds()));
+            .append(checkNull(rec.getMarkerRgdIds()))
+            .append('\t')
+            .append(checkNull(rec.getMarkerNames()))
+            .append('\t')
+            .append(checkNull(rec.getOldGeneSymbols()))
+            .append('\t')
+            .append(checkNull(rec.getOldGeneNames()))
+            .append('\t')
+            .append(checkNull(rec.getQtlRgdIds()))
+            .append('\t')
+            .append(checkNull(rec.getQtlNames()))
+            .append('\t')
+            .append(checkNull(rec.getNomenEvents()))
+            .append('\t')
+            .append(checkNull(rec.getSpliceRgdIds()))
+            .append('\t')
+            .append(checkNull(rec.getSpliceSymbols()))
+            .append('\t')
+            .append(checkNull(rec.getGeneType()))
+            .append('\t')
+            .append(checkNull(rec.getEnsemblGeneIds()));
 
         // species specific section
         switch( speciesType ) {
             case SpeciesType.RAT:
                 buf.append('\t')
-                        .append(checkNull(rec.getRefSeqStatus()))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getChromosome"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStartPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStopPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStrand"))
-                        .append('\t')
-                        .append(getString(rec.assembly4Map, "getChromosome"))
-                        .append('\t')
-                        .append(getString(rec.assembly4Map, "getStartPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly4Map, "getStopPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly4Map, "getStrand"));
+                    .append(checkNull(rec.getRefSeqStatus()))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getChromosome"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStartPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStopPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStrand"))
+                    .append('\t')
+                    .append(getString(rec.assembly4Map, "getChromosome"))
+                    .append('\t')
+                    .append(getString(rec.assembly4Map, "getStartPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly4Map, "getStopPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly4Map, "getStrand"));
                 break;
 
             case SpeciesType.HUMAN:
                 buf.append('\t')
-                        .append(checkNull(rec.getHgncIds()))
-                        .append('\t')
-                        .append('\t')
-                        .append(checkNull(rec.getOmimIds()))
-                        .append('\t')
-                        .append(checkNull(rec.getRefSeqStatus()))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getChromosome"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStartPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStopPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStrand"));
+                    .append(checkNull(rec.getHgncIds()))
+                    .append('\t')
+                    .append('\t')
+                    .append(checkNull(rec.getOmimIds()))
+                    .append('\t')
+                    .append(checkNull(rec.getRefSeqStatus()))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getChromosome"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStartPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStopPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStrand"));
                 break;
 
             case SpeciesType.MOUSE:
                 buf.append('\t')
-                        .append(checkNull(rec.getMgdIds()))
-                        .append('\t')
-                        .append(rec.getAbsPos()!=null ? Double.toString(rec.getAbsPos()) : "")
-                        .append('\t')
-                        .append(checkNull(rec.getRefSeqStatus()))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getChromosome"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStartPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStopPos"))
-                        .append('\t')
-                        .append(getString(rec.assembly3Map, "getStrand"));
+                    .append(checkNull(rec.getMgdIds()))
+                    .append('\t')
+                    .append(rec.getAbsPos()!=null ? Double.toString(rec.getAbsPos()) : "")
+                    .append('\t')
+                    .append(checkNull(rec.getRefSeqStatus()))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getChromosome"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStartPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStopPos"))
+                    .append('\t')
+                    .append(getString(rec.assembly3Map, "getStrand"));
                 break;
         }
 
