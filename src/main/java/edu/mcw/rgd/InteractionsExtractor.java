@@ -15,11 +15,8 @@ import java.util.Map;
  */
 public class InteractionsExtractor extends BaseExtractor {
 
-    private String version;
-    private String outputDir;
-    private String outputSubDir;
-
     ProteinDAO pdao= new ProteinDAO();
+    InteractionAttributesDAO adao= new InteractionAttributesDAO();
     InteractionsDAO idao= new InteractionsDAO();
     AssociationDAO assocDao= new AssociationDAO();
     OntologyXDAO xdao=new OntologyXDAO();
@@ -27,31 +24,61 @@ public class InteractionsExtractor extends BaseExtractor {
     Map<String, String> intTypes=new HashMap<>();
     Map<Integer, Protein> proteins=new HashMap<>();
     Map<Integer, List<Gene>> geneProteinMap=new HashMap<>();
+
+    boolean versionPrintedOut = false;
+
     @Override
     public void run(SpeciesRecord speciesInfo) throws Exception {
-        int speciesTypeKey= SpeciesType.parse(speciesInfo.getSpeciesName());
-        List<Integer> proteinRgdIds= getProteinRgdIds(speciesTypeKey);
-        List<Interaction> interactions= getInteractionsByRgdIdsList(proteinRgdIds);
-        String tsvFilePath = getExtractDir()+'/'+outputSubDir+"/"+"interactions_"+speciesInfo.getSpeciesName().toLowerCase()+".txt";
+
+        int speciesTypeKey = speciesInfo.getSpeciesType();
+        List<Integer> proteinRgdIds = getProteinRgdIds(speciesTypeKey);
+        if( proteinRgdIds.isEmpty() ) {
+            return;
+        }
+        List<Interaction> interactions = getInteractionsByRgdIdsList(proteinRgdIds);
+        if( interactions.isEmpty() ) {
+            return;
+        }
+
+        if( !versionPrintedOut ) {
+            System.out.println(getVersion());
+            versionPrintedOut = true;
+        }
+
+        String tsvFilePath = getSpeciesSpecificExtractDir(speciesInfo)+"/"+"INTERACTIONS_"+speciesInfo.getSpeciesName().toUpperCase()+".txt";
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date date = new Date();
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.write(
-                "# RGD-PIPELINE: ftp-file-extracts\n"
-                        +"# MODULE: interactions-version-1.0.0\n"
-                        +"# GENERATED-ON: "+dateFormat.format(date)+"\n"
-                        +"# CONTACT: rgd.data@mcw.edu\n"
-                        +"# FORMAT: tab delimited text\n"
-                        +"# NOTES:\n\tThis file provides a set of protein-protein binary interactions for species ("+speciesInfo.getSpeciesName() +").\n\tThe file is in the tab-delimited format.\n\tThe interaction data is sourced from the IMEx consortium."
-                        +"\n\tMultiple values in a single column are separated by ';'\n"
-                        +"# SPECIES: "+ speciesInfo.getSpeciesName()+"\n"
-                        +"# COUNT: "+ interactions.size()+" interactions\n"
-                        +"Interactor A \tInteractor A Gene\tInteractor A Gene RGD_ID\tInteractor B\tInteractor B Gene\tInteractor B Gene RGD_ID\tSpecies A\tSpecies B\tInteraction Type\tAttributes\n"
+            "# RGD-PIPELINE: ftp-file-extracts\n"
+            +"# MODULE: interactions  build 2019-06-17\n"
+            +"# GENERATED-ON: "+dateFormat.format(new Date())+"\n"
+            +"# CONTACT: rgd.data@mcw.edu\n"
+            +"# FORMAT: tab delimited text\n"
+            +"# NOTES:\n"
+            +"#\tThis file provides a set of protein-protein binary interactions for species ("+speciesInfo.getSpeciesName() +").\n"
+            +"#\tThe file is in the tab-delimited format.\n"
+            +"#\tThe interaction data is sourced from the IMEx consortium.\n"
+            +"#\tMultiple values in a single column are separated by ';'\n"
+            +"# SPECIES: "+ speciesInfo.getSpeciesName()+"\n"
+            +"# COUNT: "+ interactions.size()+" interactions\n"
+            +"Interactor A \tInteractor A Gene\tInteractor A Gene RGD_ID\tInteractor B\tInteractor B Gene\tInteractor B Gene RGD_ID\tSpecies A\tSpecies B\tInteraction Type\tAttributes\n"
 
         );
+
+        int dataLines = 0;
         for(Interaction i:interactions){
             Protein interactor1=getProtein(i.getRgdId1());
+            if( interactor1==null ) {
+                System.out.println("  null protein for RGD:"+i.getRgdId1());
+                continue;
+            }
             Protein interactor2=getProtein(i.getRgdId2());
+            if( interactor2==null ) {
+                System.out.println("  null protein for RGD:"+i.getRgdId2());
+                continue;
+            }
+
             List<Gene> genes1=getGeneByProteinRgdId(i.getRgdId1());
             List<Gene> genes2=getGeneByProteinRgdId(i.getRgdId2());
             String geneSymbol1=getGeneSymbol(genes1);
@@ -75,36 +102,13 @@ public class InteractionsExtractor extends BaseExtractor {
             tsvWriter.write(interactionType+"\t");
             tsvWriter.write(attributes+"\t");
             tsvWriter.write("\n");
+            dataLines++;
         }
         tsvWriter.close();
 
+        System.out.println("  "+speciesInfo.getSpeciesName()+" interactions: "+dataLines);
     }
 
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    @Override
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getOutputDir() {
-        return outputDir;
-    }
-
-    public void setOutputDir(String outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public String getOutputSubDir() {
-        return outputSubDir;
-    }
-
-    public void setOutputSubDir(String outputSubDir) {
-        this.outputSubDir = outputSubDir;
-    }
     public Collection[] split(List<Integer> rgdids, int size) throws Exception {
         int numOfBatches = rgdids.size() / size + 1;
         Collection[] batches = new Collection[numOfBatches];
@@ -119,14 +123,17 @@ public class InteractionsExtractor extends BaseExtractor {
         return batches;
     }
     public List<Integer> getProteinRgdIds(int speciesTypeKey) throws Exception {
+
         List<Protein> proteins=pdao.getProteins(speciesTypeKey);
-        List<Integer> rgdIds= new ArrayList<>();
+        List<Integer> rgdIds= new ArrayList<>(proteins.size());
 
         for(Protein p: proteins){
             rgdIds.add(p.getRgdId());
+            this.proteins.put(p.getRgdId(), p);
         }
         return rgdIds;
     }
+
     public List<Interaction> getInteractionsByRgdIdsList(List<Integer> proteinRgdIds) throws Exception {
         List<Interaction> interactions= new ArrayList<>();
         Collection[] colletions = this.split(proteinRgdIds, 1000);
@@ -139,25 +146,21 @@ public class InteractionsExtractor extends BaseExtractor {
     }
 
     public Protein getProtein(int rgdId) throws Exception {
-        Protein p;
-        if(proteins.get(rgdId)!=null){
-           p=proteins.get(rgdId);
-        }else{
+        Protein p = proteins.get(rgdId);
+        if( p==null ) {
             p=pdao.getProtein(rgdId);
             proteins.put(rgdId, p);
         }
-       return p;
+        return p;
     }
 
     public List<Gene> getGeneByProteinRgdId(int proteinRgdId) throws Exception {
-        List<Gene> genes;
-        if(geneProteinMap.get(proteinRgdId)!=null){
-            genes=geneProteinMap.get(proteinRgdId);
-        }else{
-            genes=assocDao.getAssociatedGenesForMasterRgdId(proteinRgdId, "protein_to_gene");
+        List<Gene> genes = geneProteinMap.get(proteinRgdId);
+        if( genes==null ){
+            genes = assocDao.getAssociatedGenesForMasterRgdId(proteinRgdId, "protein_to_gene");
             geneProteinMap.put(proteinRgdId, genes);
         }
-       return genes;
+        return genes;
     }
 
     public String getGeneSymbol(List<Gene> genes) throws Exception {
@@ -185,7 +188,6 @@ public class InteractionsExtractor extends BaseExtractor {
         return interactionType;
     }
     public String getAttributes(int interactionKey) throws Exception {
-        InteractionAttributesDAO adao= new InteractionAttributesDAO();
         List<InteractionAttribute> attributes=adao.getAttributes(interactionKey);
         StringBuilder sb=new StringBuilder();
         boolean first=true;

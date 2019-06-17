@@ -246,8 +246,7 @@
     </bean>
 
     <bean id="intExtractor" class="edu.mcw.rgd.InteractionsExtractor">
-        <property name="version" value="InteractionsExtractor v.1.0.0 as of Mar 28, 2019" />
-        <property name="outputSubDir" value="interactions" />
+        <property name="version" value="InteractionsExtractor  build 2019-06-17" />
     </bean>
 
 

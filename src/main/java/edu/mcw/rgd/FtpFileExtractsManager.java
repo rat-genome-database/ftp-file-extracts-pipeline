@@ -136,6 +136,7 @@ public class FtpFileExtractsManager {
                 case "-sequences":
                     beanId = "seqExtractor";
                     break;
+
                 case "-interactions":
                     beanId = "intExtractor";
                     break;
@@ -206,9 +207,9 @@ public class FtpFileExtractsManager {
 
         String USAGE = "java -Dspring.config=$APPHOME/../properties/default_db.xml -Dlog4j.configuration=$APPHOME/properties/log4j.properties"+
             " -jar ./lib/ftpFileExtracts.jar [MODULE] [OPTIONS]\n"+
-        "[MODULE] one of: -genes | -strains | -qtls | -gp2protein | -markers | -marker_alleles | -orthologs | -annotations | -daf_annotations "+
+        "[MODULE] one of: -genes | -qtls | -strains |   -gp2protein | -markers | -marker_alleles | -orthologs | -annotations | -daf_annotations "+
             "| -gaf_annotations | -gaf_agr_annotations | -uniprot_annotations | -db_snps | -radoslavov | -chinchilla | -assembly_comparison "+
-            "| -mirna_targets | -array_ids | -sequences | -obsolete\n"+
+            "| -mirna_targets | -array_ids | -sequences | -obsolete | -interactions\n"+
         "[OPTIONS] optional species name: -species=rat|mouse|human|...|all (default) (all:rat,mouse,human,...)\n"+
         "   optional annotation directory override: -annotDir=annotDirOverride;\n"+
         "     overrides value of 'annotDir' from beans 'annotExtractor' and 'annotGafExtractor'";
