@@ -174,25 +174,18 @@ public class FtpFileExtractsManager {
             return;
         }
 
-        BaseExtractor extractor = (BaseExtractor) bf.getBean(beanId);
-        extractor.setDao(manager.dao);
-        extractor.setExtractDir(manager.getExtractDir());
-
-        // set optional parameter overrides
-        if( annotDirOverride!=null && extractor instanceof AnnotBaseExtractor ) {
-            ((AnnotBaseExtractor)extractor).setAnnotDir(annotDirOverride);
-        }
-
-        // agr
-        if( agr && extractor instanceof AnnotGafExtractor ) {
-            ((AnnotGafExtractor)extractor).setGenerateForAgr(true);
-        }
-
         if( speciesTypeKey==SpeciesType.UNKNOWN ) {
             throw new Exception("Unsupported species type");
         }
 
+        manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride);
 
+        System.out.println("=== OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+    }
+
+    void run(int speciesTypeKey, DefaultListableBeanFactory bf, String beanId, boolean agr, String annotDirOverride) {
+
+        // for every species, create the bean anew to avoid potential conflicts
         List<Integer> speciesTypeKeys;
         if( speciesTypeKey==SpeciesType.ALL ) {
             speciesTypeKeys = new ArrayList<>(SpeciesType.getSpeciesTypeKeys());
@@ -205,14 +198,26 @@ public class FtpFileExtractsManager {
         speciesTypeKeys.parallelStream().forEach( key -> {
             if( key>0 ) {
                 try {
-                    extractor.go(manager.getSpeciesInfo().get(SpeciesType.getCommonName(key).toLowerCase()));
+                    BaseExtractor extractor = (BaseExtractor) bf.getBean(beanId);
+                    extractor.setDao(dao);
+                    extractor.setExtractDir(getExtractDir());
+
+                    // set optional parameter overrides
+                    if( annotDirOverride!=null && extractor instanceof AnnotBaseExtractor ) {
+                        ((AnnotBaseExtractor)extractor).setAnnotDir(annotDirOverride);
+                    }
+
+                    // agr
+                    if( agr && extractor instanceof AnnotGafExtractor ) {
+                        ((AnnotGafExtractor)extractor).setGenerateForAgr(true);
+                    }
+
+                    extractor.go(getSpeciesInfo().get(SpeciesType.getCommonName(key).toLowerCase()));
                 } catch(Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-
-        System.out.println("=== OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     static public void usage() {
