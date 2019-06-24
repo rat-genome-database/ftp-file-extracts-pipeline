@@ -229,7 +229,7 @@ public class FtpFileExtractsManager {
         System.out.println(USAGE);
         System.exit(-1);
     }
-git commit -m "im"
+
     public FtpFileExtractsManager() {
         System.out.println(dao.getConnectionInfo());
     }
