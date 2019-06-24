@@ -2,11 +2,14 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.MapData;
+import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.Strain;
 import edu.mcw.rgd.process.Utils;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -24,14 +27,22 @@ public class StrainExtractor extends BaseExtractor {
      */
     public void run(SpeciesRecord speciesRec) throws Exception {
 
+        // strain extract is valid only for rat
+        if( speciesRec.getSpeciesType() != SpeciesType.RAT ) {
+            return;
+        }
+
         System.out.println(getVersion());
 
+        // create species specific output dir
+        String outputDir = getSpeciesSpecificExtractDir(speciesRec);
+
         // create tsv and xml files
-        String tsvFilePath = getExtractDir()+'/'+tsvFileName;
+        String tsvFilePath = outputDir+'/'+tsvFileName;
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.println(
         "# RGD-PIPELINE: ftp-file-extracts\n"
-       +"# MODULE: strains-version-2.1.3\n"
+       +"# MODULE: strains   build 2019-06-24\n"
        +"# GENERATED-ON: #DATE#\n"
        +"# PURPOSE: information about active rat strains extracted from RGD database\n"
        +"# CONTACT: rgd.data@mcw.edu\n"
@@ -45,7 +56,7 @@ public class StrainExtractor extends BaseExtractor {
         );
         System.out.println("Processing file: "+tsvFilePath);
 
-        String xmlFilePath = getExtractDir()+'/'+xmlFileName;
+        String xmlFilePath = outputDir+'/'+xmlFileName;
         PrintWriter xmlWriter = new PrintWriter(xmlFilePath);
         xmlWriter.println("<?xml version='1.0'?>");
         xmlWriter.println("<Strains>");
@@ -53,7 +64,7 @@ public class StrainExtractor extends BaseExtractor {
 
         // iterate all strains
         int counter = 0;
-        for( Strain strain: getDao().getActiveStrains() ) {
+        for( Strain strain: getStrainList() ) {
 
             List<Gene> strainAlleles = getDao().getStrainsAlleles(strain.getRgdId());
             List<MapData> positions = getDao().getMapData(strain.getRgdId());
@@ -118,6 +129,21 @@ public class StrainExtractor extends BaseExtractor {
 
         // copy the files to staging dir
         FtpFileExtractsManager.qcFileContent(tsvFilePath, "strains", speciesRec.getSpeciesType());
+    }
+
+    /// strains sorted by RGD ID
+    List<Strain> getStrainList() throws Exception {
+
+        List<Strain> strainsInRgd = getDao().getActiveStrains();
+
+        Collections.sort(strainsInRgd, new Comparator<Strain>() {
+            @Override
+            public int compare(Strain o1, Strain o2) {
+                return o1.getRgdId() - o2.getRgdId();
+            }
+        });
+
+        return strainsInRgd;
     }
 
     public void printXmlPositions(List<MapData> positions, PrintWriter xmlWriter) {

@@ -1,7 +1,6 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.MapData;
-import edu.mcw.rgd.pipelines.PipelineRecord;
 import edu.mcw.rgd.process.Utils;
 
 import java.util.ArrayList;
@@ -10,13 +9,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Oct 11, 2010
- * Time: 2:26:03 PM
- * represents information extracted from database
+ * @author mtutaj
+ * @since Oct 11, 2010
+ * represents gene information extracted from database
  */
-public class GeneExtractRecord extends PipelineRecord {
+public class GeneExtractRecord {
 
 
     int geneKey;

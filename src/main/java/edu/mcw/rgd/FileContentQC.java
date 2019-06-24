@@ -1,15 +1,13 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.process.Utils;
 
 import java.io.*;
-import java.util.zip.GZIPInputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 10/22/12
- * Time: 1:39 PM
+ * @author mtutaj
+ * @since 10/22/12
  * When a file is generated, we count number of rows having no value for every column;
  * We report columns having unusual number of null values.
  * Reporting is suppressed for columns named '(UNUSED)'
@@ -27,12 +25,7 @@ public class FileContentQC {
         String[] colHeaders = null;
         int colCounts[] = null; // counts of columns with a value
 
-        BufferedReader reader;
-        if( file.endsWith(".gz") ) {
-            reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
-        } else {
-            reader = new BufferedReader(new FileReader(file));
-        }
+        BufferedReader reader = Utils.openReader(file);
 
         while( (line=reader.readLine())!=null ) {
 

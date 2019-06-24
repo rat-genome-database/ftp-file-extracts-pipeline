@@ -16,7 +16,7 @@ public class SequenceExtractor extends BaseExtractor {
 
     final String header =
         "; RGD-PIPELINE: ftp-file-extracts\n"+
-        "; MODULE: sequence-extractor-version-1.0.0\n"+
+        "; MODULE: sequence-extractor   build 2019-06-24\n"+
         "; GENERATED-ON: #DATE#\n"+
         "; CONTACT: rgd.data@mcw.edu\n"+
         "; FORMAT: fasta/Pearson sequence format\n"+
@@ -42,7 +42,7 @@ public class SequenceExtractor extends BaseExtractor {
             return;
         }
 
-        String fastaFilePath = getExtractDir()+"/sequences/"+refAssemblyMap.getName()+"-derived_transcript_sequences.fa.gz";
+        String fastaFilePath = getSpeciesSpecificExtractDir(speciesInfo)+"/"+refAssemblyMap.getName()+"-derived_transcript_sequences.fa.gz";
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(fastaFilePath))));
 
         String headerWithDate = header.replace("#DATE#", SpeciesRecord.getTodayDate());

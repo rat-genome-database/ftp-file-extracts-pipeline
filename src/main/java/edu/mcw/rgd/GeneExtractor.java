@@ -1,17 +1,13 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
-import edu.mcw.rgd.pipelines.PipelineManager;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordPreprocessor;
-import edu.mcw.rgd.pipelines.RecordProcessor;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author mtutaj
@@ -22,31 +18,30 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes-version-2.2.6\n"
+    +"# MODULE: genes  build 2019-06-24\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
     +"# FORMAT: tab delimited text\n"
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
-    +"### As of Apr 1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.\n"
-    +"### As of Apr 15, 2011 GENE_REFSEQ_STATUS column is provided.\n"
-    +"### As of Jul 1, 2011 fixed generation of CURATED_REF_PUBMED_IDs and UNCURATED_PUBMED_IDs\n"
-    +"### As of Nov 23, 2011 ver 2.1.2: no format changes (UniGene Ids are extracted from db in different way).\n"
-    +"### As of Dec 19, 2011 ver 2.1.2.1: no format changes (fixed documentation in header to be consistent with column names).\n"
-    +"### As of May 31, 2012 ver 2.1.2.2: no format changes (improved generation speed).\n"
-    +"### As of July 6, 2012 ver 2.1.2.3: no format changes (added generation of file GENES_RAT_5.0).\n"
-    +"### As of Oct 23, 2012 ver 2.1.2.4: obsoleted column 23 'UNCURATED_REF_MEDLINE_ID' - changed to '(UNUSED)'.\n"
-    +"### As of Dec 17, 2012 ver 2.1.2.5: no format changes.\n"
-    +"### As of Aug 19, 2013 ver 2.1.2.6: gene descriptions made consistent with gene report pages from RGD website.\n"
-    +"### As of Oct 2, 2014 ver 2.2: genes files refactored:\n"
+    +"### Apr  1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.\n"
+    +"### Apr 15, 2011 GENE_REFSEQ_STATUS column is provided.\n"
+    +"### Jul  1, 2011 fixed generation of CURATED_REF_PUBMED_IDs and UNCURATED_PUBMED_IDs\n"
+    +"### Nov 23, 2011 no format changes (UniGene Ids are extracted from db in different way).\n"
+    +"### Dec 19, 2011 fixed documentation in header to be consistent with column names.\n"
+    +"### Jul  6, 2012 added generation of file GENES_RAT_5.0.\n"
+    +"### Oct 23, 2012 obsoleted column 23 'UNCURATED_REF_MEDLINE_ID' - changed to '(UNUSED)'.\n"
+    +"### Aug 19, 2013 gene descriptions made consistent with gene report pages from RGD website.\n"
+    +"### Oct  2, 2014 genes files refactored:\n"
     +"###   GENES_HUMAN_B38.txt retired -- added new columns to GENES_HUMAN.txt to accommodate positions for GRCh38.\n"
     +"###   GENES_MOUSE_B36.txt retired -- added new columns to GENES_MOUSE.txt to accommodate positions for assembly build 36.\n"
     +"###   GENES_RAT_5.0.txt and GENES_RAT_6.0.txt retired -- added new columns to GENES_RAT.txt to accommodate positions for Rnor_5.0 and Rnor_6.0.\n"
-    +"### As of Feb 15, 2017 ver 2.2.2: HPRD_IDs are discontinued for human genes.\n"
-    +"### As of May 25, 2017 ver 2.2.5: GENE_REFSEQ_STATUS is now published in column 23 for all species\n"
+    +"### Feb 15, 2017 HPRD_IDs are discontinued for human genes.\n"
+    +"### May 25, 2017 GENE_REFSEQ_STATUS is now published in column 23 for all species\n"
     +"###   during transition period, for rat, mouse and human, GENE_REFSEQ_STATUS will continue to be laso published in columns 39, 41 and 42 respectively\n"
-    +"### As of Nov 1, 2018 ver 2.2.6: renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
+    +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
+    +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -92,7 +87,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES_ONE_ASSEMBLY =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: genes-version-2.2.6\n"
+        +"# MODULE: genes-version-2.2.7\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -222,9 +217,7 @@ public class GeneExtractor extends BaseExtractor {
 
     String generate(final SpeciesRecord si) throws Exception {
 
-        String outputFileName = getFileNamePrefix()+si.getSpeciesName().toUpperCase()+".txt";
-        outputFileName = getExtractDir()+'/'+outputFileName;
-        log.info("started extraction to "+outputFileName);
+        String outputFileName = getSpeciesSpecificExtractDir(si)+'/'+getFileNamePrefix()+si.getSpeciesName().toUpperCase()+".txt";
 
         final FtpFileExtractsDAO dao = getDao();
         final int speciesType = si.getSpeciesType();
@@ -289,79 +282,44 @@ public class GeneExtractor extends BaseExtractor {
         final PubmedIdsManager pubmedIdsManager = new PubmedIdsManager();
         pubmedIdsManager.loadCuratedPubmedIds(dao, RgdId.OBJECT_KEY_GENES, si.getSpeciesType());
 
-        // create pipeline managing framework
-        PipelineManager manager = new PipelineManager();
+        List<GeneExtractRecord> geneRecords = loadGeneRecords(speciesType);
 
-        // setup pipeline parser "DB" - 1 thread -- max 1000 GeneExtractRecords in output queue
-        manager.addPipelineWorkgroup(new RecordPreprocessor() {
-            // parser: break source into a stream of GeneRecord-s
-            public void process() throws Exception {
-                // process active genes for given species
-                int recNo = 0;
-                for( Gene gene: dao.getActiveGenes(speciesType) ) {
-                    log.debug("processing gene "+gene.getSymbol()+", RGD:"+gene.getRgdId());
-                    GeneExtractRecord rec = new GeneExtractRecord();
-                    rec.setRecNo(++recNo);
-                    rec.setGeneKey(gene.getKey());
-                    rec.setRgdId(gene.getRgdId());
-                    rec.setGeneSymbol(gene.getSymbol());
-                    rec.setGeneFullName(gene.getName());
-                    rec.setGeneDesc(Utils.getGeneDescription(gene));
-                    rec.setGeneType(gene.getType());
-                    rec.setRefSeqStatus(gene.getRefSeqStatus());
-                    getSession().putRecordToFirstQueue(rec);
-                }
-            }
-        }, "DB", 1, 1000);
+        final Map<Integer, String> lineMap = new ConcurrentHashMap<>(geneRecords.size());
 
+        geneRecords.parallelStream().forEach( rec -> {
 
-        // setup pipeline "QC" - 8 parallel threads -- max 1000 GeneExtractRecords in output queue
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                GeneExtractRecord rec = (GeneExtractRecord) r;
-
-                if( rec.getRecNo()%100==0 )
-                    log.debug("QC recno="+rec.getRecNo());
-
-                for( MapData md: dao.getMapData(rec.getRgdId()) ) {
+            try {
+                for (MapData md : dao.getMapData(rec.getRgdId())) {
                     // skip maps with empty chromosomes
-                    if( md.getChromosome()==null || md.getChromosome().trim().length()==0 )
+                    if (md.getChromosome() == null || md.getChromosome().trim().length() == 0)
                         continue;
 
-                    if( md.getMapKey()==mapKey1 ) {
+                    if (md.getMapKey() == mapKey1) {
                         rec.assembly1Map.add(md);
-                    }
-                    else if( md.getMapKey()==mapKey2 ) {
+                    } else if (md.getMapKey() == mapKey2) {
                         rec.assembly2Map.add(md);
-                    }
-                    else if( md.getMapKey()==mapKey3 ) {
+                    } else if (md.getMapKey() == mapKey3) {
                         rec.assembly3Map.add(md);
-                    }
-                    else if( md.getMapKey()==mapKey4 ) {
+                    } else if (md.getMapKey() == mapKey4) {
                         rec.assembly4Map.add(md);
-                    }
-                    else if( md.getMapKey()==si.getCeleraAssemblyMapKey() ) {
+                    } else if (md.getMapKey() == si.getCeleraAssemblyMapKey()) {
                         rec.celeraMap.add(md);
-                    }
-                    else if( md.getMapKey()==si.getCytoMapKey() ) {
+                    } else if (md.getMapKey() == si.getCytoMapKey()) {
                         rec.cytoMap.add(md);
-                    }
-                    else if( md.getMapKey()==si.getCmMapKey() ) {
+                    } else if (md.getMapKey() == si.getCmMapKey()) {
                         rec.setAbsPos(md.getAbsPosition());
                     }
                 }
 
                 rec.addCuratedRefRgdIds(dao.getCuratedRefs(rec.getRgdId()));
-                for( String curatedPubmedId: pubmedIdsManager.getCuratedPubmedIds(rec.getRgdId()) ) {
+                for (String curatedPubmedId : pubmedIdsManager.getCuratedPubmedIds(rec.getRgdId())) {
                     rec.addCuratedPubmedIds(curatedPubmedId);
                 }
 
-                for( XdbId xdbId: getXdbIdList(rec.getRgdId())) {
-                    switch( xdbId.getXdbKey()) {
+                for (XdbId xdbId : getXdbIdList(rec.getRgdId())) {
+                    switch (xdbId.getXdbKey()) {
                         case XdbId.XDB_KEY_PUBMED:
-                            if( !pubmedIdsManager.isCuratedPubmedId(xdbId.getRgdId(), xdbId.getAccId()) )
+                            if (!pubmedIdsManager.isCuratedPubmedId(xdbId.getRgdId(), xdbId.getAccId()))
                                 rec.addUncuratedPubmedIds(xdbId.getAccId());
                             break;
                         case XdbId.XDB_KEY_NCBI_GENE:
@@ -398,66 +356,81 @@ public class GeneExtractor extends BaseExtractor {
                 }
 
                 // get rgd id and gene symbol for splices
-                for( Gene splice: dao.getSplices(rec.getGeneKey()) ) {
+                for (Gene splice : dao.getSplices(rec.getGeneKey())) {
                     rec.addSpliceRgdIds(Integer.toString(splice.getRgdId()));
                     rec.addSpliceSymbols(splice.getSymbol());
                 }
 
                 // get rgd id and marker names for markers
-                for( SSLP marker: dao.getMarkers(rec.getGeneKey()) ) {
+                for (SSLP marker : dao.getMarkers(rec.getGeneKey())) {
                     rec.addMarkerRgdIds(Integer.toString(marker.getRgdId()));
                     rec.addMarkerNames(marker.getName());
                 }
 
                 // get aliases
-                for( Alias alias: dao.getAliases(rec.getRgdId()) ) {
-                    if( alias.getTypeName()==null )
+                for (Alias alias : dao.getAliases(rec.getRgdId())) {
+                    if (alias.getTypeName() == null)
                         continue;
-                    if( alias.getTypeName().equals("old_gene_name") )
+                    if (alias.getTypeName().equals("old_gene_name"))
                         rec.addOldGeneNames(alias.getValue());
-                    if( alias.getTypeName().equals("old_gene_symbol") )
+                    if (alias.getTypeName().equals("old_gene_symbol"))
                         rec.addOldGeneSymbols(alias.getValue());
                 }
 
                 // get rgd id and qtl names for associated qtls
-                for( QTL qtl: dao.getQtlsForGene(rec.getGeneKey()) ) {
+                for (QTL qtl : dao.getQtlsForGene(rec.getGeneKey())) {
                     rec.addQtlRgdIds(Integer.toString(qtl.getRgdId()));
                     rec.addQtlNames(qtl.getSymbol());
                 }
 
                 // get the most recent nomenclature event
-                for( NomenclatureEvent event: dao.getNomenEvents(rec.getRgdId())) {
+                for (NomenclatureEvent event : dao.getNomenEvents(rec.getRgdId())) {
                     rec.setNomenEvents(event.getNomenStatusType());
                     break; // we take only one most recent nomen event even if there are more
                 }
 
-            }
-        }, "QC", 8, 0);
-
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                GeneExtractRecord rec = (GeneExtractRecord) r;
-
                 // write out all the parameters to the file
-                writeLine(rec, writer, speciesType);
-            }
-        }, "DL", 1, 0);
+                String line = generateLineContents(rec, speciesType);
+                lineMap.put(rec.getRgdId(), line);
 
-        // run pipelines
-        manager.run();
+            } catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        writeDataLines(writer, lineMap);
 
         // close the output file
         writer.close();
 
+        log.info("   "+outputFileName+",  data lines written: "+lineMap.size());
+
         return outputFileName;
     }
 
-    void writeLine(GeneExtractRecord rec, PrintWriter writer, int speciesType) throws Exception {
+    List<GeneExtractRecord> loadGeneRecords(int speciesTypeKey) throws Exception {
+        List<Gene> genesInRgd = getDao().getActiveGenes(speciesTypeKey);
+        List<GeneExtractRecord> result = new ArrayList<>(genesInRgd.size());
 
-        writer.print(rec.getRgdId());
-        writer.append('\t')
+        for( Gene gene: genesInRgd ) {
+            GeneExtractRecord rec = new GeneExtractRecord();
+            rec.setGeneKey(gene.getKey());
+            rec.setRgdId(gene.getRgdId());
+            rec.setGeneSymbol(gene.getSymbol());
+            rec.setGeneFullName(gene.getName());
+            rec.setGeneDesc(Utils.getGeneDescription(gene));
+            rec.setGeneType(gene.getType());
+            rec.setRefSeqStatus(gene.getRefSeqStatus());
+            result.add(rec);
+        }
+        return result;
+    }
+
+    String generateLineContents(GeneExtractRecord rec, int speciesType) throws Exception {
+
+        StringBuilder buf = new StringBuilder();
+        buf.append(rec.getRgdId())
+            .append('\t')
             .append(checkNull(rec.getGeneSymbol()))
             .append('\t')
             .append(checkNull(rec.getGeneFullName()))
@@ -542,7 +515,7 @@ public class GeneExtractor extends BaseExtractor {
         // species specific section
         switch( speciesType ) {
             case SpeciesType.RAT:
-                writer.append('\t')
+                buf.append('\t')
                     .append(checkNull(rec.getRefSeqStatus()))
                     .append('\t')
                     .append(getString(rec.assembly3Map, "getChromosome"))
@@ -563,7 +536,7 @@ public class GeneExtractor extends BaseExtractor {
                 break;
 
             case SpeciesType.HUMAN:
-                writer.append('\t')
+                buf.append('\t')
                     .append(checkNull(rec.getHgncIds()))
                     .append('\t')
                     .append('\t')
@@ -581,7 +554,7 @@ public class GeneExtractor extends BaseExtractor {
                 break;
 
             case SpeciesType.MOUSE:
-                writer.append('\t')
+                buf.append('\t')
                     .append(checkNull(rec.getMgdIds()))
                     .append('\t')
                     .append(rec.getAbsPos()!=null ? Double.toString(rec.getAbsPos()) : "")
@@ -598,7 +571,9 @@ public class GeneExtractor extends BaseExtractor {
                 break;
         }
 
-        writer.println();
+        buf.append("\n");
+
+        return buf.toString();
     }
 
     String checkNull(String str) {

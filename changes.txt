@@ -1,3 +1,7 @@
+Jun 17, 2019
+-gene extractor: data sorted by RGD ID; files generated in species specific directory
+-chinchilla extractor: data sorted by RGD ID
+
 Mar 29, 2019 - v.1.5.75
 -daf extractor: updated sql for phenotypic series
 

@@ -12,11 +12,9 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 7/14/14
- * Time: 9:39 AM
- * <p>extract chinchilla data from RGD database into tab-separated files to be put on RGD FTP site
+ * @author mtutaj
+ * @since 7/14/14
+ * extract chinchilla data from RGD database into tab-separated files to be put on RGD FTP site
  */
 public class ChinchillaExtractor extends BaseExtractor {
 
@@ -24,7 +22,7 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     final String GENES_HEADER =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: chinchilla-genes-version-1.0.4\n"
+    +"# MODULE: chinchilla-genes-version-2019-06-17\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active chinchilla genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
@@ -77,54 +75,23 @@ public class ChinchillaExtractor extends BaseExtractor {
         final PrintWriter bedWriter = new PrintWriter(bedFileName);
         bedWriter.println("track name=\"chinchillaRefSeqData\" description=\"format: GeneSymbol|RgdId|GeneId|NucleotideAccIds|ProteinAccIds\" useScore=0");
 
-        // create pipeline managing framework
-        PipelineManager manager = new PipelineManager();
+        List<GeneExtractRecord> genesToProcess = getGeneList();
 
-        // setup pipeline parser "DB" - 1 thread -- max 1000 GeneExtractRecords in output queue
-        manager.addPipelineWorkgroup(new RecordPreprocessor() {
-            // parser: break source into a stream of GeneRecord-s
-            public void process() throws Exception {
-                // process active genes for given species
-                int recNo = 0;
-                for( Gene gene: dao.getActiveGenes(speciesType) ) {
-                    log.debug("processing gene "+gene.getSymbol()+", RGD:"+gene.getRgdId());
-                    GeneExtractRecord rec = new GeneExtractRecord();
-                    rec.setRecNo(++recNo);
-                    rec.setGeneKey(gene.getKey());
-                    rec.setRgdId(gene.getRgdId());
-                    rec.setGeneSymbol(gene.getSymbol());
-                    rec.setGeneFullName(gene.getName());
-                    rec.setGeneDesc(Utils.getGeneDescription(gene));
-                    rec.setGeneType(gene.getType());
-                    rec.setRefSeqStatus(gene.getRefSeqStatus());
-                    getSession().putRecordToFirstQueue(rec);
-                }
-            }
-        }, "DB", 1, 1000);
+        genesToProcess.parallelStream().forEach( rec -> {
 
-
-        // setup pipeline "QC" - 8 parallel threads -- max 1000 GeneExtractRecords in output queue
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                GeneExtractRecord rec = (GeneExtractRecord) r;
-
-                if( rec.getRecNo()%100==0 )
-                    log.debug("QC recno="+rec.getRecNo());
-
-                for( MapData md: dao.getMapData(rec.getRgdId()) ) {
+            try {
+                for (MapData md : dao.getMapData(rec.getRgdId())) {
                     // skip maps with empty chromosomes
-                    if( md.getChromosome()==null || md.getChromosome().trim().length()==0 )
+                    if (md.getChromosome() == null || md.getChromosome().trim().length() == 0)
                         continue;
 
-                    if( md.getMapKey()==mapKey ) {
+                    if (md.getMapKey() == mapKey) {
                         rec.assembly1Map.add(md);
                     }
                 }
 
-                for( XdbId xdbId: getXdbIdList(rec.getRgdId())) {
-                    switch( xdbId.getXdbKey()) {
+                for (XdbId xdbId : getXdbIdList(rec.getRgdId())) {
+                    switch (xdbId.getXdbKey()) {
                         case XdbId.XDB_KEY_NCBI_GENE:
                             rec.addNcbiGeneIds(xdbId.getAccId());
                             break;
@@ -138,31 +105,25 @@ public class ChinchillaExtractor extends BaseExtractor {
                 }
 
                 // get aliases
-                for( Alias alias: dao.getAliases(rec.getRgdId()) ) {
-                    if( alias.getTypeName()==null )
+                for (Alias alias : dao.getAliases(rec.getRgdId())) {
+                    if (alias.getTypeName() == null)
                         continue;
-                    if( alias.getTypeName().equals("old_gene_name") )
+                    if (alias.getTypeName().equals("old_gene_name"))
                         rec.addOldGeneNames(alias.getValue());
-                    if( alias.getTypeName().equals("old_gene_symbol") )
+                    if (alias.getTypeName().equals("old_gene_symbol"))
                         rec.addOldGeneSymbols(alias.getValue());
                 }
-            }
-        }, "QC", 8, 0);
-
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                GeneExtractRecord rec = (GeneExtractRecord) r;
 
                 // write out all the parameters to the file
-                writeLine(rec, writer);
-                writeBedLine(rec, bedWriter);
-            }
-        }, "DL", 1, 0);
+                String line = generateLine(rec);
+                writeLine(line, writer);
 
-        // run pipelines
-        manager.run();
+                String bedLine = generateBedLine(rec);
+                writeBedLine(bedLine, bedWriter);
+            }catch(Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         // close the output files
         writer.close();
@@ -171,39 +132,58 @@ public class ChinchillaExtractor extends BaseExtractor {
         return outputFileName;
     }
 
-    void writeLine(GeneExtractRecord rec, PrintWriter writer) throws Exception {
+    List<GeneExtractRecord> getGeneList() throws Exception {
 
-        writer.print(rec.getRgdId());
-        writer.append('\t')
-            .append(checkNull(rec.getGeneType()))
-            .append('\t')
-            .append(checkNull(rec.getGeneSymbol()))
-            .append('\t')
-            .append(checkNull(rec.getGeneFullName()))
-            .append('\t')
-            .append(checkNull(rec.getGeneDesc()))
-            .append('\t')
+        List<Gene> genesInRgd = getDao().getActiveGenes(speciesType);
+        List<GeneExtractRecord> result = new ArrayList<>(genesInRgd.size());
+        for( Gene gene: genesInRgd ) {
+            log.debug("processing gene "+gene.getSymbol()+", RGD:"+gene.getRgdId());
+            GeneExtractRecord rec = new GeneExtractRecord();
+            rec.setGeneKey(gene.getKey());
+            rec.setRgdId(gene.getRgdId());
+            rec.setGeneSymbol(gene.getSymbol());
+            rec.setGeneFullName(gene.getName());
+            rec.setGeneDesc(Utils.getGeneDescription(gene));
+            rec.setGeneType(gene.getType());
+            rec.setRefSeqStatus(gene.getRefSeqStatus());
 
-            .append(getString(rec.assembly1Map, "getChromosome"))
-            .append('\t')
-            .append(getString(rec.assembly1Map, "getStartPos"))
-            .append('\t')
-            .append(getString(rec.assembly1Map, "getStopPos"))
-            .append('\t')
-            .append(getString(rec.assembly1Map, "getStrand"))
-            .append('\t')
+            result.add(rec);
+        }
+        return result;
+    }
 
-            .append(checkNull(rec.getNcbiGeneIds()))
-            .append('\t')
+    String generateLine(GeneExtractRecord rec) throws Exception {
 
-            .append(checkNull(rec.getGeneBankNucleoIds()))
-            .append('\t')
-            .append(checkNull(rec.getGeneBankProteinIds()))
-            .append('\t')
+        return String.valueOf(rec.getRgdId()) +
+            '\t' +
+            checkNull(rec.getGeneType()) +
+            '\t' +
+            checkNull(rec.getGeneSymbol()) +
+            '\t' +
+            checkNull(rec.getGeneFullName()) +
+            '\t' +
+            checkNull(rec.getGeneDesc()) +
+            '\t' +
+            getString(rec.assembly1Map, "getChromosome") +
+            '\t' +
+            getString(rec.assembly1Map, "getStartPos") +
+            '\t' +
+            getString(rec.assembly1Map, "getStopPos") +
+            '\t' +
+            getString(rec.assembly1Map, "getStrand") +
+            '\t' +
+            checkNull(rec.getNcbiGeneIds()) +
+            '\t' +
+            checkNull(rec.getGeneBankNucleoIds()) +
+            '\t' +
+            checkNull(rec.getGeneBankProteinIds()) +
+            '\t' +
+            checkNull(rec.getRefSeqStatus()) +
+            '\n';
+    }
 
-            .append(checkNull(rec.getRefSeqStatus()));
-
-        writer.println();
+    synchronized void writeLine(String line, PrintWriter writer) throws Exception {
+        writer.append(line);
     }
 
     String getString(List<MapData> mds, String method) throws Exception {
@@ -212,29 +192,28 @@ public class ChinchillaExtractor extends BaseExtractor {
         return Utils.concatenate(";", mds, method);
     }
 
-    void writeBedLine(GeneExtractRecord rec, PrintWriter writer) throws Exception {
+    String generateBedLine(GeneExtractRecord rec) throws Exception {
 
-        writer
-            .append(getString(rec.assembly1Map, "getChromosome"))
-            .append('\t')
-            .append(checkNull(rec.assembly1Map.get(0).getStartPos() - 1))
-            .append('\t')
-            .append(checkNull(rec.assembly1Map.get(0).getStopPos() - 1))
-            .append('\t')
+        return getString(rec.assembly1Map, "getChromosome") +
+        '\t' +
+        checkNull(rec.assembly1Map.get(0).getStartPos() - 1) +
+        '\t' +
+        checkNull(rec.assembly1Map.get(0).getStopPos() - 1) +
+        '\t' +
+        rec.getGeneSymbol() +
+        "|" + String.valueOf(rec.getRgdId()) +
+        "|" + rec.getNcbiGeneIds() +
+        "|" + rec.getRefSeqNucleoIds() +
+        "|" + rec.getRefSeqProteinIds() +
+        '\t' +
+        '0' +
+        '\t' +
+        getString(rec.assembly1Map, "getStrand") +
+        '\n';
+    }
 
-            .append(rec.getGeneSymbol())
-                .append("|").append(String.valueOf(rec.getRgdId()))
-                .append("|").append(rec.getNcbiGeneIds())
-                .append("|").append(rec.getRefSeqNucleoIds())
-                .append("|").append(rec.getRefSeqProteinIds())
-            .append('\t')
-
-            .append('0')
-            .append('\t')
-
-            .append(getString(rec.assembly1Map, "getStrand"));
-
-        writer.println();
+    synchronized void writeBedLine(String line, PrintWriter writer) throws Exception {
+        writer.append(line);
     }
 
     String checkNull(String str) {

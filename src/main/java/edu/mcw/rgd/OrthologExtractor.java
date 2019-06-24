@@ -13,10 +13,8 @@ import java.util.*;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Nov 11, 2010
- * Time: 4:00:10 PM
+ * @author mtutaj
+ * @since Nov 11, 2010
  */
 public class OrthologExtractor extends BaseExtractor {
 

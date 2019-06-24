@@ -2,14 +2,16 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: Nov 29, 2010
- * Time: 12:09:33 PM
+ * @author mtutaj
+ * @since Nov 29, 2010
  * Base class with functionality common for all extractors
  */
 public abstract class BaseExtractor {
@@ -44,6 +46,24 @@ public abstract class BaseExtractor {
                 : speciesTypeKey==SpeciesType.MOUSE ? mouseConfig
                 : speciesTypeKey==SpeciesType.HUMAN ? humanConfig
                 : null;
+    }
+
+    public void writeDataLines(Writer out, Map<Integer,String> lineMap) throws IOException {
+
+        // the original data map is unsorted -- let's sort it by rgd id
+        Map<Integer, String> sortedLineMap = new TreeMap<>();
+        for( Map.Entry<Integer,String> entry: lineMap.entrySet() ) {
+            sortedLineMap.put(entry.getKey(), entry.getValue());
+        }
+        for( Map.Entry<Integer,String> entry: sortedLineMap.entrySet() ) {
+            out.write(entry.getValue());
+        }
+    }
+
+    public String getSpeciesSpecificExtractDir(SpeciesRecord si) {
+        String outputDir = getExtractDir()+'/'+si.getSpeciesName().toUpperCase();
+        new File(outputDir).mkdirs(); // ensure the species specific directory does exist
+        return outputDir;
     }
 
     public FtpFileExtractsDAO getDao() {

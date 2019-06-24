@@ -9,7 +9,7 @@ public class ArrayIdExtractor extends BaseExtractor {
 
     private static final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: array-ids-version-1.0.1\n"
+        +"# MODULE: array-ids  build 2019-06-24\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: microarray probe IDs to gene RGD ID mapping data\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -18,8 +18,9 @@ public class ArrayIdExtractor extends BaseExtractor {
         +"GENE_RGD_ID\tGENE_SYMBOL\tNCBI_GENE_ID\tENSEMBL_GENE_ID\tARRAY_ID\tPROBE_SET_ID\n";
 
     private String version;
-    private String outputDir;
     private String fileNamePrefix;
+
+    static boolean versionPrintedOut = false;
 
     /**
      * extract gene array ids from Ensembl to tab separated file
@@ -27,10 +28,17 @@ public class ArrayIdExtractor extends BaseExtractor {
      */
     public void run(SpeciesRecord speciesRec) throws Exception {
 
-        System.out.println(getVersion());
+        synchronized (ArrayIdExtractor.class) {
+            if (!versionPrintedOut) {
+                System.out.println(getVersion());
+                versionPrintedOut = true;
+            }
+        }
+
+        String speciesName = speciesRec.getSpeciesName().toUpperCase();
 
         List<Alias> aliases = getDao().getActiveArrayIdAliasesFromEnsembl(RgdId.OBJECT_KEY_GENES, speciesRec.getSpeciesType());
-        System.out.println("  array id aliases from Ensembl for "+speciesRec.getSpeciesName()+" available: "+aliases.size());
+        System.out.println("  "+speciesName+": array id aliases from Ensembl available: "+aliases.size());
         if( aliases.isEmpty() ) {
             return;
         }
@@ -40,16 +48,17 @@ public class ArrayIdExtractor extends BaseExtractor {
         for( Gene gene: getDao().getActiveGenes(speciesRec.getSpeciesType()) ) {
             geneSymbols.put(gene.getRgdId(), gene.getSymbol());
         }
-        System.out.println("  gene symbols loaded: "+geneSymbols.size());
+        //System.out.println("  "+speciesName+": gene symbols loaded: "+geneSymbols.size());
 
         // create csv file and write the header
-        String filePath = getOutputDir()+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
+        String filePath = getSpeciesSpecificExtractDir(speciesRec)+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
         PrintWriter writer = new PrintWriter(filePath);
+
         String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
         writer.print(header);
-        System.out.println("  processing file: "+filePath);
 
-        int dataLineCount = 0;
+        Set<String> lineSet = new TreeSet<>();
+
         for( Alias alias: aliases ) {
 
             Collection<String> geneIds = getXdbIds(alias.getRgdId(), XdbId.XDB_KEY_NCBI_GENE);
@@ -64,20 +73,24 @@ public class ArrayIdExtractor extends BaseExtractor {
 
             for( String geneId: geneIds ) {
                 for( String ensemblId: ensemblIds ) {
-                    writer.print(alias.getRgdId()+"\t");
-                    writer.print(geneSymbols.get(alias.getRgdId())+"\t");
-                    writer.print(geneId+"\t");
-                    writer.print(ensemblId+"\t");
-                    writer.print(arrayId+"\t");
-                    writer.print(alias.getValue()+"\n");
-                    dataLineCount++;
+                    String line =
+                        alias.getRgdId()+"\t"+
+                        geneSymbols.get(alias.getRgdId())+"\t"+
+                        geneId+"\t"+
+                        ensemblId+"\t"+
+                        arrayId+"\t"+
+                        alias.getValue()+"\n";
+                    lineSet.add(line);
                 }
             }
         }
 
+        for( String line: lineSet ) {
+            writer.append(line);
+        }
         writer.close();
 
-        System.out.println("  data lines written: "+dataLineCount);
+        System.out.println("  "+speciesName+": data lines written: "+lineSet.size()+" to "+filePath);
     }
 
     java.util.Map<Integer, List<XdbId>> xdbIdMap = new HashMap<>();
@@ -115,14 +128,6 @@ public class ArrayIdExtractor extends BaseExtractor {
 
     public void setVersion(String version) {
         this.version = version;
-    }
-
-    public void setOutputDir(String outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public String getOutputDir() {
-        return outputDir;
     }
 
     public void setFileNamePrefix(String fileNamePrefix) {
