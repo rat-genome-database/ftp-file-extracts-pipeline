@@ -18,7 +18,7 @@ public class DafExport {
     class DafMetadata {
         public HashMap dataProvider = getDataProviderForMetaData();
         public String dateProduced;
-        public String release = "RGD Daf Extractor v. 1.2.8, AGR schema 1.0.0.8, build Mar 19, 2019";
+        public String release = "RGD Daf Extractor, AGR schema 1.0.0.8, build  June 24, 2019";
 
         public DafMetadata() {
             dateProduced = sdf_agr.format(new Date());
@@ -85,14 +85,7 @@ public class DafExport {
 
         handlePublication(a.getDbReference(), refRgdId, data.evidence.publication);
 
-        Date dateAssigned;
-        try {
-            dateAssigned = sdt.parse(a.getCreatedDate());
-        } catch (ParseException e) {
-            System.out.println("date parse exception for " + a.getCreatedDate());
-            dateAssigned = new Date();
-        }
-        data.dateAssigned = sdf_agr.format(dateAssigned);
+        data.dateAssigned = getDateAssigned(a.getCreatedDate());
 
         data.objectName = a.getDbObjectSymbol();
 
@@ -204,6 +197,17 @@ public class DafExport {
         dataProvider.put("crossReference", crossReference);
 
         return dataProvider;
+    }
+
+    synchronized String getDateAssigned(String dt) {
+        String result;
+        try {
+            Date dateAssigned = sdt.parse(dt);
+            result = sdf_agr.format(dateAssigned);
+        } catch( ParseException e ) {
+            throw new RuntimeException(e);
+        }
+        return result;
     }
 
     static SimpleDateFormat sdt = new SimpleDateFormat("yyyyMMdd");
