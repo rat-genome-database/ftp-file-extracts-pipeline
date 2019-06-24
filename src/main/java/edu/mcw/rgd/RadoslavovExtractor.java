@@ -122,7 +122,8 @@ public class RadoslavovExtractor extends BaseExtractor {
         System.out.println("written "+rows+" rows for "+fileName);
     }
 
-    String writeDate(Date dt) {
+    // must be synchronized when run in parallel by multiple threads
+    synchronized String writeDate(Date dt) {
         if( dt==null )
             return "";
         return _sdtDate.format(dt);
