@@ -5,44 +5,40 @@ set -e
 
 APPHOME=/home/rgddata/pipelines/ftpFileExtracts
 OUTDIR=$APPHOME/data/agr
-TMPJSON=$OUTDIR/tmp.json
 # note: python -m json.tool is formatting the json files in human readable pretty format
 
-echo "=== AGR alleles for rat ... ==="
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/alleles/10116 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/alleles.10116.json
-echo "=== AGR alleles for rat OK"
-echo ""
+echo "=== AGR files ... ==="
+# download all files in parallel
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/alleles/10116 -O $OUTDIR/alleles_rat.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/variants/10116 -O $OUTDIR/variants_rat.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/expression/9606 -O $OUTDIR/expression_human.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/expression/10116 -O $OUTDIR/expression_rat.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/9606 -O $OUTDIR/phenotypes_human.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/10116 -O $OUTDIR/phenotypes_rat.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/9606 -O $OUTDIR/genes_human.json &
+wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/10116 -O $OUTDIR/genes_rat.json &
 
-echo "=== AGR variants for rat ... ==="
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/variants/10116 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/variants.10116.json
-echo "=== AGR variants for rat OK"
-echo ""
+# make the downloaded json files human readable
+wait
+python -m json.tool $OUTDIR/alleles_rat.json > $OUTDIR/alleles.10116.json &
+python -m json.tool $OUTDIR/variants_rat.json > $OUTDIR/variants.10116.json &
+python -m json.tool $OUTDIR/expression_human.json > $OUTDIR/expression.9606.json &
+python -m json.tool $OUTDIR/expression_rat.json > $OUTDIR/expression.10116.json &
+python -m json.tool $OUTDIR/phenotypes_human.json > $OUTDIR/phenotypes.9606.json &
+python -m json.tool $OUTDIR/phenotypes_rat.json > $OUTDIR/phenotypes.10116.json &
+python -m json.tool $OUTDIR/genes_human.json > $OUTDIR/bgi.9606.json &
+python -m json.tool $OUTDIR/genes_rat.json > $OUTDIR/bgi.10116.json &
 
-echo "=== AGR expression for rat and human ... ==="
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/expression/9606 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/expression.9606.json
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/expression/10116 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/expression.10116.json
-echo "=== AGR expression for rat and human OK"
-echo ""
+#remove tmp files
+wait
+rm $OUTDIR/alleles_rat.json
+rm $OUTDIR/variants_rat.json
+rm $OUTDIR/expression_human.json
+rm $OUTDIR/expression_rat.json
+rm $OUTDIR/phenotypes_human.json
+rm $OUTDIR/phenotypes_rat.json
+rm $OUTDIR/genes_human.json
+rm $OUTDIR/genes_rat.json
 
-echo "=== AGR phenotype files ... ==="
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/9606 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/phenotypes.9606.json
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/10116 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/phenotypes.10116.json
-echo "=== AGR phenotype files OK ==="
-echo ""
-
-echo "=== AGR BGI files ... ==="
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/9606 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/bgi.9606.json
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/10116 -O $TMPJSON
-python -m json.tool $TMPJSON > $OUTDIR/bgi.10116.json
-echo "=== AGR BGI files OK ==="
-
-rm $OUTDIR/tmp.json
-
+echo "=== AGR files OK"
 echo ""
