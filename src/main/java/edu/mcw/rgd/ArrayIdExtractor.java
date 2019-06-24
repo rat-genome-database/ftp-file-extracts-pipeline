@@ -9,7 +9,7 @@ public class ArrayIdExtractor extends BaseExtractor {
 
     private static final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: array-ids  build 2019-06-17\n"
+        +"# MODULE: array-ids  build 2019-06-24\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: microarray probe IDs to gene RGD ID mapping data\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -20,16 +20,25 @@ public class ArrayIdExtractor extends BaseExtractor {
     private String version;
     private String fileNamePrefix;
 
+    static boolean versionPrintedOut = false;
+
     /**
      * extract gene array ids from Ensembl to tab separated file
      * @throws Exception
      */
     public void run(SpeciesRecord speciesRec) throws Exception {
 
-        System.out.println(getVersion());
+        synchronized (ArrayIdExtractor.class) {
+            if (!versionPrintedOut) {
+                System.out.println(getVersion());
+                versionPrintedOut = true;
+            }
+        }
+
+        String speciesName = speciesRec.getSpeciesName().toUpperCase();
 
         List<Alias> aliases = getDao().getActiveArrayIdAliasesFromEnsembl(RgdId.OBJECT_KEY_GENES, speciesRec.getSpeciesType());
-        System.out.println("  array id aliases from Ensembl for "+speciesRec.getSpeciesName()+" available: "+aliases.size());
+        System.out.println("  "+speciesName+": array id aliases from Ensembl available: "+aliases.size());
         if( aliases.isEmpty() ) {
             return;
         }
@@ -39,7 +48,7 @@ public class ArrayIdExtractor extends BaseExtractor {
         for( Gene gene: getDao().getActiveGenes(speciesRec.getSpeciesType()) ) {
             geneSymbols.put(gene.getRgdId(), gene.getSymbol());
         }
-        System.out.println("  gene symbols loaded: "+geneSymbols.size());
+        //System.out.println("  "+speciesName+": gene symbols loaded: "+geneSymbols.size());
 
         // create csv file and write the header
         String filePath = getSpeciesSpecificExtractDir(speciesRec)+"/"+getFileNamePrefix()+speciesRec.getSpeciesName().toUpperCase()+".txt";
@@ -47,7 +56,6 @@ public class ArrayIdExtractor extends BaseExtractor {
 
         String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
         writer.print(header);
-        System.out.println("  processing file: "+filePath);
 
         Set<String> lineSet = new TreeSet<>();
 
@@ -82,7 +90,7 @@ public class ArrayIdExtractor extends BaseExtractor {
         }
         writer.close();
 
-        System.out.println("  data lines written: "+lineSet.size());
+        System.out.println("  "+speciesName+": data lines written: "+lineSet.size()+" to "+filePath);
     }
 
     java.util.Map<Integer, List<XdbId>> xdbIdMap = new HashMap<>();

@@ -16,7 +16,7 @@ public class SslpExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: markers  build 2019-06-17\n"
+    +"# MODULE: markers  build 2019-06-24\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# markers extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -120,9 +120,9 @@ public class SslpExtractor extends BaseExtractor {
     "#24  CHROMOSOME_37          chromosome for the current reference assembly v.37\n"
    +"#25  START_POS_37           start position for current reference assembly v.37\n"
    +"#26  STOP_POS_37            stop position for current reference assembly v.37\n"
-   +"#27  CHROMOSOME_36          chromosome for the old reference assembly v.36\n"
-   +"#28  START_POS_36           start position for old reference assembly v.36\n"
-   +"#29  STOP_POS_36            stop position for old reference assembly v.36\n"
+   +"#27  (UNUSED)\n"
+   +"#28  (UNUSED)\n"
+   +"#29  (UNUSED)\n"
    +"#30  MGD_ID                 MGD ID\n"
    +"#31  CM_POS                 mouse cM map absolute position\n"
    +"#\n"
@@ -132,19 +132,19 @@ public class SslpExtractor extends BaseExtractor {
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
    +"CHROMOSOME_37\tSTART_POS_37\tSTOP_POS_37\t"
-   +"CHROMOSOME_36\tSTART_POS_36\tSTOP_POS_36\t"
+   +"(UNUSED)\t(UNUSED)\t(UNUSED)\t"
    +"MGD_ID\tCM_POS";
 
     Logger log = Logger.getLogger(getClass());
 
     public void run(SpeciesRecord speciesInfo) throws Exception {
 
-        System.out.println(getVersion()+" - "+speciesInfo.getSpeciesName());
-
         final SpeciesRecord speciesRec = speciesInfo;
         String outputFile = speciesInfo.getMarkerFileName();
         if( outputFile==null )
             return;
+
+        long time0 = System.currentTimeMillis();
 
         // create species specific output dir
         outputFile = getSpeciesSpecificExtractDir(speciesInfo)+'/'+outputFile;
@@ -268,8 +268,10 @@ public class SslpExtractor extends BaseExtractor {
         // close the output file
         writer.close();
 
+        System.out.println(getVersion()+" - "+speciesInfo.getSpeciesName() + "  - data lines written: "+lineMap.size()+",  elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
+
         // copy the output file to the staging area
-        FtpFileExtractsManager.qcFileContent(outputFile, "sslps", speciesType);
+        FtpFileExtractsManager.qcFileContent(outputFile, "markers", speciesType);
     }
 
     List<MarkerRecord> getMarkerList(int speciesType) throws Exception {

@@ -17,9 +17,9 @@ public class SslpAlleleExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: marker-alleles-version-2.0.2\n"
+    +"# MODULE: marker-alleles  build 2019-06-24\n"
     +"# GENERATED-ON: #DATE#\n"
-    +"# PURPOSE: information about active #SPECIES# sslp alleles extracted from RGD database\n"
+    +"# PURPOSE: information about active #SPECIES# marker alleles extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
     +"# FORMAT: tab delimited text\n"
     +"#\n"
@@ -27,21 +27,19 @@ public class SslpAlleleExtractor extends BaseExtractor {
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"#\n"
-    +"#1   SSLP_RGD_ID	       RGD_ID of the sslp allele\n"
-    +"#2   RGD_NAME                name of the sslp allele in RGD\n"
-    +"#3   STRAIN_SSLP_SIZE        sslp size for given strain\n"
-    +"SSLP_RGD_ID\tRGD_NAME";
+    +"#1   MARKER_RGD_ID	       RGD_ID of the marker allele\n"
+    +"#2   RGD_NAME                name of the marker allele in RGD\n"
+    +"#3   STRAIN_MARKER_SIZE      marker size for given strain\n"
+    +"MARKER_RGD_ID\tRGD_NAME";
 
     Logger log = Logger.getLogger(getClass());
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 
-        String outputFile = speciesRec.getMarkerAllelesFileName();
-        if( outputFile==null )
+        String outputFileName = speciesRec.getMarkerAllelesFileName();
+        if( outputFileName==null )
             return;
-        String outputDir = getExtractDir()+'/'+speciesRec.getSpeciesName().toUpperCase();
-        new File(outputDir).mkdirs();
-        outputFile = getExtractDir()+'/'+outputFile;
+        String outputFile = getSpeciesSpecificExtractDir(speciesRec)+'/'+outputFileName;
 
         // retrieve from database all markers with allele sizes and strain names
         Set<String> strainNamesSet = new HashSet<String>();
@@ -79,7 +77,7 @@ public class SslpAlleleExtractor extends BaseExtractor {
         writer.close();
 
         // copy the output file to the staging area
-        FtpFileExtractsManager.qcFileContent(outputFile, "sslp_alleles", speciesRec.getSpeciesType());
+        FtpFileExtractsManager.qcFileContent(outputFile, "marker_alleles", speciesRec.getSpeciesType());
     }
 
     private String checkNull(String str) {

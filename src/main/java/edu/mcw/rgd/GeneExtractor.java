@@ -18,7 +18,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2019-06-17\n"
+    +"# MODULE: genes  build 2019-06-24\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
@@ -218,7 +218,6 @@ public class GeneExtractor extends BaseExtractor {
     String generate(final SpeciesRecord si) throws Exception {
 
         String outputFileName = getSpeciesSpecificExtractDir(si)+'/'+getFileNamePrefix()+si.getSpeciesName().toUpperCase()+".txt";
-        log.info("started extraction to "+outputFileName);
 
         final FtpFileExtractsDAO dao = getDao();
         final int speciesType = si.getSpeciesType();
@@ -403,6 +402,8 @@ public class GeneExtractor extends BaseExtractor {
 
         // close the output file
         writer.close();
+
+        log.info("   "+outputFileName+",  data lines written: "+lineMap.size());
 
         return outputFileName;
     }

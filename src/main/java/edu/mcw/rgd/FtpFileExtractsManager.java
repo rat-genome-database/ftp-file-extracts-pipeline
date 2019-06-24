@@ -1,8 +1,8 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import edu.mcw.rgd.process.Utils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
@@ -41,7 +41,9 @@ public class FtpFileExtractsManager {
     }
 
     static public void main2(String[] args) throws Exception {
-        
+
+        long time0 = System.currentTimeMillis();
+
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         new XmlBeanDefinitionReader(bf).loadBeanDefinitions(new FileSystemResource("properties/AppConfigure.xml"));
         FtpFileExtractsManager manager = (FtpFileExtractsManager) (bf.getBean("manager"));
@@ -189,27 +191,37 @@ public class FtpFileExtractsManager {
         if( speciesTypeKey==SpeciesType.UNKNOWN ) {
             throw new Exception("Unsupported species type");
         }
-        else if( speciesTypeKey==SpeciesType.ALL ) {
-            List<Integer> keys = new ArrayList<>(SpeciesType.getSpeciesTypeKeys());
-            Collections.shuffle(keys);
-            for( int key: keys ) {
-                if( key>0 ) {
+
+
+        List<Integer> speciesTypeKeys;
+        if( speciesTypeKey==SpeciesType.ALL ) {
+            speciesTypeKeys = new ArrayList<>(SpeciesType.getSpeciesTypeKeys());
+        } else {
+            speciesTypeKeys = new ArrayList<>();
+            speciesTypeKeys.add(speciesTypeKey);
+        }
+        Collections.shuffle(speciesTypeKeys);
+
+        speciesTypeKeys.parallelStream().forEach( key -> {
+            if( key>0 ) {
+                try {
                     extractor.go(manager.getSpeciesInfo().get(SpeciesType.getCommonName(key).toLowerCase()));
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
-        }
-        else {
-            extractor.go(manager.getSpeciesInfo().get(SpeciesType.getCommonName(speciesTypeKey).toLowerCase()));
-        }
+        });
+
+        System.out.println("=== OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     static public void usage() {
 
         String USAGE = "java -Dspring.config=$APPHOME/../properties/default_db.xml -Dlog4j.configuration=$APPHOME/properties/log4j.properties"+
             " -jar ./lib/ftpFileExtracts.jar [MODULE] [OPTIONS]\n"+
-        "[MODULE] one of: -genes | -qtls | -strains |   -gp2protein | -markers | -marker_alleles | -orthologs | -annotations | -daf_annotations "+
-            "| -gaf_annotations | -gaf_agr_annotations | -uniprot_annotations | -db_snps | -radoslavov | -chinchilla | -assembly_comparison "+
-            "| -mirna_targets | -array_ids | -sequences | -obsolete | -interactions\n"+
+        "[MODULE] one of: -annotations | -array_ids | -assembly_comparison | -chinchilla | -daf_annotations | -db_snps"+
+            " | -gaf_agr_annotations | -gaf_annotations | -genes | -gp2protein | -interactions | -markers | -marker_alleles"+
+            " | -mirna_targets | -obsolete | -orthologs | -radoslavov | -qtls | -sequences | -strains | -uniprot_annotations\n"+
         "[OPTIONS] optional species name: -species=rat|mouse|human|...|all (default) (all:rat,mouse,human,...)\n"+
         "   optional annotation directory override: -annotDir=annotDirOverride;\n"+
         "     overrides value of 'annotDir' from beans 'annotExtractor' and 'annotGafExtractor'";
@@ -228,7 +240,7 @@ public class FtpFileExtractsManager {
         FileContentQC qcContentChecker = new FileContentQC();
         String result = qcContentChecker.validate(fileName, module, speciesTypeKey);
         if( !result.isEmpty() ) {
-            Log logNullColumns = LogFactory.getLog("nullColumns");
+            Logger logNullColumns = Logger.getLogger("nullColumns");
             logNullColumns.info(result);
         }
     }

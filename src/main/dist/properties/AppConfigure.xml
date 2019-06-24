@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  build 2019-06-17" />
+        <property name="version" value="FtpFileExtractManager  build 2019-06-24" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -35,7 +35,7 @@
     <bean id="mouseInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="2" />
         <property name="newRefAssemblyMapKeyForMarkers" value="18" />
-        <property name="oldRefAssemblyMapKeyForMarkers" value="14" />
+        <property name="oldRefAssemblyMapKeyForMarkers" value="0" />
         <property name="celeraAssemblyMapKey" value="20" />
         <property name="cytoMapKey" value="12" />
         <property name="cmMapKey" value="31" />
@@ -96,7 +96,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor">
-        <property name="version" value="Gene Extractor  build 2019-06-17"/>
+        <property name="version" value="Gene Extractor  build 2019-06-24"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
@@ -154,7 +154,7 @@
 
 
     <bean id="qtlExtractor" class="edu.mcw.rgd.QtlExtractor">
-        <property name="version" value="Qtl Extractor  build 2019-06-17"/>
+        <property name="version" value="Qtl Extractor  build 2019-06-24"/>
     </bean>
 
     <bean id="dbSnpExtractor" class="edu.mcw.rgd.DbSnpExtractor">
@@ -187,7 +187,7 @@
     </bean>
 
     <bean id="markerExtractor" class="edu.mcw.rgd.SslpExtractor">
-        <property name="version" value="MarkerExtractor  build 2019-06-17" />
+        <property name="version" value="MarkerExtractor  build 2019-06-24" />
     </bean>
 
     <bean id="markerAlleleExtractor" class="edu.mcw.rgd.SslpAlleleExtractor">
@@ -289,7 +289,7 @@
     </bean>
 
     <bean id="arrayIdExtractor" class="edu.mcw.rgd.ArrayIdExtractor">
-        <property name="version" value="ArrayIdExtractor  build 2019-06-17" />
+        <property name="version" value="ArrayIdExtractor  build 2019-06-24" />
         <property name="fileNamePrefix" value="ARRAY_IDS_ENSEMBL_" />
     </bean>
 

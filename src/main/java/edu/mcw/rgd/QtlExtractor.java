@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
+import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
@@ -14,20 +15,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class QtlExtractor  extends BaseExtractor {
 
+    static boolean versionPrintedOut = false;
+
     public void run(SpeciesRecord speciesRec) throws Exception {
 
         String outputFile = speciesRec.getQtlFileName();
         if( outputFile==null )
             return;
 
-        System.out.println(getVersion());
+        synchronized (ArrayIdExtractor.class) {
+            if (!versionPrintedOut) {
+                System.out.println(getVersion());
+                versionPrintedOut = true;
+            }
+        }
 
         run(speciesRec, getSpeciesSpecificExtractDir(speciesRec));
     }
 
     final String HEADER_COMMON_LINES =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: qtls  build 2019-06-17\n"
+        +"# MODULE: qtls  build 2019-06-24\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: information about active #SPECIES# qtls extracted from RGD database\n"
         +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -164,7 +172,7 @@ public class QtlExtractor  extends BaseExtractor {
      */
     public void run(final SpeciesRecord species, String tmpDir) throws Exception {
 
-        log.info("Running qtl extracts to file "+ species.getQtlFileName());
+        long time0 = System.currentTimeMillis();
 
         this.species = species;
         final int speciesType = species.getSpeciesType();
@@ -283,6 +291,8 @@ public class QtlExtractor  extends BaseExtractor {
 
         // close the output file
         writer.close();
+
+        log.info("   "+ species.getQtlFileName()+",  elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
 
         // copy the output file to the staging area
         FtpFileExtractsManager.qcFileContent(fileName, "qtls", speciesType);

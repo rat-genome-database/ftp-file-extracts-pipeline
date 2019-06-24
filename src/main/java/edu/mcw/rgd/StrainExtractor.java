@@ -42,7 +42,7 @@ public class StrainExtractor extends BaseExtractor {
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.println(
         "# RGD-PIPELINE: ftp-file-extracts\n"
-       +"# MODULE: strains  build 2019-06-17\n"
+       +"# MODULE: strains   build 2019-06-24\n"
        +"# GENERATED-ON: #DATE#\n"
        +"# PURPOSE: information about active rat strains extracted from RGD database\n"
        +"# CONTACT: rgd.data@mcw.edu\n"
