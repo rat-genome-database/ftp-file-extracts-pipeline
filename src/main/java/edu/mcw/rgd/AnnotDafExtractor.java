@@ -2,7 +2,6 @@ package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 import edu.mcw.rgd.datamodel.SpeciesType;
