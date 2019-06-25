@@ -15,13 +15,22 @@ public class DafExport {
     public DafMetadata metaData = new DafMetadata();
     public List<DafData> data = new ArrayList<>();
 
+    SimpleDateFormat sdt = new SimpleDateFormat("yyyyMMdd");
+    SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
     class DafMetadata {
-        public HashMap dataProvider = getDataProviderForMetaData();
-        public String dateProduced;
-        public String release = "RGD Daf Extractor, AGR schema 1.0.0.8, build  June 24, 2019";
+        public final HashMap dataProvider;
+        public final String dateProduced;
+        public final String release;
 
         public DafMetadata() {
-            dateProduced = sdf_agr.format(new Date());
+            synchronized(DafExport.class) {
+                dataProvider = getDataProviderForMetaData();
+                release = "RGD Daf Extractor, AGR schema 1.0.0.8, build  June 24, 2019";
+
+                SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                dateProduced = sdf_agr.format(new Date());
+            }
         }
     }
 
@@ -209,7 +218,4 @@ public class DafExport {
         }
         return result;
     }
-
-    static SimpleDateFormat sdt = new SimpleDateFormat("yyyyMMdd");
-    static SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 }

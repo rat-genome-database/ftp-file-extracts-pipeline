@@ -41,7 +41,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
 
     // map of REF_RGD_IDs to PMID acc ids: used to significantly reduce database overhead
     // (issue one sql query vs millions of queries previously)
-    static private Map<Integer, String> pmidMap;
+    private Map<Integer, String> pmidMap;
 
     public String getPmid(int refRgdId) {
         return pmidMap.get(refRgdId);
