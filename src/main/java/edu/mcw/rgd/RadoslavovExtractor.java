@@ -8,11 +8,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mtutaj
- * Date: 6/30/14
- * Time: 12:35 PM
- * <p>generates files to be used by researcher Radoslavov; original queries provided by Jennifer:
+ * @author mtutaj
+ * @since 6/30/14
+ * generates files to be used by researcher Radoslavov; original queries provided by Jennifer:
  * <pre>
 
  Alleles_to_Genes.txt file columns:
@@ -41,12 +39,13 @@ public class RadoslavovExtractor extends BaseExtractor {
     private String mouseGenesFile;
     private String humanGenesFile;
 
-    static SimpleDateFormat _sdtDate = new SimpleDateFormat("yyyy-MM-dd");
     private String strainToCmoFile;
     private String strainToMmoFile;
     private String strainToXcoFile;
     private String allelesToGenesFile;
     private String splicesToGenesFile;
+
+    SimpleDateFormat _sdtDate = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public void run(SpeciesRecord speciesInfo) throws Exception {
