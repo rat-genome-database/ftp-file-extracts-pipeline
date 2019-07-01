@@ -25,25 +25,18 @@ public class InteractionsExtractor extends BaseExtractor {
     Map<Integer, Protein> proteins=new HashMap<>();
     Map<Integer, List<Gene>> geneProteinMap=new HashMap<>();
 
-    boolean versionPrintedOut = false;
+    static boolean versionPrintedOut = false;
 
     @Override
     public void run(SpeciesRecord speciesInfo) throws Exception {
 
-        int speciesTypeKey = speciesInfo.getSpeciesType();
-        List<Integer> proteinRgdIds = getProteinRgdIds(speciesTypeKey);
-        if( proteinRgdIds.isEmpty() ) {
-            return;
-        }
-        List<Interaction> interactions = getInteractionsByRgdIdsList(proteinRgdIds);
-        if( interactions.isEmpty() ) {
-            return;
+        if( !versionPrintedOut ) {
+            versionPrintedOut = true;
+            System.out.println(getVersion());
         }
 
-        if( !versionPrintedOut ) {
-            System.out.println(getVersion());
-            versionPrintedOut = true;
-        }
+        int speciesTypeKey = speciesInfo.getSpeciesType();
+        Collection<String> dataLines = generateDataLines(speciesTypeKey);
 
         String tsvFilePath = getSpeciesSpecificExtractDir(speciesInfo)+"/"+"INTERACTIONS_"+speciesInfo.getSpeciesName().toUpperCase()+".txt";
 
@@ -51,7 +44,7 @@ public class InteractionsExtractor extends BaseExtractor {
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.write(
             "# RGD-PIPELINE: ftp-file-extracts\n"
-            +"# MODULE: interactions   build 2019-06-24\n"
+            +"# MODULE: interactions   build 2019-07-01\n"
             +"# GENERATED-ON: "+dateFormat.format(new Date())+"\n"
             +"# CONTACT: rgd.data@mcw.edu\n"
             +"# FORMAT: tab delimited text\n"
@@ -61,21 +54,40 @@ public class InteractionsExtractor extends BaseExtractor {
             +"#\tThe interaction data is sourced from the IMEx consortium.\n"
             +"#\tMultiple values in a single column are separated by ';'\n"
             +"# SPECIES: "+ speciesInfo.getSpeciesName()+"\n"
-            +"# COUNT: "+ interactions.size()+" interactions\n"
+            +"# COUNT: "+ dataLines.size()+" interactions\n"
             +"Interactor A \tInteractor A Gene\tInteractor A Gene RGD_ID\tInteractor B\tInteractor B Gene\tInteractor B Gene RGD_ID\tSpecies A\tSpecies B\tInteraction Type\tAttributes\n"
 
         );
 
-        int dataLines = 0;
-        for(Interaction i:interactions){
-            Protein interactor1=getProtein(i.getRgdId1());
-            if( interactor1==null ) {
-                System.out.println("  null protein for RGD:"+i.getRgdId1());
+        for( String line: dataLines ) {
+            tsvWriter.write(line);
+        }
+        tsvWriter.close();
+
+        System.out.println("  "+speciesInfo.getSpeciesName()+" interactions: "+dataLines.size());
+    }
+
+    Collection<String> generateDataLines(int speciesTypeKey) throws Exception {
+        List<Integer> proteinRgdIds = getProteinRgdIds(speciesTypeKey);
+        if( proteinRgdIds.isEmpty() ) {
+            return Collections.emptyList();
+        }
+        List<Interaction> interactions = getInteractionsByRgdIdsList(proteinRgdIds);
+        if( interactions.isEmpty() ) {
+            return Collections.emptyList();
+        }
+
+        Set<String> sortedLines = new TreeSet<>();
+
+        for (Interaction i : interactions) {
+            Protein interactor1 = getProtein(i.getRgdId1());
+            if (interactor1 == null) {
+                System.out.println("  null protein for RGD:" + i.getRgdId1());
                 continue;
             }
-            Protein interactor2=getProtein(i.getRgdId2());
-            if( interactor2==null ) {
-                System.out.println("  null protein for RGD:"+i.getRgdId2());
+            Protein interactor2 = getProtein(i.getRgdId2());
+            if (interactor2 == null) {
+                System.out.println("  null protein for RGD:" + i.getRgdId2());
                 continue;
             }
 
@@ -90,23 +102,26 @@ public class InteractionsExtractor extends BaseExtractor {
             String species1=SpeciesType.getCommonName(interactor1.getSpeciesTypeKey());
             String species2=SpeciesType.getCommonName(interactor2.getSpeciesTypeKey());
             String attributes= getAttributes(i.getInteractionKey());
-            tsvWriter.write(interactor1.getUniprotId()+"\t");
-            tsvWriter.write(geneSymbol1+"\t");
-            tsvWriter.write(geneRgdId1+"\t");
 
-            tsvWriter.write(interactor2.getUniprotId()+"\t");
-            tsvWriter.write(geneSymbol2+"\t");
-            tsvWriter.write(geneRgdId2+"\t");
-            tsvWriter.write(species1+"\t");
-            tsvWriter.write(species2+"\t");
-            tsvWriter.write(interactionType+"\t");
-            tsvWriter.write(attributes+"\t");
-            tsvWriter.write("\n");
-            dataLines++;
+            String line =
+                interactor1.getUniprotId()+"\t"+
+                geneSymbol1+"\t"+
+                geneRgdId1+"\t"+
+
+                interactor2.getUniprotId()+"\t"+
+                geneSymbol2+"\t"+
+                geneRgdId2+"\t"+
+
+                species1+"\t"+
+                species2+"\t"+
+                interactionType+"\t"+
+                attributes+"\t"+
+                "\n";
+
+            sortedLines.add(line);
         }
-        tsvWriter.close();
 
-        System.out.println("  "+speciesInfo.getSpeciesName()+" interactions: "+dataLines);
+        return sortedLines;
     }
 
     public Collection[] split(List<Integer> rgdids, int size) throws Exception {
@@ -136,10 +151,8 @@ public class InteractionsExtractor extends BaseExtractor {
 
     public List<Interaction> getInteractionsByRgdIdsList(List<Integer> proteinRgdIds) throws Exception {
         List<Interaction> interactions= new ArrayList<>();
-        Collection[] colletions = this.split(proteinRgdIds, 1000);
-
-        for(int i=0; i<colletions.length;i++){
-            List c= (List) colletions[i];
+        for (Collection colletion : split(proteinRgdIds, 1000)) {
+            List c = (List) colletion;
             interactions.addAll(idao.getInteractionsByRgdIdsList(c));
         }
         return interactions;
@@ -172,21 +185,20 @@ public class InteractionsExtractor extends BaseExtractor {
     }
 
     public String getInteractionType(String accId) {
-        String interactionType = "";
-        if (intTypes.get(accId) != null) {
-            interactionType = intTypes.get(accId);
-        } else {
+
+        String interactionType = intTypes.get(accId);
+        if( interactionType == null) {
             try {
                 interactionType = xdao.getTermByAccId(accId).getTerm();
                 intTypes.put(accId, interactionType);
             } catch (Exception e) {
-                System.out.println("interaction TYpe: " + accId);
+                System.out.println("interaction type: " + accId);
                 e.printStackTrace();
             }
-
         }
         return interactionType;
     }
+
     public String getAttributes(int interactionKey) throws Exception {
         List<InteractionAttribute> attributes=adao.getAttributes(interactionKey);
         StringBuilder sb=new StringBuilder();
