@@ -1,3 +1,6 @@
+Jul 1, 2019
+-interactions: added line sorting; fixed code to no longer generate duplicate lines
+
 Jun 24, 2019
 -several modules rewritten for better performance
 -for several modules, lines in generated files are sorted
