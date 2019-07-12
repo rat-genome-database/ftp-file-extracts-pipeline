@@ -1,3 +1,6 @@
+Jul 12, 2019
+-agr extractor: added extract of affectedGenomicModel
+
 Jul 1, 2019
 -interactions: added line sorting; fixed code to no longer generate duplicate lines
 

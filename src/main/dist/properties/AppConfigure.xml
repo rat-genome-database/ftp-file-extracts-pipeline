@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  build 2019-07-01" />
+        <property name="version" value="FtpFileExtractManager  build 2019-07-12" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -234,7 +234,7 @@
     </bean>
 
     <bean id="annotDafExtractor" class="edu.mcw.rgd.AnnotDafExtractor" parent="annotBaseExtractor" scope="prototype">
-        <property name="version" value="AnnotDafExtractor v.1.1.14 as of Mar 29, 2019" />
+        <property name="version" value="AnnotDafExtractor  -- build July 12, 2019" />
         <property name="annotDir" value="data/agr" />
         <property name="fileJsonPrefix" value="disease." />
         <property name="fileJsonSuffix" value=".daf.json" />
