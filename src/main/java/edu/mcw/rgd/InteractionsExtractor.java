@@ -44,7 +44,7 @@ public class InteractionsExtractor extends BaseExtractor {
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.write(
             "# RGD-PIPELINE: ftp-file-extracts\n"
-            +"# MODULE: interactions   build 2019-07-01\n"
+            +"# MODULE: interactions   build 2019-10-07\n"
             +"# GENERATED-ON: "+dateFormat.format(new Date())+"\n"
             +"# CONTACT: rgd.data@mcw.edu\n"
             +"# FORMAT: tab delimited text\n"

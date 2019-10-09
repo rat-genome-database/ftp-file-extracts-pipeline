@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
- * User: mtutaj <br>
- * Date: August 18, 2016 <br>
+ * @author mtutaj
+ * @since August 18, 2016
  * Extracts annotated rgd genes with uniprot ids by ontology.
  */
 public class AnnotUniProtExtractor extends AnnotBaseExtractor {
@@ -18,7 +18,7 @@ public class AnnotUniProtExtractor extends AnnotBaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: uniprot-annotations-version-1.0.0 (Aug 19, 2016)\n"
+    +"# MODULE: uniprot-annotations-version-1.0.1 (Sep 30, 2019)\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: uniprot annotations with references\n"
     +"# ONTOLOGY: #ONT#\n"

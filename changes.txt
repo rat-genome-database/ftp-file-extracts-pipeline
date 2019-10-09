@@ -1,3 +1,6 @@
+Oct 07, 2019
+-annotation modules rewritten to use parallel streams for efficiency and simpler code
+
 Oct 02, 2019
 -radoslavov script: archived scripts for radoslavov pipeline from text mining application server GREEN
  which has been retired

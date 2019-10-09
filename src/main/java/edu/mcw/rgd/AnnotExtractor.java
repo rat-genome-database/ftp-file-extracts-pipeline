@@ -6,9 +6,8 @@ import java.io.PrintWriter;
 
 
 /**
- * Created by IntelliJ IDEA. <br>
- * User: mtutaj <br>
- * Date: June 28, 2011 <br>
+ * @author mtutaj
+ * @since June 28, 2011
  * Extracts annotated rgd objects by ontology.
  * The annotated objects being exported are genes, qtls and strains.
  */
@@ -17,7 +16,7 @@ public class AnnotExtractor extends AnnotBaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: annotations-version-1.1.7 (Oct 1, 2012)\n"
+    +"# MODULE: annotations-version-1.1.8 (Sep 30, 2019)\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: annotations about active #SPECIES# objects extracted from RGD database\n"
     +"# ONTOLOGY: #ONT#\n"
