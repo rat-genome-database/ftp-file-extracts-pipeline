@@ -127,9 +127,11 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             try {
                 qc(rec, counters);
 
+                String line = null;
                 if( !rec.isExcludedFromProcessing() ) {
-                    rec.setLineAndClear(writeLine(rec));
+                    line = writeLine(rec);
                 }
+                rec.setLineAndClear(line);
 
             } catch(Exception e) {
                 throw new RuntimeException(e);
