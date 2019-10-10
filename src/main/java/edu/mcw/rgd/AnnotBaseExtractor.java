@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -29,7 +30,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     abstract String getOutputFileNamePrefix(int speciesTypeKey);
     abstract String getOutputFileNameSuffix(String ontId, int objectKey);
     abstract String getHeaderCommonLines();
-    abstract void writeLine(AnnotRecord rec, PrintWriter writer);
+    abstract String writeLine(AnnotRecord rec);
     abstract boolean processOnlyGenes();
     abstract boolean loadUniProtIds();
 
@@ -98,9 +99,17 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             annotDir.mkdirs();
         }
 
+        // for GAF annotations submitted to AGR, the annotations must be deconsolidated!
+        if( this instanceof AnnotGafExtractor ) {
+            if( ((AnnotGafExtractor)this).isGenerateForAgr() ) {
+                suppressDeconsolidation = false;
+                logAnnot.info("Deconsolidation enabled for AGR GAF file");
+            }
+        }
+
         // prefix for output file name dependent on species
-        final int speciesType = speciesTypeKey;
-        final String outputFileNamePrefix = getAnnotDir()+"/"+getOutputFileNamePrefix(speciesType);
+
+        final String outputFileNamePrefix = getAnnotDir()+"/"+getOutputFileNamePrefix(speciesTypeKey);
         // the suffix will be ontology id -- generated automatically from the data
 
         // prepare header common lines
@@ -111,36 +120,37 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         // process active genes for given species
         CounterPool counters = new CounterPool();
 
-        List<Annotation> annots = processOnlyGenes()
-                ? getDao().getAnnotationsBySpecies(speciesType, RgdId.OBJECT_KEY_GENES)
-                : getDao().getAnnotationsBySpecies(speciesType);
+        List<AnnotRecord> annots = getAnnotRecords();
 
-        Collection<Annotation> annots2 = suppressDeconsolidation ? annots : deconsolidateAnnotations(annots);
-
-        annots2.parallelStream().forEach( a -> {
-
-            if( !acceptAnnotation(a) ) {
-                return;
-            }
-
-            AnnotRecord rec = new AnnotRecord();
-            rec.annot = a;
-            rec.taxon = "taxon:"+ SpeciesType.getTaxonomicId(speciesType);
+        annots.parallelStream().forEach( rec -> {
 
             try {
                 qc(rec, counters);
 
                 if( !rec.isExcludedFromProcessing() ) {
-                    // write out all the parameters to the file
-                    PrintWriter writer = getWriter(outputFileNamePrefix, commonLines, rec.ontId, rec.ontName);
-                    writeLine(rec, writer);
+                    rec.line = writeLine(rec);
                 }
 
             } catch(Exception e) {
-                logAnnot.info("getWriter("+outputFileNamePrefix+","+commonLines+","+rec.ontId+","+rec.ontName);
                 throw new RuntimeException(e);
             }
         });
+
+        // sort generated lines
+        Collections.sort(annots, new Comparator<AnnotRecord>() {
+            @Override
+            public int compare(AnnotRecord o1, AnnotRecord o2) {
+                return Utils.stringsCompareToIgnoreCase(o1.line, o2.line);
+            }
+        });
+
+        // write out all the lines to the file
+        for( AnnotRecord rec: annots ) {
+            if( rec.line!=null ) {
+                PrintWriter writer = getWriter(outputFileNamePrefix, commonLines, rec.ontId, rec.ontName);
+                writer.print(rec.line);
+            }
+        }
 
         // close the file writers
         closeFileWriters();
@@ -153,6 +163,31 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             logAnnot.info("count of orphaned annotations for "+si.getSpeciesName()+": "+count);
 
         onDone();
+    }
+
+    List<AnnotRecord> getAnnotRecords() throws Exception {
+
+        String taxon = "taxon:"+ SpeciesType.getTaxonomicId(speciesTypeKey);
+
+        List<Annotation> annots = processOnlyGenes()
+                ? getDao().getAnnotationsBySpecies(speciesTypeKey, RgdId.OBJECT_KEY_GENES)
+                : getDao().getAnnotationsBySpecies(speciesTypeKey);
+
+        Collection<Annotation> annots2 = suppressDeconsolidation ? annots : deconsolidateAnnotations(annots);
+        annots = null;
+
+        // limit annotations to accepted
+        List<AnnotRecord> records = new ArrayList<>(annots2.size());
+
+        for( Annotation a: annots2 ) {
+            if( acceptAnnotation(a) ) {
+                AnnotRecord rec = new AnnotRecord();
+                rec.annot = a;
+                rec.taxon = taxon;
+                records.add(rec);
+            }
+        }
+        return records;
     }
 
     /**
@@ -172,16 +207,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         int deconsolidatedAnnotsIncoming = 0;
         int deconsolidatedAnnotsCreated = 0;
 
-        Set<Annotation> result = new TreeSet<>(new Comparator<Annotation>() {
-            @Override
-            public int compare(Annotation o1, Annotation o2) {
-                int r = o1.getAnnotatedObjectRgdId() - o2.getAnnotatedObjectRgdId();
-                if( r!=0 ) {
-                    return r;
-                }
-                return o1.getTermAcc().compareTo(o2.getTermAcc());
-            }
-        });
+        List<Annotation> result = new ArrayList<>(annotations.size());
 
         for( Annotation a: annotations ) {
 
@@ -197,7 +223,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
 
             int parPos = a.getNotes().indexOf("(");
             if( parPos<0 ) {
-                logAnnot.warn("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING IT: notes info missing: "+a.dump("|"));
+                deconsolidatedAnnotsCreated += deconsolidateWithNotesInfoMissing(a, result);
                 continue;
             }
             String notesOrig = a.getNotes().substring(0, parPos).trim();
@@ -221,8 +247,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 // find corresponding PMID info in NOTES field
                 int pmidPos = a.getNotes().indexOf(pmid);
                 if( pmidPos<0 ) {
-                    logAnnot.warn("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING IT: notes info missing PMID: "+a.dump("|"));
-                    continue;
+                    deconsolidatedAnnotsCreated += deconsolidateWithNotesInfoMissing(a, result);
+                    break;
                 }
                 int parStartPos = a.getNotes().lastIndexOf("(", pmidPos);
                 int parEndPos = a.getNotes().indexOf(")", pmidPos);
@@ -241,8 +267,33 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         }
 
         logAnnot.info(deconsolidatedAnnotsIncoming+" incoming annotations deconsolidated into "+deconsolidatedAnnotsCreated+" annotations");
-
         return result;
+    }
+
+    int deconsolidateWithNotesInfoMissing(Annotation a, List<Annotation> result) throws CloneNotSupportedException {
+
+        int deconsolidatedAnnotsCreated = 0;
+
+        String xrefSrc = Utils.defaultString(a.getXrefSource());
+
+        // multi PMID annotation: deconsolidate it
+        // we handle only xrefs with PMIDS only
+        String[] xrefs = xrefSrc.split("[\\|\\,]");
+        for( String xref: xrefs ){
+            // extract PMID from xrefSrc
+            if( !xref.startsWith("PMID:") ) {
+                logAnnot.warn("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING: notes info missing, not all PMIDs: "+a.dump("|"));
+                return 0;
+            }
+        }
+
+        for( String xref: xrefs ){
+            Annotation ann = (Annotation)a.clone();
+            ann.setXrefSource(xref);
+            result.add(ann);
+            deconsolidatedAnnotsCreated++;
+        }
+        return deconsolidatedAnnotsCreated;
     }
 
     public Set<Integer> getRefRgdIdsForGoPipelines() {
@@ -441,7 +492,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     //   since creation date of an annotation *never* changes, as of May 2016, per ticket RGDD-1194
     //   then all GO 'IEA' annotations must use LAST_MODIFIED_DATE instead of CREATED_DATE during export
     //   (note that LAST_MODIFIED_DATE for an annotation is updated during every pipeline run)
-    String determineCreatedDate(Annotation annot, CounterPool counters) {
+    String determineCreatedDate(Annotation annot, CounterPool counters) throws ParseException {
 
         Date createdDate;
         if( annot.getTermAcc().startsWith("GO:") && annot.getEvidence().equals("IEA") ) {
@@ -454,10 +505,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 // reviewed, so the decision was later made to change them to IEA annotations.  Since they were not assigned by
                 // a pipeline, however, they would not be updated on a regular basis as the GOC assumes would be done for IEA
                 // annotations.  Hence the need to update the "created date" each year.  Just to give some history.
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.DATE, -90); // created date should be 3 months back from the current date
-                createdDate = calendar.getTime();
+                createdDate = Utils.addDaysToDate(new Date(), -90);
             } else {
                 createdDate = annot.getLastModifiedDate();
             }
@@ -542,6 +590,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         public String withInfo;
         public String createdDate;
         public Collection<String> uniprotIds;
+        public String line; // line to be written to output file
 
         public void excludeFromProcessing() {
             ontId = null;

@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -70,27 +69,27 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         return "";
     }
 
-    void writeLine(AnnotRecord rec, PrintWriter writer) {
+    String writeLine(AnnotRecord rec) {
 
         // only process RGD manual disease annotations and OMIM IEA annotations
         if( !(rec.annot.getDataSrc().equals("RGD") || rec.annot.getDataSrc().equals("OMIM")) ) {
-            return;
+            return null;
         }
         if( !rec.termAccId.startsWith("DOID:") ) {
-            return;
+            return null;
         }
 
         // for human genes, HGNC id; for mouse, MGD id; for other species, RGD id
         String objectID;
         if( getSpeciesTypeKey()==SpeciesType.HUMAN ) {
             if (Utils.isStringEmpty(rec.hgncId)) {
-                return; // skip genes without HGNC id
+                return null; // skip genes without HGNC id
             }
             objectID = rec.hgncId;
         }
         else if( getSpeciesTypeKey()==SpeciesType.MOUSE ) {
             if( Utils.isStringEmpty(rec.mgdId) ) {
-                return; // skip genes without MGD id
+                return null; // skip genes without MGD id
             }
             objectID = rec.mgdId;
         } else {
@@ -108,7 +107,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             case "IGI": assocType = "is_implicated_in"; break;
             //case "IEA": assocType = "is_implicated_in"; break; // for OMIM annotations
             default:
-                return; // not a manual evidence code
+                return null; // not a manual evidence code
         }
 
         // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
@@ -122,12 +121,12 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
                 throw new RuntimeException(e);
             }
             if( parentTermAcc==null ) {
-                return;
+                return null;
             }
 
             if( parentTermAcc.startsWith("DOID:90") && parentTermAcc.length()==12 ) {
                 System.out.println("  OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
-                return;
+                return null;
             } else {
                 System.out.println("  OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
                 rec.termAccId = parentTermAcc;
@@ -174,6 +173,8 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
 
         dafExport.addData(daf, rec.annot.getRefRgdId());
+
+        return null;
     }
 
     String getGeneRgdIdsForAllele(int rgdId) {
