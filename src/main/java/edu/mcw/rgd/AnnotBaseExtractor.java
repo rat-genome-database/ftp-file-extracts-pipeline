@@ -130,9 +130,11 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             try {
                 qc(rec, counters);
 
-                // write out all the parameters to the file
-                PrintWriter writer = getWriter(outputFileNamePrefix, commonLines, rec.ontId, rec.ontName);
-                writeLine(rec, writer);
+                if( !rec.isExcludedFromProcessing() ) {
+                    // write out all the parameters to the file
+                    PrintWriter writer = getWriter(outputFileNamePrefix, commonLines, rec.ontId, rec.ontName);
+                    writeLine(rec, writer);
+                }
 
             } catch(Exception e) {
                 logAnnot.info("getWriter("+outputFileNamePrefix+","+commonLines+","+rec.ontId+","+rec.ontName);
@@ -261,7 +263,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         if( !getDao().isForCuration(rec.termAccId) ) {
             if( rec.termAccId.startsWith("GO:") ) {
                 logAnnot.warn(" term "+rec.termAccId+" ["+rec.termName+"] is Not4Curation! annotation export skipped" );
-                rec.ontId = null;
+                rec.excludeFromProcessing();
                 return;
             }
             logAnnot.warn(" term "+rec.termAccId+" ["+rec.termName+"] is Not4Curation!" );
@@ -270,9 +272,10 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         int objectKey = rec.annot.getRgdObjectKey();
         Term term = getDao().getTermByAccId(rec.annot.getTermAcc());
         if( term==null ) {
-            rec.ontId = "orphaned";
-            rec.ontName = "Orphaned annotations - terms no longer found in ontologies";
+            rec.excludeFromProcessing();
             counters.increment("orphaned_annots");
+            logAnnot.warn(" term "+rec.annot.getTermAcc()+" ["+rec.annot.getTerm()+"] is obsolete! annotation export skipped" );
+            return;
         }
         else {
             rec.ontId = getOutputFileNameSuffix(term.getOntologyId(), objectKey);
@@ -286,8 +289,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
              case RgdId.OBJECT_KEY_VARIANTS: rec.objectType = "variant"; break;
              default: rec.objectType = "";
                  logAnnot.warn("unknown object type "+objectKey+" for annot key="+rec.annot.getKey());
-                 rec.ontId = null; // to skip this term from processing
-                 break;
+                 rec.excludeFromProcessing();
+                 return;
         }
 
         int refRgdId = rec.annot.getRefRgdId()!=null && rec.annot.getRefRgdId()>0 ? rec.annot.getRefRgdId() : 0;
@@ -330,7 +333,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         //                   and non-null WITH field
         if( rec.termAccId.equals("GO:0005515") && (!rec.annot.getEvidence().equals("IPI") || rec.withInfo.length()==0 )) {
             // "protein binding" rule violation -- skip this row
-            rec.ontId = null; // to skip this term from processing
+            rec.excludeFromProcessing();
+            return;
         }
 
         // filter out ND annotations that violate GO rule GO_AR:0000011
@@ -370,7 +374,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 && !(rec.termAccId.equals("GO:0005575") || rec.termAccId.equals("GO:0003674") || rec.termAccId.equals("GO:0008150")) ) {
 
             counters.increment("Skipped GO ND annots to non-root terms");
-            rec.ontId = null;
+            rec.excludeFromProcessing();
             return;
         }
 
@@ -379,7 +383,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 && (rec.termAccId.equals("GO:0005575") || rec.termAccId.equals("GO:0003674") || rec.termAccId.equals("GO:0008150")) ) {
 
             counters.increment("Skipped GO non-ND annots to root terms");
-            rec.ontId = null;
+            rec.excludeFromProcessing();
             return;
         }
 
@@ -538,6 +542,14 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         public String withInfo;
         public String createdDate;
         public Collection<String> uniprotIds;
+
+        public void excludeFromProcessing() {
+            ontId = null;
+        }
+
+        public boolean isExcludedFromProcessing() {
+            return ontId == null;
+        }
     }
 
 }

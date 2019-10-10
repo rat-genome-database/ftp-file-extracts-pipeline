@@ -55,9 +55,11 @@ public class AnnotUniProtExtractor extends AnnotBaseExtractor {
     void writeLine(AnnotRecord rec, PrintWriter writer) {
 
         Collection<String> pmids = new HashSet<>();
-        for( String ref: rec.references.split("[\\|]") ) {
-            if( ref.startsWith("PMID:") ) {
-                pmids.add(ref.substring(5));
+        if( rec.references!=null ) {
+            for (String ref : rec.references.split("[\\|]")) {
+                if (ref.startsWith("PMID:")) {
+                    pmids.add(ref.substring(5));
+                }
             }
         }
 

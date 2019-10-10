@@ -1,3 +1,6 @@
+Oct 10, 2019
+-fixed minor issues introduced by previous commit
+
 Oct 07, 2019
 -annotation modules rewritten to use parallel streams for efficiency and simpler code
 
