@@ -128,7 +128,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 qc(rec, counters);
 
                 if( !rec.isExcludedFromProcessing() ) {
-                    rec.line = writeLine(rec);
+                    rec.setLineAndClear(writeLine(rec));
                 }
 
             } catch(Exception e) {
@@ -590,7 +590,27 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         public String withInfo;
         public String createdDate;
         public Collection<String> uniprotIds;
+
         public String line; // line to be written to output file
+
+        public void setLineAndClear(String line) {
+            this.line = line;
+
+            // clear remaining fields not needed to write the data to file
+            annot = null;
+            meshOrOmimId = null;
+            hgncId = null;
+            mgdId = null;
+            curationNotes = null;
+            taxon = null;
+
+            objectType = null;
+            termAccId = null;
+            termName = null;
+            references = null;
+            withInfo = null;
+            createdDate = null;
+        }
 
         public void excludeFromProcessing() {
             ontId = null;
