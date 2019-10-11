@@ -2,13 +2,10 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
 
-import java.io.PrintWriter;
-
 
 /**
- * Created by IntelliJ IDEA. <br>
- * User: mtutaj <br>
- * Date: June 28, 2011 <br>
+ * @author mtutaj
+ * @since June 28, 2011
  * Extracts annotated rgd objects by ontology.
  * The annotated objects being exported are genes, qtls and strains.
  */
@@ -17,7 +14,7 @@ public class AnnotExtractor extends AnnotBaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: annotations-version-1.1.7 (Oct 1, 2012)\n"
+    +"# MODULE: annotations-version-1.1.9 (Oct 10, 2019)\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: annotations about active #SPECIES# objects extracted from RGD database\n"
     +"# ONTOLOGY: #ONT#\n"
@@ -65,40 +62,41 @@ public class AnnotExtractor extends AnnotBaseExtractor {
         return HEADER_COMMON_LINES;
     }
 
-    void writeLine(AnnotRecord rec, PrintWriter writer) {
+    String writeLine(AnnotRecord rec) {
 
-        writer.print(rec.annot.getAnnotatedObjectRgdId());
-        writer.append('\t')
-            .append(checkNull(rec.annot.getObjectSymbol()))
-            .append('\t')
-            .append(checkNull(rec.annot.getObjectName()))
-            .append('\t')
-            .append(checkNull(rec.objectType))
-            .append('\t')
-            .append(checkNull(rec.termAccId))
-            .append('\t')
-            .append(checkNull(rec.termName))
-            .append('\t')
-            .append(checkNull(rec.annot.getQualifier()))
-            .append('\t')
-            .append(checkNull(rec.annot.getEvidence()))
-            .append('\t')
-            .append(checkNull(rec.withInfo))
-            .append('\t')
-            .append(checkNull(rec.annot.getAspect()))
-            .append('\t')
-            .append(checkNull(rec.references))
-            .append('\t')
-            .append(checkNull(rec.createdDate))
-            .append('\t')
-            .append(checkNull(rec.annot.getDataSrc()))
-            .append('\t')
-            .append(checkNull(rec.meshOrOmimId))
-            .append('\t')
-            .append(checkNull(rec.curationNotes))
-            .append('\t')
-            .append(checkNull(rec.annot.getXrefSource()))
-            .append('\n');
+        String line = String.valueOf(rec.annot.getAnnotatedObjectRgdId()) +
+                '\t' +
+                checkNull(rec.annot.getObjectSymbol()) +
+                '\t' +
+                checkNull(rec.annot.getObjectName()) +
+                '\t' +
+                checkNull(rec.objectType) +
+                '\t' +
+                checkNull(rec.termAccId) +
+                '\t' +
+                checkNull(rec.termName) +
+                '\t' +
+                checkNull(rec.annot.getQualifier()) +
+                '\t' +
+                checkNull(rec.annot.getEvidence()) +
+                '\t' +
+                checkNull(rec.withInfo) +
+                '\t' +
+                checkNull(rec.annot.getAspect()) +
+                '\t' +
+                checkNull(rec.references) +
+                '\t' +
+                checkNull(rec.createdDate) +
+                '\t' +
+                checkNull(rec.annot.getDataSrc()) +
+                '\t' +
+                checkNull(rec.meshOrOmimId) +
+                '\t' +
+                checkNull(rec.curationNotes) +
+                '\t' +
+                checkNull(rec.annot.getXrefSource()) +
+                '\n';
+        return line;
     }
 
     private String annotDir;

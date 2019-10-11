@@ -5,7 +5,6 @@ import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.process.Utils;
 
-import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
@@ -103,13 +102,13 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
         return Utils.concatenate(refs, "|");
     }
 
-    void writeLine(AnnotRecord rec, PrintWriter writer) {
+    String writeLine(AnnotRecord rec) {
 
         String objectID, references;
 
         if( isGenerateForAgr() ) {
             if (Utils.isStringEmpty(rec.hgncId)) {
-                return; // skip genes without HGNC id
+                return null; // skip genes without HGNC id
             }
             objectID = rec.hgncId;
             references = rec.annot.getXrefSource();
@@ -119,38 +118,39 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
         }
 
         // column contents must comply with GAF 2.0 format
-        writer.append("RGD")
-            .append('\t')
-            .append(objectID)
-            .append('\t')
-            .append(checkNull(rec.annot.getObjectSymbol()))
-            .append('\t')
-            .append(checkNull(rec.annot.getQualifier()))
-            .append('\t')
-            .append(checkNull(rec.termAccId))
-            .append('\t')
-            .append(checkNull(references))
-            .append('\t')
-            .append(checkNull(rec.annot.getEvidence()))
-            .append('\t')
-            .append(checkNull(rec.withInfo))
-            .append('\t')
-            .append(checkNull(rec.annot.getAspect()))
-            .append('\t')
-            .append(checkNull(rec.annot.getObjectName()))
-            .append('\t')
-            .append(checkNull(rec.meshOrOmimId))
-            .append('\t')
-            .append(checkNull(rec.objectType))
-            .append('\t')
-            .append(checkNull(rec.taxon))
-            .append('\t')
-            .append(checkNull(rec.createdDate))
-            .append('\t')
-            .append(checkNull(rec.annot.getDataSrc()))
-            .append('\t')
-            .append('\t')
-            .append('\n');
+        String line = "RGD" +
+                '\t' +
+                objectID +
+                '\t' +
+                checkNull(rec.annot.getObjectSymbol()) +
+                '\t' +
+                checkNull(rec.annot.getQualifier()) +
+                '\t' +
+                checkNull(rec.termAccId) +
+                '\t' +
+                checkNull(references) +
+                '\t' +
+                checkNull(rec.annot.getEvidence()) +
+                '\t' +
+                checkNull(rec.withInfo) +
+                '\t' +
+                checkNull(rec.annot.getAspect()) +
+                '\t' +
+                checkNull(rec.annot.getObjectName()) +
+                '\t' +
+                checkNull(rec.meshOrOmimId) +
+                '\t' +
+                checkNull(rec.objectType) +
+                '\t' +
+                checkNull(rec.taxon) +
+                '\t' +
+                checkNull(rec.createdDate) +
+                '\t' +
+                checkNull(rec.annot.getDataSrc()) +
+                '\t' +
+                '\t' +
+                '\n';
+        return line;
     }
 
     private String annotDir;

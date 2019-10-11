@@ -2,23 +2,22 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
 
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * User: mtutaj <br>
- * Date: August 18, 2016 <br>
+ * @author mtutaj
+ * @since August 18, 2016
  * Extracts annotated rgd genes with uniprot ids by ontology.
  */
 public class AnnotUniProtExtractor extends AnnotBaseExtractor {
 
-
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: uniprot-annotations-version-1.0.0 (Aug 19, 2016)\n"
+    +"# MODULE: uniprot-annotations-version-1.0.2 (Oct 10, 2019)\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: uniprot annotations with references\n"
     +"# ONTOLOGY: #ONT#\n"
@@ -49,15 +48,17 @@ public class AnnotUniProtExtractor extends AnnotBaseExtractor {
     }
 
     static Set<String> writtenLinesCache = new ConcurrentSkipListSet<>();
-    static int added = 0;
-    static int skipped = 0;
+    static AtomicInteger added = new AtomicInteger(0);
+    static AtomicInteger skipped = new AtomicInteger(0);
 
-    void writeLine(AnnotRecord rec, PrintWriter writer) {
+    String writeLine(AnnotRecord rec) {
 
         Collection<String> pmids = new HashSet<>();
-        for( String ref: rec.references.split("[\\|]") ) {
-            if( ref.startsWith("PMID:") ) {
-                pmids.add(ref.substring(5));
+        if( rec.references!=null ) {
+            for (String ref : rec.references.split("[\\|]")) {
+                if (ref.startsWith("PMID:")) {
+                    pmids.add(ref.substring(5));
+                }
             }
         }
 
@@ -72,15 +73,15 @@ public class AnnotUniProtExtractor extends AnnotBaseExtractor {
                         + rec.annot.getEvidence() + '\n';
 
                 if( writtenLinesCache.add(line) ) {
-                    writer.print(line);
-                    ++added;
+                    added.incrementAndGet();
+                    return line;
                 } else {
-                    ++skipped;
+                    skipped.incrementAndGet();
                 }
             }
         }
 
-        //System.out.println("  added "+added+" skipped "+skipped);
+        return null;
     }
 
     private String annotDir;
