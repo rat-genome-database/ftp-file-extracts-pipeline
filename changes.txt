@@ -1,3 +1,6 @@
+Oct 21, 2019
+-daf extractor: added export of strains
+
 Oct 10, 2019
 -fixed minor issues introduced by previous commit
 -lines are sorted alphabetically in generated files

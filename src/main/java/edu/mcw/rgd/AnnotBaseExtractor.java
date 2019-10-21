@@ -47,6 +47,9 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     // (issue one sql query vs millions of queries previously)
     private Map<Integer, String> pmidMap;
 
+    // map of gene rgd ids to HGNC or MGI acc ids
+    private Map<Integer, String> hgncMgiMap;
+
     private SimpleDateFormat sdt = new SimpleDateFormat("yyyyMMdd");
 
     public String getPmid(int refRgdId) {
@@ -107,6 +110,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             }
         }
 
+        preloadHgncMgiIds();
+
         // prefix for output file name dependent on species
 
         final String outputFileNamePrefix = getAnnotDir()+"/"+getOutputFileNamePrefix(speciesTypeKey);
@@ -165,6 +170,30 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             logAnnot.info("count of orphaned annotations for "+si.getSpeciesName()+": "+count);
 
         onDone();
+    }
+
+    void preloadHgncMgiIds() throws Exception {
+        int xdbKey = 0;
+        if( speciesTypeKey==SpeciesType.HUMAN ) {
+            xdbKey = XdbId.XDB_KEY_HGNC;
+        } else if( speciesTypeKey==SpeciesType.MOUSE ) {
+            xdbKey = XdbId.XDB_KEY_MGD;
+        }
+        if( xdbKey == 0 ) {
+            hgncMgiMap = null;
+            return;
+        }
+
+        hgncMgiMap = new HashMap<>();
+        List<XdbId> xdbIds = getDao().getActiveXdbIds(xdbKey, RgdId.OBJECT_KEY_GENES);
+        for( XdbId xdbId: xdbIds ) {
+            String accIds = hgncMgiMap.get(xdbId.getRgdId());
+            if( accIds==null ) {
+                hgncMgiMap.put(xdbId.getRgdId(), xdbId.getAccId());
+            } else {
+                hgncMgiMap.put(xdbId.getRgdId(), accIds+","+xdbId.getAccId());
+            }
+        }
     }
 
     List<AnnotRecord> getAnnotRecords() throws Exception {
@@ -519,27 +548,33 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     }
 
     void handleMouseAndHumanPrimaryIds(AnnotRecord rec) throws Exception {
-        if (getSpeciesTypeKey() == SpeciesType.HUMAN) {
-            List<XdbId> xdbIds = getDao().getXdbIds(rec.annot.getAnnotatedObjectRgdId(), XdbId.XDB_KEY_HGNC);
-            if( !xdbIds.isEmpty() ) {
-                rec.hgncId = xdbIds.get(0).getAccId();
-                if( xdbIds.size()>1 ) {
-                    String multiId = "MULTI HGNC Ids for RGD:"+rec.annot.getAnnotatedObjectRgdId()+": "+Utils.concatenate(",", xdbIds, "getAccId");
+        if( getSpeciesTypeKey() == SpeciesType.HUMAN ) {
+            String hgncIds = hgncMgiMap.get(rec.annot.getAnnotatedObjectRgdId());
+            if( hgncIds!=null ) {
+                int commaPos = hgncIds.indexOf(',');
+                if( commaPos>0 ) {
+                    String multiId = "MULTI HGNC Ids for RGD:"+rec.annot.getAnnotatedObjectRgdId()+": "+hgncIds;
                     if( _multiIds.add(multiId) ) {
                         logAnnot.info(multiId);
                     }
+                    rec.hgncId = hgncIds.substring(0, commaPos);
+                } else {
+                    rec.hgncId = hgncIds;
                 }
             }
         }
-        if (getSpeciesTypeKey() == SpeciesType.MOUSE) {
-            List<XdbId> xdbIds = getDao().getXdbIds(rec.annot.getAnnotatedObjectRgdId(), XdbId.XDB_KEY_MGD);
-            if( !xdbIds.isEmpty() ) {
-                rec.mgdId = xdbIds.get(0).getAccId();
-                if( xdbIds.size()>1 ) {
-                    String multiId = "MULTI MGD Ids for RGD:"+rec.annot.getAnnotatedObjectRgdId()+": "+Utils.concatenate(",", xdbIds, "getAccId");
+        else if( getSpeciesTypeKey() == SpeciesType.MOUSE ) {
+            String mgiIds = hgncMgiMap.get(rec.annot.getAnnotatedObjectRgdId());
+            if( mgiIds!=null ) {
+                int commaPos = mgiIds.indexOf(',');
+                if( commaPos>0 ) {
+                    String multiId = "MULTI MGD Ids for RGD:"+rec.annot.getAnnotatedObjectRgdId()+": "+mgiIds;
                     if( _multiIds.add(multiId) ) {
                         logAnnot.info(multiId);
                     }
+                    rec.mgdId = mgiIds.substring(0, commaPos);
+                } else {
+                    rec.mgdId = mgiIds;
                 }
             }
         }
