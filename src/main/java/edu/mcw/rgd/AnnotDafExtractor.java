@@ -69,7 +69,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
     String writeLine(AnnotRecord rec) {
 
         // process only genes and strains
-        if( !(rec.objectType.equals("gene") || rec.objectType.equals("strain")) ) {
+        boolean isGene = rec.objectType.equals("gene");
+        boolean isStrain = rec.objectType.equals("strain");
+        if( !(isGene || isStrain) ) {
             return null;
         }
 
@@ -100,7 +102,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
         // create association type
         String assocType;
-        if( rec.objectType.equals("gene") ) {
+        if( isGene ) {
             // for genes evidence code must be a manual evidence code
             switch (rec.annot.getEvidence()) {
                 case "IAGP":
@@ -187,7 +189,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         daf.setDataProviders(dataProviders);
 
         // handle gene alleles: inferredGeneAssociation non null only for gene alleles
-        daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
+        if( isGene ) {
+            daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
+        }
 
         dafExport.addData(daf, rec.annot.getRefRgdId());
 
