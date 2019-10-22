@@ -268,7 +268,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
     }
 
     boolean processOnlyGenes() {
-        return false;
+        return true;
     }
 
     boolean loadUniProtIds() {

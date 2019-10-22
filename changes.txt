@@ -1,3 +1,6 @@
+Oct 22, 2019
+-daf extractor: suppressed export of strains (RGD is not ready yet, strain disease annotations must be reviewed first)
+
 Oct 21, 2019
 -daf extractor: added export of strains
 
