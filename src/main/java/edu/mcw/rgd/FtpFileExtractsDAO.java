@@ -10,6 +10,7 @@ import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.core.*;
 
@@ -213,6 +214,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
      */
     public List<XdbId> getXdbIdsByRgdId(List xdbKeys, int rgdId) throws Exception {
         return xdbIdDAO.getXdbIdsByRgdId(xdbKeys, rgdId);
+    }
+
+    public List<XdbId> getActiveXdbIds(int xdbKey, int objectKey) throws Exception {
+        return xdbIdDAO.getActiveXdbIds(xdbKey, objectKey);
     }
 
     /**
@@ -591,7 +596,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     static final Map<String, Boolean> _isForCurationMap = new HashMap<>();
 
-    public String getOmimPSTermAccForChildTerm(String childTermAcc) throws Exception {
+    public String getOmimPSTermAccForChildTerm(String childTermAcc, CounterPool counters) throws Exception {
         String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name IN\n" +
             "(SELECT phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN\n"+
             " (SELECT synonym_name FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
@@ -601,7 +606,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
             return null;
         }
         if( termAccIds.size()>1 ) {
-            System.out.println("multiple OMIM:PS parents for child term "+childTermAcc+": "+Utils.concatenate(termAccIds,","));
+            counters.increment("OMIM:PS problem: multiple OMIM:PS parents for child term "+childTermAcc+": "+Utils.concatenate(termAccIds,","));
             return null;
         }
         return termAccIds.get(0);

@@ -5,16 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 
 /**
@@ -25,8 +23,8 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     Logger log = Logger.getLogger(AnnotDafExtractor.class);
 
-    int recordsExported;
-    int omimPSConversions;
+    CounterPool counters;
+
     ObjectMapper json;
     DafExport dafExport;
 
@@ -42,8 +40,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             return false;
         }
 
-        recordsExported = 0;
-        omimPSConversions = 0;
+        counters = new CounterPool();
 
         dafExport = new DafExport();
 
@@ -71,6 +68,13 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     String writeLine(AnnotRecord rec) {
 
+        // process only genes and strains
+        boolean isGene = rec.objectType.equals("gene");
+        boolean isStrain = rec.objectType.equals("strain");
+        if( !(isGene || isStrain) ) {
+            return null;
+        }
+
         // only process RGD manual disease annotations and OMIM IEA annotations
         if( !(rec.annot.getDataSrc().equals("RGD") || rec.annot.getDataSrc().equals("OMIM")) ) {
             return null;
@@ -96,18 +100,33 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             objectID = "RGD:"+rec.annot.getAnnotatedObjectRgdId();
         }
 
-        // evidence code must be a manual evidence code
         // create association type
         String assocType;
-        switch( rec.annot.getEvidence() ) {
-            case "IAGP": assocType = "is_implicated_in"; break;
-            case "IMP": assocType = "is_implicated_in"; break;
-            case "IEP": assocType = "is_marker_for"; break;
-            case "IDA": assocType = "is_implicated_in"; break;
-            case "IGI": assocType = "is_implicated_in"; break;
-            //case "IEA": assocType = "is_implicated_in"; break; // for OMIM annotations
-            default:
-                return null; // not a manual evidence code
+        if( isGene ) {
+            // for genes evidence code must be a manual evidence code
+            switch (rec.annot.getEvidence()) {
+                case "IAGP":
+                    assocType = "is_implicated_in";
+                    break;
+                case "IMP":
+                    assocType = "is_implicated_in";
+                    break;
+                case "IEP":
+                    assocType = "is_marker_for";
+                    break;
+                case "IDA":
+                    assocType = "is_implicated_in";
+                    break;
+                case "IGI":
+                    assocType = "is_implicated_in";
+                    break;
+                //case "IEA": assocType = "is_implicated_in"; break; // for OMIM annotations
+                default:
+                    return null; // not a manual evidence code
+            }
+        } else {
+            // for strains
+            assocType = "is_model_of";
         }
 
         // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
@@ -116,7 +135,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             // see if this term could be mapped to an OMIM PS id
             String parentTermAcc = null;
             try {
-                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId);
+                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId, counters);
             } catch( Exception e ) {
                 throw new RuntimeException(e);
             }
@@ -125,16 +144,16 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             }
 
             if( parentTermAcc.startsWith("DOID:90") && parentTermAcc.length()==12 ) {
-                System.out.println("  OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
+                counters.increment("OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
                 return null;
             } else {
-                System.out.println("  OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
+                counters.increment("OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
                 rec.termAccId = parentTermAcc;
-                omimPSConversions++;
+                counters.increment("omimPSConversions");
             }
         }
 
-        recordsExported++;
+        counters.increment("recordsExported");
 
         // remove 'RGD:xxx' from reference list
         String pmids = getPmids(rec.references);
@@ -170,7 +189,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         daf.setDataProviders(dataProviders);
 
         // handle gene alleles: inferredGeneAssociation non null only for gene alleles
-        daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
+        if( isGene ) {
+            daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
+        }
 
         dafExport.addData(daf, rec.annot.getRefRgdId());
 
@@ -206,9 +227,19 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         return Utils.concatenate(pmids, "|");
     }
 
+
     void onDone() {
-        log.info("Records exported: "+recordsExported);
-        log.info("DO+ records exported thanks to OMIM:PS conversions: "+omimPSConversions);
+        log.info("Records exported: "+counters.get("recordsExported"));
+        log.info("DO+ records exported thanks to OMIM:PS conversions: "+counters.get("omimPSConversions"));
+
+        Enumeration<String> counterNames = counters.getCounterNames();
+        while( counterNames.hasMoreElements() ) {
+            String counterName = counterNames.nextElement();
+            if( counterName.startsWith("OMIM:PS") ) {
+                int value = counters.get(counterName);
+                log.info(counterName + (value>1?("   ["+value+" hits]"):"   [1 hit]"));
+            }
+        }
 
         // sort data, alphabetically by object symbols
         dafExport.sort();
@@ -237,7 +268,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
     }
 
     boolean processOnlyGenes() {
-        return true;
+        return false;
     }
 
     boolean loadUniProtIds() {
