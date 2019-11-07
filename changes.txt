@@ -1,7 +1,8 @@
-Oct 22, 2019
--uniprot extractor: fixed logic bug introduced in June (as the result only one random line per gene out of possibly multiple
- was exported into output file; that resulted in significantly smaller files)
+Nov 07, 2019
+-uniprot extractor: fixed logic bug introduced last month (as the result only one random line per gene out of possibly multiple
+ was exported into output file; that resulted in significantly smaller files
 
+Oct 22, 2019
 -daf extractor: suppressed export of strains (RGD is not ready yet, strain disease annotations must be reviewed first)
 
 Oct 21, 2019
