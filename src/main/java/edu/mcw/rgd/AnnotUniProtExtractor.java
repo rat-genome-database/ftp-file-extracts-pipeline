@@ -1,6 +1,7 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.process.Utils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,11 +48,13 @@ public class AnnotUniProtExtractor extends AnnotBaseExtractor {
         return HEADER_COMMON_LINES;
     }
 
-    static Set<String> writtenLinesCache = new ConcurrentSkipListSet<>();
-    static AtomicInteger added = new AtomicInteger(0);
-    static AtomicInteger skipped = new AtomicInteger(0);
+    Set<String> writtenLinesCache = new ConcurrentSkipListSet<>();
+    AtomicInteger added = new AtomicInteger(0);
+    AtomicInteger skipped = new AtomicInteger(0);
 
     String writeLine(AnnotRecord rec) {
+
+        StringBuffer buf = null;
 
         Collection<String> pmids = new HashSet<>();
         if( rec.references!=null ) {
@@ -74,14 +77,19 @@ public class AnnotUniProtExtractor extends AnnotBaseExtractor {
 
                 if( writtenLinesCache.add(line) ) {
                     added.incrementAndGet();
-                    return line;
+
+                    if( buf==null ) {
+                        buf = new StringBuffer(line);
+                    } else {
+                        buf.append(line);
+                    }
                 } else {
                     skipped.incrementAndGet();
                 }
             }
         }
 
-        return null;
+        return buf==null ? null : buf.toString();
     }
 
     private String annotDir;
