@@ -30,6 +30,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     abstract String getOutputFileNamePrefix(int speciesTypeKey);
     abstract String getOutputFileNameSuffix(String ontId, int objectKey);
     abstract String getHeaderCommonLines();
+    // generate line to be written (or multiple lines to be written); every line must end with '\n'
     abstract String writeLine(AnnotRecord rec);
     abstract boolean processOnlyGenes();
     abstract boolean loadUniProtIds();
@@ -139,24 +140,19 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 rec.setLineAndClear(line);
 
             } catch(Exception e) {
+                Utils.printStackTrace(e, logAnnot);
                 throw new RuntimeException(e);
             }
         });
 
-        // sort generated lines
-        Collections.sort(annots, new Comparator<AnnotRecord>() {
-            @Override
-            public int compare(AnnotRecord o1, AnnotRecord o2) {
-                return Utils.stringsCompareToIgnoreCase(o1.line, o2.line);
-            }
-        });
+        Map<String, AnnotRecord> sortedLines = sortLines(annots);
 
         // write out all the lines to the file
-        for( AnnotRecord rec: annots ) {
-            if( rec.line!=null ) {
-                PrintWriter writer = getWriter(outputFileNamePrefix, commonLines, rec.ontId, rec.ontName);
-                writer.print(rec.line);
-            }
+        for( Map.Entry<String, AnnotRecord> entry: sortedLines.entrySet() ) {
+            AnnotRecord rec = entry.getValue();
+            PrintWriter writer = getWriter(outputFileNamePrefix, commonLines, rec.ontId, rec.ontName);
+            writer.print(entry.getKey());
+            writer.print('\n');
         }
 
         // close the file writers
@@ -170,6 +166,21 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             logAnnot.info("count of orphaned annotations for "+si.getSpeciesName()+": "+count);
 
         onDone();
+    }
+
+    Map<String, AnnotRecord> sortLines( List<AnnotRecord> annots ) {
+
+        Map<String, AnnotRecord> sortedLines = new TreeMap<>();
+        for( AnnotRecord rec: annots ) {
+            if( rec.line==null ) {
+                continue;
+            }
+            String[] lines = rec.line.split("[\\n]");
+            for( String line: lines ) {
+                sortedLines.put(line, rec);
+            }
+        }
+        return sortedLines;
     }
 
     void preloadHgncMgiIds() throws Exception {
