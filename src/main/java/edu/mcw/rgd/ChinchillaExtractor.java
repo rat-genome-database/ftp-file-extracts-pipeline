@@ -1,15 +1,12 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
-import edu.mcw.rgd.pipelines.PipelineManager;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordPreprocessor;
-import edu.mcw.rgd.pipelines.RecordProcessor;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author mtutaj
@@ -22,7 +19,7 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     final String GENES_HEADER =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: chinchilla-genes-version-2019-06-17\n"
+    +"# MODULE: chinchilla-genes-version-2019-12-02\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active chinchilla genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
@@ -48,10 +45,11 @@ public class ChinchillaExtractor extends BaseExtractor {
     private String orthologsFile;
     private String bedFile;
     private String genesFile;
+    private int mapKey;
 
     public void run(SpeciesRecord species) throws Exception {
 
-        extractGenes(getGenesFile(), 44);
+        extractGenes(getGenesFile(), getMapKey());
         extractOrthologs();
     }
 
@@ -66,7 +64,8 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     String runGenes(String headerLines, String outputFileName, String bedFileName, final int mapKey) throws Exception {
 
-        log.info("started extraction to "+outputFileName);
+        log.info("### started extraction to "+outputFileName);
+        long time0 = System.currentTimeMillis();
 
         final FtpFileExtractsDAO dao = getDao();
         final PrintWriter writer = new PrintWriter(outputFileName);
@@ -76,6 +75,7 @@ public class ChinchillaExtractor extends BaseExtractor {
         bedWriter.println("track name=\"chinchillaRefSeqData\" description=\"format: GeneSymbol|RgdId|GeneId|NucleotideAccIds|ProteinAccIds\" useScore=0");
 
         List<GeneExtractRecord> genesToProcess = getGeneList();
+        AtomicInteger recCount = new AtomicInteger();
 
         genesToProcess.parallelStream().forEach( rec -> {
 
@@ -117,6 +117,7 @@ public class ChinchillaExtractor extends BaseExtractor {
                 // write out all the parameters to the file
                 String line = generateLine(rec);
                 writeLine(line, writer);
+                recCount.incrementAndGet();
 
                 String bedLine = generateBedLine(rec);
                 writeBedLine(bedLine, bedWriter);
@@ -128,6 +129,8 @@ public class ChinchillaExtractor extends BaseExtractor {
         // close the output files
         writer.close();
         bedWriter.close();
+
+        log.info("### extracted "+recCount.intValue()+"  rows;  elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
 
         return outputFileName;
     }
@@ -194,6 +197,12 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     String generateBedLine(GeneExtractRecord rec) throws Exception {
 
+        // according to BED spec, the first 3 columns {CHR, START_POS, END_POS} are required;
+        //  if position is not available, we do not emit a row
+        if( rec.assembly1Map==null || rec.assembly1Map.isEmpty() ) {
+            return "";
+        }
+
         return getString(rec.assembly1Map, "getChromosome") +
         '\t' +
         checkNull(rec.assembly1Map.get(0).getStartPos() - 1) +
@@ -231,11 +240,11 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     final String ORTHOLOGS_HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
-        "# MODULE: chinchilla-orthologs-version-1.0.0\n"+
+        "# MODULE: chinchilla-orthologs-version-2019-12-02\n"+
         "# GENERATED-ON: #DATE#\n"+
         "# RGD Ortholog FTP file\n" +
         "# From: RGD\n" +
-        "# URL: http://rgd.mcw.edu\n" +
+        "# URL: https://rgd.mcw.edu\n" +
         "# Contact: RGD.Data@mcw.edu\n" +
         "#\n" +
         "# Format:\n" +
@@ -249,8 +258,7 @@ public class ChinchillaExtractor extends BaseExtractor {
         "# 5. HUMAN_ORTHOLOG_RGD_ID\n" +
         "# 6. HUMAN_ORTHOLOG_NCBI_GENE_ID\n" +
         "#\n" +
-        "# Most orthologs listed will be one-to-one-to-one across all three species.\n" +
-        "# Where multiple human or mouse homologs are present in RGD the human and mouse\n" +
+        "# Where multiple human homologs are present in RGD, the human\n" +
         "# fields will contain multiple entries separated by '|'.\n" +
         "#\n"+
         "CHINCHILLA_GENE_SYMBOL\tCHINCHILLA_GENE_RGD_ID\tCHINCHILLA_GENE_NCBI_GENE_ID\t"+
@@ -258,70 +266,9 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     public void extractOrthologs() throws Exception {
 
-        // extract chinchilla-human orthologs
-        final java.util.Map<Integer,OrthologRecord> map = new HashMap<Integer, OrthologRecord>();
-
-        // create pipeline managing framework
-        PipelineManager manager = new PipelineManager();
-
-        // setup pipeline parser "DB" - 1 thread
-        manager.addPipelineWorkgroup(new RecordPreprocessor() {
-            // parser: break source into a stream of GeneRecord-s
-            public void process() throws Exception {
-                // build map of chinchilla-human orthologs -- all entries of any SRC_RGD_ID
-                int recNo;
-                for( Ortholog ortholog: getDao().getOrthologs(SpeciesType.CHINCHILLA) ) {
-                    if( ortholog.getDestSpeciesTypeKey()!=SpeciesType.HUMAN )
-                        continue;
-                    recNo = ortholog.getSrcRgdId();
-                    OrthologRecord rec = map.get(recNo);
-                    if( rec==null ) {
-                        rec = new OrthologRecord(recNo);
-                        map.put(recNo, rec);
-                        rec.setRecNo(recNo);
-                    }
-                    rec.orthologs.add(ortholog);
-                }
-
-                // put all homology record to the pipeline system
-                for( OrthologRecord rec: map.values() ) {
-                    getSession().putRecordToFirstQueue(rec);
-                }
-            }
-        }, "DB", 1, 0);
-
-        // setup pipeline "QC" - 9 parallel threads
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                OrthologRecord rec = (OrthologRecord) r;
-
-                // get rat information from database
-                rec.loadChinchillaInfo(getDao());
-
-                // load supplementary homolog info from database
-                rec.loadHomologInfo();
-
-            }
-        }, "QC", 6, 0);
-
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                OrthologRecord rec = (OrthologRecord) r;
-
-                // write out all the parameters to the file
-                rec.printRecord();
-            }
-        }, "DL", 1, 0);
-
-        // run pipelines
-        manager.run();
-
-
+        long time0 = System.currentTimeMillis();
         String outputFileName = getExtractDir()+"/"+getOrthologsFile();
-        log.info("started extraction to "+outputFileName);
+        log.info("### started extraction to "+outputFileName);
         final PrintWriter writer = new PrintWriter(outputFileName);
 
         // prepare header common lines
@@ -329,13 +276,52 @@ public class ChinchillaExtractor extends BaseExtractor {
                 .replace("#DATE#", SpeciesRecord.getTodayDate());
         writer.print(commonLines);
 
+
+        // extract chinchilla-human orthologs
+        final java.util.Map<Integer, OrthologRecord> map = new HashMap<Integer, OrthologRecord>();
+
+        List<OrthologRecord> records = new ArrayList<>();
+        // build map of chinchilla-human orthologs -- all entries of any SRC_RGD_ID
+        int recNo;
+        for( Ortholog ortholog: getDao().getOrthologs(SpeciesType.CHINCHILLA) ) {
+            if( ortholog.getDestSpeciesTypeKey()!=SpeciesType.HUMAN )
+                continue;
+            recNo = ortholog.getSrcRgdId();
+            OrthologRecord rec = map.get(recNo);
+            if( rec==null ) {
+                rec = new OrthologRecord(recNo);
+                map.put(recNo, rec);
+            }
+            rec.orthologs.add(ortholog);
+            records.add(rec);
+        }
+
+        records.parallelStream().forEach( rec -> {
+
+            try {
+                // get rat information from database
+                rec.loadChinchillaInfo(getDao());
+
+                // load supplementary homolog info from database
+                rec.loadHomologInfo();
+
+            } catch( Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            // write out all the parameters to the file
+            rec.printRecord();
+        });
+
         // sort homology records by symbol
-        Object[] records = map.values().toArray();
-        Arrays.sort(records);
-        for( Object record: records ) {
+        Object[] recordsSorted = map.values().toArray();
+        Arrays.sort(recordsSorted);
+        for( Object record: recordsSorted ) {
             writer.print(record.toString());
         }
         writer.close();
+
+        log.info("### extracted "+recordsSorted.length+"  rows;  elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
     public void setOrthologsFile(String orthologsFile) {
@@ -362,7 +348,15 @@ public class ChinchillaExtractor extends BaseExtractor {
         return genesFile;
     }
 
-    class OrthologRecord extends PipelineRecord implements Comparable<OrthologRecord> {
+    public int getMapKey() {
+        return mapKey;
+    }
+
+    public void setMapKey(int mapKey) {
+        this.mapKey = mapKey;
+    }
+
+    class OrthologRecord implements Comparable<OrthologRecord> {
         public int chinchillaRgdId;
         public List<Ortholog> orthologs = new ArrayList<Ortholog>();
 
