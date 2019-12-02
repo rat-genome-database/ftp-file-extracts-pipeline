@@ -1,3 +1,6 @@
+Dec 02, 2019
+-chinchilla extractor: fixed issues with bed file generation, for genes without positions
+
 Nov 07, 2019
 -uniprot extractor: fixed logic bug introduced last month (as the result only one random line per gene out of possibly multiple
  was exported into output file; that resulted in significantly smaller files

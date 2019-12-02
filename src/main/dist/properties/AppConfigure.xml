@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  build 2019-11-07" />
+        <property name="version" value="FtpFileExtractManager  -- build 2019-12-02" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -200,10 +200,11 @@
     </bean>
 
     <bean id="chinchillaExtractor" class="edu.mcw.rgd.ChinchillaExtractor" scope="prototype">
-        <property name="version" value="ChinchillaExtractor v.1.2.4 as of May 30, 2017" />
+        <property name="version" value="ChinchillaExtractor   -- buid 2019-12-02" />
         <property name="orthologsFile" value="chinchilla/ORTHOLOGS_CHINCHILLA.txt" />
         <property name="bedFile" value="chinchilla/REFSEQ_CHINCHILLA.bed" />
         <property name="genesFile" value="chinchilla/GENES_CHINCHILLA.txt" />
+        <property name="mapKey" value="44" />
     </bean>
 
     <bean id="annotBaseExtractor" class="edu.mcw.rgd.AnnotBaseExtractor" abstract="true" scope="prototype">
