@@ -88,6 +88,10 @@ public class FtpFileExtractsManager {
                     beanId = "orthologExtractor";
                     break;
 
+                case "-orthologs2":
+                    beanId = "orthologExtractor2";
+                    break;
+
                 case "-annotations":
                     beanId = "annotExtractor";
                     break;
