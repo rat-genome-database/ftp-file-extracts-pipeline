@@ -19,7 +19,7 @@ public class OrthologExtractor extends BaseExtractor {
 
     final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
-        "# MODULE: orthologs-version-2000-01-13\n"+
+        "# MODULE: orthologs-version-2020-01-15\n"+
         "# GENERATED-ON: #DATE#\n"+
         "# RGD Ortholog FTP file\n" +
         "# From: RGD\n" +
@@ -76,6 +76,7 @@ public class OrthologExtractor extends BaseExtractor {
         "HUMAN_ORTHOLOG_HGNC_ID\n";
 
     Logger log = Logger.getLogger(getClass());
+    private String outputDir;
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 
@@ -136,12 +137,12 @@ public class OrthologExtractor extends BaseExtractor {
     }
 
     void printReport(String fileName, Object[] records, boolean detailMode) throws Exception {
-        File dir = new File(getExtractDir());
+        File dir = new File(getOutputDir());
         if( !dir.exists() ) {
             dir.mkdirs();
         }
 
-        String outputFileName = getExtractDir()+'/'+fileName;
+        String outputFileName = getOutputDir()+'/'+fileName;
         log.info("started extraction to "+outputFileName);
         final PrintWriter writer = new PrintWriter(outputFileName);
 
@@ -182,7 +183,7 @@ public class OrthologExtractor extends BaseExtractor {
 
     public void splitOrthologFilesForRatmine() throws Exception {
 
-        String fname = "data/RGD_ORTHOLOGS_RATMINE.txt";
+        String fname = getOutputDir()+"/RGD_ORTHOLOGS_RATMINE.txt";
         String line;
         Map<String, BufferedWriter> writers = new HashMap<>();
 
@@ -200,7 +201,7 @@ public class OrthologExtractor extends BaseExtractor {
             String src = cols[6];
             BufferedWriter out = writers.get(src);
             if( out==null ) {
-                out = new BufferedWriter(new FileWriter("data/RGD_ORTHOLOGS_"+src+".txt"));
+                out = new BufferedWriter(new FileWriter(getOutputDir()+"/RGD_ORTHOLOGS_"+src+".txt"));
                 out.write(header);
                 writers.put(src, out);
             }
@@ -213,6 +214,14 @@ public class OrthologExtractor extends BaseExtractor {
         for( BufferedWriter out: writers.values() ) {
             out.close();
         }
+    }
+
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
+
+    public String getOutputDir() {
+        return outputDir;
     }
 }
 

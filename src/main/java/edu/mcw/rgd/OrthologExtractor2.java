@@ -16,7 +16,7 @@ public class OrthologExtractor2 extends BaseExtractor {
 
     final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
-        "# MODULE: orthologs-2-version-2000-01-13\n"+
+        "# MODULE: orthologs-2-version-2020-01-15\n"+
         "# GENERATED-ON: #DATE#\n"+
         "# RGD Ortholog FTP file for #SPECIES#\n" +
         "# From: RGD\n" +
@@ -26,12 +26,13 @@ public class OrthologExtractor2 extends BaseExtractor {
         "# Format:\n" +
         "# Comment lines begin with '#'\n" +
         "# Tab delimited fields, one line per #SPECIES# gene.\n" +
-        "#\n" +
-        "# Most orthologs listed will be one-to-one across each pair of species.\n" +
-        "# However, where multiple homologs are present in RGD, fields will contain multiple entries separated by '|'.\n" +
+        "# Orthologs listed are one-to-one across each pair of species.\n" +
+        "# Where multiple entries for given field are present in RGD, (f.e. multiple Ensembl Gene IDs), fields will contain multiple entries separated by '|'.\n" +
+        "# Genes without known orthologs are listed at the bottom of the file.\n" +
         "#\n";
 
     Logger log = Logger.getLogger(getClass());
+    private String outputDir;
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 
@@ -87,12 +88,12 @@ public class OrthologExtractor2 extends BaseExtractor {
         List<String> lines = sortLines(map);
 
 
-        File dir = new File(getExtractDir());
+        File dir = new File(getOutputDir());
         if( !dir.exists() ) {
             dir.mkdirs();
         }
 
-        String outputFileName = getExtractDir()+'/'+speciesName+"_ORTHOLOGS.txt";
+        String outputFileName = getOutputDir()+'/'+speciesName+"_ORTHOLOGS.txt";
         log.info("started extraction to "+outputFileName);
         final PrintWriter writer = new PrintWriter(outputFileName);
 
@@ -107,19 +108,48 @@ public class OrthologExtractor2 extends BaseExtractor {
 
         for( String line: lines ) {
             writer.print(line);
+            writer.print("\n");
         }
         writer.close();
 
-        System.out.println(getVersion()+"   "+speciesName+"  OK");
+        System.out.println(getVersion()+"   "+speciesName+"  OK  -- "+lines.size()+" lines");
     }
 
     List<String> sortLines( Map<Integer, StringBuffer> map ) {
         List<String> lines = new ArrayList<>(map.size());
         for( StringBuffer buf: map.values() ) {
-            buf.append("\n");
-            lines.add(buf.toString());
+            lines.add(buf.toString().trim());
         }
-        Collections.sort(lines);
+
+        // genes without orthologs must be listed at the bottom
+        // to do that we count TABs
+        // 4 or less TABs in a line, means, that the gene does not have any known orthologs
+        Collections.sort(lines, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                int gene1HasOrthologs = countTabs(o1) > 4 ? 0 : 1;
+                int gene2HasOrthologs = countTabs(o2) > 4 ? 0 : 1;
+                int r = gene1HasOrthologs - gene2HasOrthologs;
+                if( r!=0 ) {
+                    return r;
+                }
+                return o1.compareToIgnoreCase(o2);
+            }
+
+            int countTabs(String s) {
+                int tabCount = 0;
+                int pos = 0;
+                while( tabCount < 5 ) {
+                    pos = s.indexOf('\t', pos);
+                    if( pos<0 ) {
+                        break;
+                    }
+                    tabCount++;
+                    pos++;
+                }
+                return tabCount;
+            }
+        });
 
         map.clear();
         return lines;
@@ -178,12 +208,14 @@ public class OrthologExtractor2 extends BaseExtractor {
 
         Map<Integer, GeneInfo> geneInfos = loadGeneInfo(speciesTypeKey2);
 
-        for( int srcRgdId: orthologMap.keySet() ) {
+        for( int srcRgdId: map.keySet() ) {
+            StringBuffer buf = map.get(srcRgdId);
             Ortholog o = orthologMap.get(srcRgdId);
-
-            StringBuffer buf = map.get(o.getSrcRgdId());
-            if( buf==null ) {
-                System.out.println("unexpected hit: RGD:"+o.getDestRgdId());
+            if( o==null ) {
+                buf.append("\t\t\t\t");
+                if( speciesTypeKey2==SpeciesType.HUMAN || speciesTypeKey2==SpeciesType.MOUSE ) {
+                    buf.append("\t");
+                }
                 continue;
             }
 
@@ -270,6 +302,14 @@ public class OrthologExtractor2 extends BaseExtractor {
         }
 
         return infos;
+    }
+
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
+
+    public String getOutputDir() {
+        return outputDir;
     }
 
     class GeneInfo {

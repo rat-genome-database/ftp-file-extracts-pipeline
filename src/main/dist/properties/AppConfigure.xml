@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2020-01-13" />
+        <property name="version" value="FtpFileExtractManager  -- build 2020-01-15" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -194,15 +194,15 @@
     </bean>
 
     <bean id="orthologExtractor" class="edu.mcw.rgd.OrthologExtractor" scope="prototype">
-        <property name="version" value="OrthologExtractor  -- build 2020-01-13" />
-        <property name="extractDir" value="data/orthologs" />
+        <property name="version" value="OrthologExtractor  -- build 2020-01-15" />
+        <property name="outputDir" value="data/orthologs" />
         <property name="fileName" value="RGD_ORTHOLOGS.txt" />
         <property name="fileNameRatMine" value="RGD_ORTHOLOGS_RATMINE.txt" />
     </bean>
 
     <bean id="orthologExtractor2" class="edu.mcw.rgd.OrthologExtractor2" scope="prototype">
-        <property name="version" value="OrthologExtractor2  -- build 2020-01-13" />
-        <property name="extractDir" value="data/orthologs" />
+        <property name="version" value="OrthologExtractor2  -- build 2020-01-15" />
+        <property name="outputDir" value="data/orthologs" />
     </bean>
 
     <bean id="chinchillaExtractor" class="edu.mcw.rgd.ChinchillaExtractor" scope="prototype">
