@@ -94,7 +94,6 @@ public class OrthologExtractor2 extends BaseExtractor {
         }
 
         String outputFileName = getOutputDir()+'/'+speciesName+"_ORTHOLOGS.txt";
-        log.info("started extraction to "+outputFileName);
         final PrintWriter writer = new PrintWriter(outputFileName);
 
         // prepare header common lines
@@ -112,7 +111,7 @@ public class OrthologExtractor2 extends BaseExtractor {
         }
         writer.close();
 
-        System.out.println(getVersion()+"   "+speciesName+"  OK  -- "+lines.size()+" lines");
+        System.out.println(outputFileName+"  OK  -- "+lines.size()+" lines");
     }
 
     List<String> sortLines( Map<Integer, StringBuffer> map ) {
@@ -171,9 +170,19 @@ public class OrthologExtractor2 extends BaseExtractor {
                 String symbol1 = getDao().getSymbolForGene(orthologInMap.getDestRgdId());
                 String symbol2 = getDao().getSymbolForGene(o.getDestRgdId());
                 if( symbol1.equals(symbol2) ) {
-                    System.out.println("cannot resolve multi orthologs, same symbol");
-                    System.out.println("  in-map: "+orthologInMap.dump("|"));
-                    System.out.println("  incoming: "+o.dump("|"));
+                    // RGD source takes preference
+                    if( orthologInMap.getXrefDataSrc().equals("RGD") ) {
+                        System.out.println("multi orthologs, resolved by RGD source");
+                    }
+                    else if( o.getXrefDataSrc().equals("RGD") ) {
+                        orthologMap.put(o.getSrcRgdId(), o);
+                        System.out.println("multi orthologs, resolved by RGD source");
+                    }
+                    else {
+                        System.out.println("cannot resolve multi orthologs, same symbol");
+                        System.out.println("  in-map: " + orthologInMap.dump("|"));
+                        System.out.println("  incoming: " + o.dump("|"));
+                    }
                 } else {
                     String symbol = getDao().getSymbolForGene(o.getSrcRgdId());
                     if( symbol.equalsIgnoreCase(symbol1) ) {
@@ -183,9 +192,20 @@ public class OrthologExtractor2 extends BaseExtractor {
                         orthologMap.put(o.getSrcRgdId(), o);
                         System.out.println("multi orthologs, resolved by symbol");
                     } else {
-                        System.out.println("cannot resolve multi orthologs, diff symbol");
-                        System.out.println("  in-map: "+orthologInMap.dump("|"));
-                        System.out.println("  incoming: "+o.dump("|"));
+
+                        // RGD source takes preference
+                        if( orthologInMap.getXrefDataSrc().equals("RGD") ) {
+                            System.out.println("multi orthologs, resolved by RGD source");
+                        }
+                        else if( o.getXrefDataSrc().equals("RGD") ) {
+                            orthologMap.put(o.getSrcRgdId(), o);
+                            System.out.println("multi orthologs, resolved by RGD source");
+                        }
+                        else {
+                            System.out.println("cannot resolve multi orthologs, diff symbol");
+                            System.out.println("  in-map: " + orthologInMap.dump("|"));
+                            System.out.println("  incoming: " + o.dump("|"));
+                        }
                     }
                 }
             }
