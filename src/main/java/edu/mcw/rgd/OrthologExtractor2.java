@@ -34,10 +34,15 @@ public class OrthologExtractor2 extends BaseExtractor {
     Logger log = Logger.getLogger(getClass());
     private String outputDir;
 
+    private static boolean _versionPrinted = false;
+
     public void run(SpeciesRecord speciesRec) throws Exception {
 
         String speciesName = SpeciesType.getCommonName(speciesRec.getSpeciesType()).toUpperCase();
-        System.out.println(getVersion()+"   "+speciesName);
+        if( !_versionPrinted ) {
+            _versionPrinted = true;
+            System.out.println(getVersion());
+        }
 
         // load data for the source species
         Map<Integer, StringBuffer> map = new HashMap<>();
