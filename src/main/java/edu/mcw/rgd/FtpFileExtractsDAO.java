@@ -521,6 +521,11 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         return dao.getAllOrthologs(speciesTypeKey);
     }
 
+    List<Ortholog> getOrthologs(int speciesTypeKey1, int speciesTypeKey2) throws Exception {
+        OrthologDAO dao = new OrthologDAO();
+        return dao.getAllOrthologs(speciesTypeKey1, speciesTypeKey2);
+    }
+
     /**
      * get ontology object given ontology id
      *

@@ -1,3 +1,8 @@
+Jan 15, 2020
+-ortholog extractor: simplified code for rat-mouse-human ortholog extractor
+   created extractor for all species
+   the files are now generated in directory 'data/orthologs' ('data' previously)
+
 Dec 02, 2019
 -chinchilla extractor: fixed issues with bed file generation, for genes without positions
 

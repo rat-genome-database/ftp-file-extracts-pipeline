@@ -1,10 +1,6 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
-import edu.mcw.rgd.pipelines.PipelineManager;
-import edu.mcw.rgd.pipelines.PipelineRecord;
-import edu.mcw.rgd.pipelines.RecordPreprocessor;
-import edu.mcw.rgd.pipelines.RecordProcessor;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
 
@@ -23,7 +19,7 @@ public class OrthologExtractor extends BaseExtractor {
 
     final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
-        "# MODULE: orthologs-version-2.1.6\n"+
+        "# MODULE: orthologs-version-2020-01-15\n"+
         "# GENERATED-ON: #DATE#\n"+
         "# RGD Ortholog FTP file\n" +
         "# From: RGD\n" +
@@ -44,7 +40,7 @@ public class OrthologExtractor extends BaseExtractor {
         "# 4. HUMAN_ORTHOLOG_SYMBOL - human ortholog(s) to rat gene\n" +
         "# 5. HUMAN_ORTHOLOG_RGD_ID\n" +
         "# 6. HUMAN_ORTHOLOG_NCBI_GENE_ID\n" +
-        "# 7. HUMAN_ORTHOLOG_SOURCE - RGD or MGI\n" +
+        "# 7. HUMAN_ORTHOLOG_SOURCE - RGD or HGNC\n" +
         "# 8. MOUSE_ORTHOLOG_SYMBOL - mouse ortholog(s) to rat gene\n" +
         "# 9. MOUSE_ORTHOLOG_RGD_ID\n" +
         "#10. MOUSE_ORTHOLOG_NCBI_GENE_ID\n" +
@@ -80,6 +76,7 @@ public class OrthologExtractor extends BaseExtractor {
         "HUMAN_ORTHOLOG_HGNC_ID\n";
 
     Logger log = Logger.getLogger(getClass());
+    private String outputDir;
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 
@@ -92,83 +89,39 @@ public class OrthologExtractor extends BaseExtractor {
         GeneInfo.dao = getDao();
         final Map<Integer,HomologyRecord> map = new HashMap<>();
 
-        // create pipeline managing framework
-        PipelineManager manager = new PipelineManager();
-
-        // setup pipeline parser "DB" - 1 thread
-        manager.addPipelineWorkgroup(new RecordPreprocessor() {
-            // parser: break source into a stream of GeneRecord-s
-            public void process() throws Exception {
-                // build map of all orthologs -- all entries of any SRC_RGD_ID
-                int recNo;
-                for( Ortholog ortholog: getDao().getOrthologs(SpeciesType.RAT) ) {
-                    recNo = ortholog.getSrcRgdId();
-                    HomologyRecord rec = map.get(recNo);
-                    if( rec==null ) {
-                        rec = new HomologyRecord(recNo);
-                        map.put(recNo, rec);
-                        rec.setRecNo(recNo);
-                    }
-                    rec.orthologs.add(ortholog);
-                }
-
-                // put all homology record to the pipeline system
-                for( HomologyRecord rec: map.values() ) {
-                    getSession().putRecordToFirstQueue(rec);
-                }
+        // build map of all orthologs -- all entries of any SRC_RGD_ID
+        for( Ortholog ortholog: getDao().getOrthologs(SpeciesType.RAT) ) {
+            int srcRgdId = ortholog.getSrcRgdId();
+            HomologyRecord rec = map.get(srcRgdId);
+            if( rec==null ) {
+                rec = new HomologyRecord(srcRgdId);
+                map.put(srcRgdId, rec);
             }
-        }, "DB", 1, 0);
+            rec.orthologs.add(ortholog);
+        }
 
-        // setup pipeline "QC" - 9 parallel threads
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                HomologyRecord rec = (HomologyRecord) r;
+        // put all homology record to the pipeline system
+        map.values().parallelStream().forEach( rec -> {
 
+            try {
                 // get rat information from database
                 rec.loadRatInfo();
 
                 // load supplementary homolog info from database
                 rec.loadHomologInfo(false);
-            }
-        }, "QC", 9, 0);
-
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                HomologyRecord rec = (HomologyRecord) r;
 
                 // write out all the parameters to the file
                 rec.overviewLine = rec.printRecord(false);
-            }
-        }, "DL", 1, 0);
-
-
-        // setup pipeline "QC" - 9 parallel threads
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // gather data from database
-            public void process(PipelineRecord r) throws Exception {
-                HomologyRecord rec = (HomologyRecord) r;
 
                 // load supplementary homolog info from database
                 rec.loadHomologInfo(true);
-            }
-        }, "QC2", 9, 0);
-
-        // setup data loading pipeline "DL" - 1 thread; writing records to output file
-        manager.addPipelineWorkgroup(new RecordProcessor() {
-            // write record to a line in output file
-            public void process(PipelineRecord r) throws Exception {
-                HomologyRecord rec = (HomologyRecord) r;
 
                 // write out all the parameters to the file
                 rec.detailedLines = rec.printRecord(true);
+            } catch( Exception e ) {
+                throw new RuntimeException(e);
             }
-        }, "DL2", 1, 0);
-
-        // run pipelines
-        manager.run();
+        });
 
 
         // sort homology records by symbol
@@ -184,7 +137,12 @@ public class OrthologExtractor extends BaseExtractor {
     }
 
     void printReport(String fileName, Object[] records, boolean detailMode) throws Exception {
-        String outputFileName = getExtractDir()+'/'+fileName;
+        File dir = new File(getOutputDir());
+        if( !dir.exists() ) {
+            dir.mkdirs();
+        }
+
+        String outputFileName = getOutputDir()+'/'+fileName;
         log.info("started extraction to "+outputFileName);
         final PrintWriter writer = new PrintWriter(outputFileName);
 
@@ -225,7 +183,7 @@ public class OrthologExtractor extends BaseExtractor {
 
     public void splitOrthologFilesForRatmine() throws Exception {
 
-        String fname = "data/RGD_ORTHOLOGS_RATMINE.txt";
+        String fname = getOutputDir()+"/RGD_ORTHOLOGS_RATMINE.txt";
         String line;
         Map<String, BufferedWriter> writers = new HashMap<>();
 
@@ -243,7 +201,7 @@ public class OrthologExtractor extends BaseExtractor {
             String src = cols[6];
             BufferedWriter out = writers.get(src);
             if( out==null ) {
-                out = new BufferedWriter(new FileWriter("data/RGD_ORTHOLOGS_"+src+".txt"));
+                out = new BufferedWriter(new FileWriter(getOutputDir()+"/RGD_ORTHOLOGS_"+src+".txt"));
                 out.write(header);
                 writers.put(src, out);
             }
@@ -257,9 +215,17 @@ public class OrthologExtractor extends BaseExtractor {
             out.close();
         }
     }
+
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
+
+    public String getOutputDir() {
+        return outputDir;
+    }
 }
 
-class HomologyRecord extends PipelineRecord implements Comparable<HomologyRecord> {
+class HomologyRecord implements Comparable<HomologyRecord> {
     public int ratRgdId;
     public List<Ortholog> orthologs = new ArrayList<>();
 
