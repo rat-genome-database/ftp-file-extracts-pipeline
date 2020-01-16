@@ -16,7 +16,7 @@ public class OrthologExtractor2 extends BaseExtractor {
 
     final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
-        "# MODULE: orthologs-2-version-2020-01-15\n"+
+        "# MODULE: orthologs-2-version-2020-01-16\n"+
         "# GENERATED-ON: #DATE#\n"+
         "# RGD Ortholog FTP file for #SPECIES#\n" +
         "# From: RGD\n" +
@@ -98,7 +98,7 @@ public class OrthologExtractor2 extends BaseExtractor {
             dir.mkdirs();
         }
 
-        String outputFileName = getOutputDir()+'/'+speciesName+"_ORTHOLOGS.txt";
+        String outputFileName = getOutputDir()+"/ORTHOLOGS_"+speciesName+"_.txt";
         final PrintWriter writer = new PrintWriter(outputFileName);
 
         // prepare header common lines
