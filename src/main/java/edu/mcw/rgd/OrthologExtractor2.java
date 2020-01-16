@@ -98,7 +98,7 @@ public class OrthologExtractor2 extends BaseExtractor {
             dir.mkdirs();
         }
 
-        String outputFileName = getOutputDir()+"/ORTHOLOGS_"+speciesName+"_.txt";
+        String outputFileName = getOutputDir()+"/ORTHOLOGS_"+speciesName+".txt";
         final PrintWriter writer = new PrintWriter(outputFileName);
 
         // prepare header common lines
