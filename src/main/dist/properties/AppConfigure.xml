@@ -201,7 +201,7 @@
     </bean>
 
     <bean id="orthologExtractor2" class="edu.mcw.rgd.OrthologExtractor2" scope="prototype">
-        <property name="version" value="OrthologExtractor2  -- build 2020-01-15" />
+        <property name="version" value="OrthologExtractor2  -- build 2020-01-16" />
         <property name="outputDir" value="data/orthologs" />
     </bean>
 
