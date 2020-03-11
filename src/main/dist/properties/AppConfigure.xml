@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2020-01-15" />
+        <property name="version" value="FtpFileExtractManager  -- build 2020-03-11" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -14,6 +14,8 @@
                 <entry key="bonobo" value-ref="bonoboInfo" />
                 <entry key="squirrel" value-ref="squirrelInfo" />
                 <entry key="pig" value-ref="pigInfo" />
+                <entry key="vervet" value-ref="vervetInfo" />
+                <entry key="molerat" value-ref="moleratInfo" />
             </map>
         </property>
 	</bean>
@@ -24,6 +26,7 @@
         <property name="newRefAssemblyMapKeyForMarkers" value="17" />
         <property name="oldRefAssemblyMapKeyForMarkers" value="13" />
         <property name="celeraAssemblyMapKey" value="16" />
+        <property name="ensemblAssemblyMapKey" value="40" />
         <property name="cytoMapKey" value="11" />
 
         <property name="qtlFileName" value="QTLS_HUMAN.txt" />
@@ -37,6 +40,7 @@
         <property name="newRefAssemblyMapKeyForMarkers" value="18" />
         <property name="oldRefAssemblyMapKeyForMarkers" value="0" />
         <property name="celeraAssemblyMapKey" value="20" />
+        <property name="ensemblAssemblyMapKey" value="39" />
         <property name="cytoMapKey" value="12" />
         <property name="cmMapKey" value="31" />
 
@@ -51,6 +55,7 @@
         <property name="newRefAssemblyMapKeyForMarkers" value="70" />
         <property name="oldRefAssemblyMapKeyForMarkers" value="60" />
         <property name="celeraAssemblyMapKey" value="15" />
+        <property name="ensemblAssemblyMapKey" value="361" />
         <property name="cytoMapKey" value="99" />
 
         <property name="qtlFileName" value="QTLS_RAT.txt" />
@@ -64,27 +69,42 @@
 
     <bean id="chinchillaInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="4" />
+        <property name="ensemblAssemblyMapKey" value="45" />
     </bean>
 
     <bean id="dogInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="6" />
         <property name="cytoMapKey" value="600" />
+        <property name="ensemblAssemblyMapKey" value="632" />
     </bean>
 
     <bean id="bonoboInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="5" />
         <property name="cytoMapKey" value="500" />
+        <property name="ensemblAssemblyMapKey" value="512" />
     </bean>
 
     <bean id="squirrelInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="7" />
+        <property name="ensemblAssemblyMapKey" value="721" />
     </bean>
 
     <bean id="pigInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="9" />
         <property name="cytoMapKey" value="900" />
+        <property name="ensemblAssemblyMapKey" value="912" />
     </bean>
 
+    <bean id="moleratInfo" class="edu.mcw.rgd.SpeciesRecord">
+        <property name="speciesType" value="14" />
+        <property name="ensemblAssemblyMapKey" value="1411" />
+    </bean>
+
+    <bean id="vervetInfo" class="edu.mcw.rgd.SpeciesRecord">
+        <property name="speciesType" value="13" />
+        <property name="cytoMapKey" value="1300" />
+        <property name="ensemblAssemblyMapKey" value="1312" />
+    </bean>
 
     <bean id="strainExtractor" class="edu.mcw.rgd.StrainExtractor" scope="prototype">
         <property name="version" value="Strain Extractor  build 2019-06-17"/>
@@ -96,7 +116,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build 2019-06-24"/>
+        <property name="version" value="Gene Extractor  build 2020-03-11"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
@@ -146,6 +166,16 @@
                     <list>
                         <value>910 10.2</value>
                         <value>911 11.1</value>
+                    </list>
+                </entry>
+                <entry key="molerat">
+                    <list>
+                        <value>1410 1.0</value>
+                    </list>
+                </entry>
+                <entry key="vervet">
+                    <list>
+                        <value>1311 1.1</value>
                     </list>
                 </entry>
             </map>

@@ -18,9 +18,10 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2019-06-24\n"
+    +"# MODULE: genes  build 2020-03-11\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
+    +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
     +"# FORMAT: tab delimited text\n"
     +"# NOTES: multiple values in a single column are separated by ';'\n"
@@ -42,6 +43,7 @@ public class GeneExtractor extends BaseExtractor {
     +"###   during transition period, for rat, mouse and human, GENE_REFSEQ_STATUS will continue to be laso published in columns 39, 41 and 42 respectively\n"
     +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
     +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
+    +"### Mar 11 2020  added Ensembl map positions\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -86,118 +88,275 @@ public class GeneExtractor extends BaseExtractor {
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n";
 
     final String HEADER_COMMON_LINES_ONE_ASSEMBLY =
-        "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: genes-version-2.2.7\n"
-        +"# GENERATED-ON: #DATE#\n"
-        +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
-        +"# CONTACT: rgd.data@mcw.edu\n"
-        +"# FORMAT: tab delimited text\n"
-        +"# NOTES: multiple values in a single column are separated by ';'\n"
-        +"#\n"
-        +"#COLUMN INFORMATION:\n"
-        +"# (First 38 columns are in common between all species)\n"
-        +"#\n"
-        +"#1   GENE_RGD_ID	      the RGD_ID of the gene\n"
-        +"#2   SYMBOL             official gene symbol\n"
-        +"#3   NAME    	          gene name\n"
-        +"#4   GENE_DESC          gene description (if available)\n"
-        +"#5   (UNUSED)           blank\n"
-        +"#6   CHROMOSOME_#REF1# chromosome for reference assembly build #REF1#\n"
-        +"#7   (UNUSED)           blank\n"
-        +"#8   FISH_BAND          fish band information\n"
-        +"#9   (UNUSED)           blank\n"
-        +"#10  (UNUSED)           blank\n"
-        +"#11  (UNUSED)           blank\n"
-        +"#12  START_POS_#REF1#   start position for reference assembly build #REF1#\n"
-        +"#13  STOP_POS_#REF1#    stop position for reference assembly build #REF1#\n"
-        +"#14  STRAND_#REF1#      strand information for reference assembly build #REF1#\n"
-        +"#15  (UNUSED)           blank\n"
-        +"#16  (UNUSED)           blank\n"
-        +"#17  (UNUSED)           blank\n"
-        +"#18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene\n"
-        +"#19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene\n"
-        +"#20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation\n"
-        +"#21  NCBI_GENE_ID           NCBI Gene ID\n"
-        +"#22  UNIPROT_ID             UniProtKB id(s)\n"
-        +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
-        +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-        +"#25  TIGR_ID                TIGR ID(s)\n"
-        +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-        +"#27  UNIGENE_ID             UniGene ID(s)\n"
-        +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
-        +"#29  MARKER_SYMBOL          marker symbol\n"
-        +"#30  OLD_SYMBOL             old symbol alias(es)\n"
-        +"#31  OLD_NAME               old name alias(es)\n"
-        +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
-        +"#33  QTL_SYMBOL             QTL symbol\n"
-        +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-        +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-        +"#36  SPLICE_SYMBOL          symbol for gene \n"
-        +"#37  GENE_TYPE              gene type\n"
-        +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
-        +"#\n"
-        +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
-        +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
-        +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-        +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-        +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-        +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID";
+    "# RGD-PIPELINE: ftp-file-extracts\n"
+    +"# MODULE: genes  build 2020-03-11\n"
+    +"# GENERATED-ON: #DATE#\n"
+    +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
+    +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
+    +"# CONTACT: rgd.data@mcw.edu\n"
+    +"# FORMAT: tab delimited text\n"
+    +"# NOTES: multiple values in a single column are separated by ';'\n"
+    +"#\n"
+    +"### Mar 11 2020  added Ensembl map positions\n"
+    +"#\n"
+    +"#COLUMN INFORMATION:\n"
+    +"# (First 38 columns are in common between all species)\n"
+    +"#\n"
+    +"#1   GENE_RGD_ID	      the RGD_ID of the gene\n"
+    +"#2   SYMBOL             official gene symbol\n"
+    +"#3   NAME    	          gene name\n"
+    +"#4   GENE_DESC          gene description (if available)\n"
+    +"#5   (UNUSED)           blank\n"
+    +"#6   CHROMOSOME_#REF1# chromosome for reference assembly build #REF1#\n"
+    +"#7   (UNUSED)           blank\n"
+    +"#8   FISH_BAND          fish band information\n"
+    +"#9   (UNUSED)           blank\n"
+    +"#10  (UNUSED)           blank\n"
+    +"#11  (UNUSED)           blank\n"
+    +"#12  START_POS_#REF1#   start position for reference assembly build #REF1#\n"
+    +"#13  STOP_POS_#REF1#    stop position for reference assembly build #REF1#\n"
+    +"#14  STRAND_#REF1#      strand information for reference assembly build #REF1#\n"
+    +"#15  (UNUSED)           blank\n"
+    +"#16  (UNUSED)           blank\n"
+    +"#17  (UNUSED)           blank\n"
+    +"#18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene\n"
+    +"#19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene\n"
+    +"#20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation\n"
+    +"#21  NCBI_GENE_ID           NCBI Gene ID\n"
+    +"#22  UNIPROT_ID             UniProtKB id(s)\n"
+    +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
+    +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
+    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
+    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
+    +"#29  MARKER_SYMBOL          marker symbol\n"
+    +"#30  OLD_SYMBOL             old symbol alias(es)\n"
+    +"#31  OLD_NAME               old name alias(es)\n"
+    +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
+    +"#33  QTL_SYMBOL             QTL symbol\n"
+    +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
+    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
+    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#37  GENE_TYPE              gene type\n"
+    +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
+    +"#39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
+    +"#40  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
+    +"#41  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
+    +"#42  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
+    +"#\n"
+    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
+    +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
+    +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
+    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t"
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
 
     final String HEADER_LINE_RAT =
-     "#39  GENE_REFSEQ_STATUS_LEGACY legacy column -- use column 23 instead -- it will be discontinued in the future\n"
-    +"#40  CHROMOSOME_#REF3#         chromosome for Rnor_#REF3# reference assembly\n"
-    +"#41  START_POS_#REF3#          start position for Rnor_#REF3# reference assembly\n"
-    +"#42  STOP_POS_#REF3#           stop position for Rnor_#REF3# reference assembly\n"
-    +"#43  STRAND_#REF3#             strand information for Rnor_#REF3# reference assembly\n"
-    +"#44  CHROMOSOME_#REF4#         chromosome for Rnor_#REF4# reference assembly\n"
-    +"#45  START_POS_#REF4#          start position for Rnor_#REF4# reference assembly\n"
-    +"#46  STOP_POS_#REF4#           stop position for Rnor_#REF4# reference assembly\n"
-    +"#47  STRAND_#REF4#             strand information for Rnor_#REF4# reference assembly\n"
+     "#39  (UNUSED)               blank\n"
+    +"#40  CHROMOSOME_#REF3#      chromosome for Rnor_#REF3# reference assembly\n"
+    +"#41  START_POS_#REF3#       start position for Rnor_#REF3# reference assembly\n"
+    +"#42  STOP_POS_#REF3#        stop position for Rnor_#REF3# reference assembly\n"
+    +"#43  STRAND_#REF3#          strand information for Rnor_#REF3# reference assembly\n"
+    +"#44  CHROMOSOME_#REF4#      chromosome for Rnor_#REF4# reference assembly\n"
+    +"#45  START_POS_#REF4#       start position for Rnor_#REF4# reference assembly\n"
+    +"#46  STOP_POS_#REF4#        stop position for Rnor_#REF4# reference assembly\n"
+    +"#47  STRAND_#REF4#          strand information for Rnor_#REF4# reference assembly\n"
+    +"#48  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
+    +"#49  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
+    +"#50  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
+    +"#51  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
     +"#\n"
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
     +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tGENE_REFSEQ_STATUS\t"
+    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
-    +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#";
+    +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_LINE_HUMAN =
      "#39  HGNC_ID            Human Genome Nomenclature Committee ID\n"
     +"#40  (UNUSED)\n"
     +"#41  OMIM_ID            Online Mendelian Inheritance in Man ID\n"
-    +"#42  GENE_REFSEQ_STATUS_LEGACY legacy column -- use column 23 instead -- it will be discontinued in the future\n"
-    +"#43  CHROMOSOME_#REF3#         chromosome for GRCh#REF3# reference assembly\n"
-    +"#44  START_POS_#REF3#          start position for GRCh#REF3# reference assembly\n"
-    +"#45  STOP_POS_#REF3#           stop position for GRCh#REF3# reference assembly\n"
-    +"#46  STRAND_#REF3#             strand information for GRCh#REF3# reference assembly\n"
+    +"#42  (UNUSED)\n"
+    +"#43  CHROMOSOME_#REF3#      chromosome for GRCh#REF3# reference assembly\n"
+    +"#44  START_POS_#REF3#       start position for GRCh#REF3# reference assembly\n"
+    +"#45  STOP_POS_#REF3#        stop position for GRCh#REF3# reference assembly\n"
+    +"#46  STRAND_#REF3#          strand information for GRCh#REF3# reference assembly\n"
+    +"#47  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
+    +"#48  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
+    +"#49  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
+    +"#50  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
     +"#\n"
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
     +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tHGNC_ID\t(UNUSED)\tOMIM_ID\tGENE_REFSEQ_STATUS\t"
-    +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#";
+    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tHGNC_ID\t(UNUSED)\tOMIM_ID\t(UNUSED)\t"
+    +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_LINE_MOUSE =
      "#39  MGD_ID             MGD ID\n"
     +"#40  CM_POS             mouse cM map absolute position\n"
-    +"#41  GENE_REFSEQ_STATUS_LEGACY legacy column -- use column 23 instead -- it will be discontinued in the future\n"
-    +"#42  CHROMOSOME_#REF3#         chromosome for reference assembly build #REF3#\n"
-    +"#43  START_POS_#REF3#          start position for reference assembly build #REF3#\n"
-    +"#44  STOP_POS_#REF3#           stop position for reference assembly build #REF3#\n"
-    +"#45  STRAND_#REF3#             strand information for reference assembly build #REF3#\n"
+    +"#41  (UNUSED)\n"
+    +"#42  CHROMOSOME_#REF3#      chromosome for reference assembly build #REF3#\n"
+    +"#43  START_POS_#REF3#       start position for reference assembly build #REF3#\n"
+    +"#44  STOP_POS_#REF3#        stop position for reference assembly build #REF3#\n"
+    +"#45  STRAND_#REF3#          strand information for reference assembly build #REF3#\n"
+    +"#46  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
+    +"#47  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
+    +"#48  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
+    +"#49  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
     +"#\n"
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
     +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tMGD_ID\tCM_POS\tGENE_REFSEQ_STATUS\t"
-    +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#";
+    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tMGD_ID\tCM_POS\t(UNUSED)\t"
+    +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
+
+    final String HEADER_PIG =
+    "# RGD-PIPELINE: ftp-file-extracts\n"
+    +"# MODULE: genes  build 2020-03-11\n"
+    +"# GENERATED-ON: #DATE#\n"
+    +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
+    +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
+    +"# CONTACT: rgd.data@mcw.edu\n"
+    +"# FORMAT: tab delimited text\n"
+    +"# NOTES: multiple values in a single column are separated by ';'\n"
+    +"#\n"
+    +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
+    +"#\n"
+    +"#COLUMN INFORMATION:\n"
+    +"# (First 38 columns are in common between all species)\n"
+    +"#\n"
+    +"#1   GENE_RGD_ID	      the RGD_ID of the gene\n"
+    +"#2   SYMBOL             official gene symbol\n"
+    +"#3   NAME    	          gene name\n"
+    +"#4   GENE_DESC          gene description (if available)\n"
+    +"#5   (UNUSED)           blank\n"
+    +"#6   CHROMOSOME_#REF1# chromosome for reference assembly build #REF1#\n"
+    +"#7   CHROMOSOME_#REF2# chromosome for reference assembly build #REF2#\n"
+    +"#8   FISH_BAND          fish band information\n"
+    +"#9   (UNUSED)           blank\n"
+    +"#10  (UNUSED)           blank\n"
+    +"#11  (UNUSED)           blank\n"
+    +"#12  START_POS_#REF1#   start position for reference assembly build #REF1#\n"
+    +"#13  STOP_POS_#REF1#    stop position for reference assembly build #REF1#\n"
+    +"#14  STRAND_#REF1#      strand information for reference assembly build #REF1#\n"
+    +"#15  START_POS_#REF2#   start position for reference assembly build #REF2#\n"
+    +"#16  STOP_POS_#REF2#    stop position for reference assembly build #REF2#\n"
+    +"#17  STRAND_#REF2#      strand information for reference assembly build #REF2#\n"
+    +"#18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene\n"
+    +"#19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene\n"
+    +"#20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation\n"
+    +"#21  NCBI_GENE_ID           NCBI Gene ID\n"
+    +"#22  UNIPROT_ID             UniProtKB id(s)\n"
+    +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
+    +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
+    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
+    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
+    +"#29  MARKER_SYMBOL          marker symbol\n"
+    +"#30  OLD_SYMBOL             old symbol alias(es)\n"
+    +"#31  OLD_NAME               old name alias(es)\n"
+    +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
+    +"#33  QTL_SYMBOL             QTL symbol\n"
+    +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
+    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
+    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#37  GENE_TYPE              gene type\n"
+    +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
+    +"#39  VGNC_ID                VGNC ID\n"
+    +"#40  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
+    +"#41  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
+    +"#42  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
+    +"#43  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
+    +"#\n"
+    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
+    +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
+    +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
+    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
+
+    final String HEADER_DOG =
+    "# RGD-PIPELINE: ftp-file-extracts\n"
+    +"# MODULE: genes  build 2020-03-11\n"
+    +"# GENERATED-ON: #DATE#\n"
+    +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
+    +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
+    +"# CONTACT: rgd.data@mcw.edu\n"
+    +"# FORMAT: tab delimited text\n"
+    +"# NOTES: multiple values in a single column are separated by ';'\n"
+    +"#\n"
+    +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
+    +"#\n"
+    +"#COLUMN INFORMATION:\n"
+    +"# (First 38 columns are in common between all species)\n"
+    +"#\n"
+    +"#1   GENE_RGD_ID	      the RGD_ID of the gene\n"
+    +"#2   SYMBOL             official gene symbol\n"
+    +"#3   NAME    	          gene name\n"
+    +"#4   GENE_DESC          gene description (if available)\n"
+    +"#5   (UNUSED)           blank\n"
+    +"#6   CHROMOSOME_#REF1# chromosome for reference assembly build #REF1#\n"
+    +"#7   (UNUSED)           blank\n\n"
+    +"#8   FISH_BAND          fish band information\n"
+    +"#9   (UNUSED)           blank\n"
+    +"#10  (UNUSED)           blank\n"
+    +"#11  (UNUSED)           blank\n"
+    +"#12  START_POS_#REF1#   start position for reference assembly build #REF1#\n"
+    +"#13  STOP_POS_#REF1#    stop position for reference assembly build #REF1#\n"
+    +"#14  STRAND_#REF1#      strand information for reference assembly build #REF1#\n"
+    +"#15  (UNUSED)           blank\n"
+    +"#16  (UNUSED)           blank\n"
+    +"#17  (UNUSED)           blank\n"
+    +"#18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene\n"
+    +"#19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene\n"
+    +"#20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation\n"
+    +"#21  NCBI_GENE_ID           NCBI Gene ID\n"
+    +"#22  UNIPROT_ID             UniProtKB id(s)\n"
+    +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
+    +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
+    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
+    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
+    +"#29  MARKER_SYMBOL          marker symbol\n"
+    +"#30  OLD_SYMBOL             old symbol alias(es)\n"
+    +"#31  OLD_NAME               old name alias(es)\n"
+    +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
+    +"#33  QTL_SYMBOL             QTL symbol\n"
+    +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
+    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
+    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#37  GENE_TYPE              gene type\n"
+    +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
+    +"#39  VGNC_ID                VGNC ID\n"
+    +"#40  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
+    +"#41  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
+    +"#42  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
+    +"#43  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
+    +"#\n"
+    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
+    +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
+    +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
+    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     Logger log = Logger.getLogger(getClass());
     private java.util.Map<String,List<String>> mapKeys;
@@ -259,13 +418,18 @@ public class GeneExtractor extends BaseExtractor {
 
 
         // prepare header common lines
-        String headerLines = (assembly2==null ? HEADER_COMMON_LINES_ONE_ASSEMBLY : HEADER_COMMON_LINES)
-                .replace("#SPECIES#", si.getSpeciesName())
-                .replace("#DATE#", SpeciesRecord.getTodayDate());
+        String headerLines = (assembly2==null ? HEADER_COMMON_LINES_ONE_ASSEMBLY : HEADER_COMMON_LINES);
 
-        headerLines += speciesType== SpeciesType.RAT ? HEADER_LINE_RAT :
-                speciesType==SpeciesType.HUMAN ? HEADER_LINE_HUMAN :
-                speciesType==SpeciesType.MOUSE ? HEADER_LINE_MOUSE : "";
+        if( speciesType==SpeciesType.PIG ) {
+            headerLines = HEADER_PIG;
+        }
+        else if( speciesType==SpeciesType.DOG ) {
+            headerLines = HEADER_DOG;
+        } else {
+            headerLines += speciesType== SpeciesType.RAT ? HEADER_LINE_RAT :
+                    speciesType==SpeciesType.HUMAN ? HEADER_LINE_HUMAN :
+                    speciesType==SpeciesType.MOUSE ? HEADER_LINE_MOUSE : "";
+        }
 
         if( assembly1!=null )
             headerLines = headerLines.replace("#REF1#", assembly1);
@@ -276,7 +440,18 @@ public class GeneExtractor extends BaseExtractor {
         if( assembly4!=null )
             headerLines = headerLines.replace("#REF4#", assembly4);
 
+        String taxonomyName = SpeciesType.getTaxonomicName(speciesType);
+        String speciesLongName = SpeciesType.getGenebankCommonName(speciesType);
+        String taxonId = Integer.toString(SpeciesType.getTaxonomicId(speciesType));
+        headerLines = headerLines
+            .replace("#SPECIES#", si.getSpeciesName())
+            .replace("#DATE#", SpeciesRecord.getTodayDate())
+            .replace("#TAXONOMY_NAME#", taxonomyName)
+            .replace("#SPECIES_LONGNAME#", speciesLongName)
+            .replace("#TAXONID#", taxonId);
+
         writer.println(headerLines);
+
 
         // load all curated pubmed ids
         final PubmedIdsManager pubmedIdsManager = new PubmedIdsManager();
@@ -304,6 +479,8 @@ public class GeneExtractor extends BaseExtractor {
                         rec.assembly4Map.add(md);
                     } else if (md.getMapKey() == si.getCeleraAssemblyMapKey()) {
                         rec.celeraMap.add(md);
+                    } else if (md.getMapKey() == si.getEnsemblAssemblyMapKey()) {
+                        rec.ensemblMap.add(md);
                     } else if (md.getMapKey() == si.getCytoMapKey()) {
                         rec.cytoMap.add(md);
                     } else if (md.getMapKey() == si.getCmMapKey()) {
@@ -342,6 +519,9 @@ public class GeneExtractor extends BaseExtractor {
                             break;
                         case XdbId.XDB_KEY_HGNC:
                             rec.addHgncIds(xdbId.getAccId());
+                            break;
+                        case 127:
+                            rec.addVgncIds(xdbId.getAccId());
                             break;
                         case XdbId.XDB_KEY_OMIM:
                             rec.addOmimIds(xdbId.getAccId());
@@ -516,7 +696,6 @@ public class GeneExtractor extends BaseExtractor {
         switch( speciesType ) {
             case SpeciesType.RAT:
                 buf.append('\t')
-                    .append(checkNull(rec.getRefSeqStatus()))
                     .append('\t')
                     .append(getString(rec.assembly3Map, "getChromosome"))
                     .append('\t')
@@ -542,7 +721,6 @@ public class GeneExtractor extends BaseExtractor {
                     .append('\t')
                     .append(checkNull(rec.getOmimIds()))
                     .append('\t')
-                    .append(checkNull(rec.getRefSeqStatus()))
                     .append('\t')
                     .append(getString(rec.assembly3Map, "getChromosome"))
                     .append('\t')
@@ -559,7 +737,6 @@ public class GeneExtractor extends BaseExtractor {
                     .append('\t')
                     .append(rec.getAbsPos()!=null ? Double.toString(rec.getAbsPos()) : "")
                     .append('\t')
-                    .append(checkNull(rec.getRefSeqStatus()))
                     .append('\t')
                     .append(getString(rec.assembly3Map, "getChromosome"))
                     .append('\t')
@@ -569,7 +746,22 @@ public class GeneExtractor extends BaseExtractor {
                     .append('\t')
                     .append(getString(rec.assembly3Map, "getStrand"));
                 break;
+
+            case SpeciesType.DOG:
+            case SpeciesType.PIG:
+                buf.append('\t')
+                   .append(checkNull(rec.getVgncIds()));
+                break;
         }
+
+        buf.append('\t')
+            .append(getString(rec.ensemblMap, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.ensemblMap, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.ensemblMap, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.ensemblMap, "getStrand"));
 
         buf.append("\n");
 

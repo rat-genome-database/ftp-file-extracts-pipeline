@@ -21,6 +21,8 @@ MAIN CHANGES (compared with previous version):
 - RATMAP_ID and RHDB_ID columns for RAT are discontinued -- blanks will be used for compatibility.
 
 CHANGES:
+Mar-11-2020 - added VGNC_ID column for DOG and PIG.
+            - added Ensembl primary assembly positions for all species.
 Feb-15-2017 - HPRD IDs are discontinued for human genes -- blanks will be used for compatibility.
 Oct-02-2014 - added columns with Rnor_5.0 and Rnor_6.0 positions to GENES_RAT.txt file;
               GENES_RAT_5.0.txt and GENES_RAT_6.0 files discontinued
