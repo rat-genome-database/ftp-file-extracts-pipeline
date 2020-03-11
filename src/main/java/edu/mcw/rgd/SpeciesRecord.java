@@ -14,6 +14,7 @@ public class SpeciesRecord {
     private int newRefAssemblyMapKeyForMarkers;
     private int oldRefAssemblyMapKeyForMarkers;
     private int celeraAssemblyMapKey;
+    private int ensemblAssemblyMapKey;
     private int cytoMapKey;
     private int cmMapKey; // for mouse only
 
@@ -51,6 +52,14 @@ public class SpeciesRecord {
 
     public void setCeleraAssemblyMapKey(int celeraAssemblyMapKey) {
         this.celeraAssemblyMapKey = celeraAssemblyMapKey;
+    }
+
+    public int getEnsemblAssemblyMapKey() {
+        return ensemblAssemblyMapKey;
+    }
+
+    public void setEnsemblAssemblyMapKey(int ensemblAssemblyMapKey) {
+        this.ensemblAssemblyMapKey = ensemblAssemblyMapKey;
     }
 
     public int getCytoMapKey() {

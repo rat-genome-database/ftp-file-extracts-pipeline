@@ -32,6 +32,7 @@ public class GeneExtractRecord {
     List<MapData> assembly3Map = new ArrayList<>();
     List<MapData> assembly4Map = new ArrayList<>();
     Double absPos; // absolute position for cM mouse map
+    List<MapData> ensemblMap = new ArrayList<>();
 
     Set<String> curatedRefRgdIds = new TreeSet<String>();
     Set<String> curatedPubmedIds = new TreeSet<String>();
@@ -43,6 +44,7 @@ public class GeneExtractRecord {
     Set<String> geneBankProteinIds = new TreeSet<String>();
     Set<String> uniGeneIds = new TreeSet<String>();
     Set<String> hgncIds = new TreeSet<String>(); // human only
+    Set<String> vgncIds = new TreeSet<String>(); // pig and dog only
     Set<String> omimIds = new TreeSet<String>(); // human only
     Set<String> mgdIds = new TreeSet<String>(); // mouse only
     Set<String> ensemblGeneIds = new TreeSet<String>();
@@ -313,6 +315,15 @@ public class GeneExtractRecord {
     public void addHgncIds(String hgncIds) {
         if( hgncIds!=null )
             this.hgncIds.add(hgncIds);
+    }
+
+    public String getVgncIds() {
+        return getString(vgncIds);
+    }
+
+    public void addVgncIds(String vgncIds) {
+        if( vgncIds!=null )
+            this.vgncIds.add(vgncIds);
     }
 
     public String getMgdIds() {
