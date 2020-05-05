@@ -3,6 +3,8 @@ package edu.mcw.rgd;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mcw.rgd.datamodel.Gene;
+import edu.mcw.rgd.datamodel.Omim;
+import edu.mcw.rgd.datamodel.XdbId;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.CounterPool;
@@ -22,6 +24,7 @@ import java.util.*;
 public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     Logger log = Logger.getLogger(AnnotDafExtractor.class);
+    Logger logDaf = Logger.getLogger("daf");
 
     CounterPool counters;
 
@@ -33,10 +36,11 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     // a good place to initialize variables for the species being processed
     boolean onInit() {
+
         // generate only for rat mouse and human
         if( getSpeciesTypeKey()!=SpeciesType.RAT &&
-                getSpeciesTypeKey()!=SpeciesType.MOUSE &&
-                getSpeciesTypeKey()!=SpeciesType.HUMAN ) {
+            getSpeciesTypeKey()!=SpeciesType.MOUSE &&
+            getSpeciesTypeKey()!=SpeciesType.HUMAN ) {
             return false;
         }
 
@@ -181,7 +185,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         // currently AGR does not support OMIM as data source, so we must use 'RGD'
         HashMap<String,String> dataProviders = new HashMap<>();
         if( rec.annot.getDataSrc().equals("OMIM") ) {
-            dataProviders.put("OMIM", "curated");
+            dataProviders.put(getGeneOmimId(rec.annot.getAnnotatedObjectRgdId(), rec.termAccId), "curated");
             dataProviders.put("RGD", "loaded");
         } else {
             dataProviders.put("RGD", "curated");
@@ -196,6 +200,46 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         dafExport.addData(daf, rec.annot.getRefRgdId());
 
         return null;
+    }
+
+    String getGeneOmimId(int geneRgdId, String phenotypeOmimId) {
+
+        try {
+            List<XdbId> omimIds = getDao().getXdbIds(geneRgdId, XdbId.XDB_KEY_OMIM);
+
+            // remove phenotype OMIM ids
+            if( omimIds.size()>1 ) {
+                //logDaf.info("  MULTIS: remove phenotype OMIM ids for "+phenotypeOmimId);
+                Iterator<XdbId> it = omimIds.iterator();
+                while (it.hasNext()) {
+                    XdbId id = it.next();
+                    Omim omim = getDao().getOmimByNr(id.getAccId());
+                    if( omim==null ) {
+                        logDaf.info("NULL OMIM table entry for OMIM:"+id.getAccId());
+                    }
+                    else if (omim.getMimType().equals("phenotype") || omim.getMimType().equals("moved/removed")) {
+                        it.remove();
+                    }
+                }
+            }
+
+            if( omimIds.size()==0 ) {
+                logDaf.info("NO GENE OMIM for "+phenotypeOmimId+ ", RGD:"+geneRgdId);
+                return "OMIM";
+            }
+            if( omimIds.size()==1 ) {
+                //logDaf.info("SINGLE GENE OMIM "+omimIds.get(0).getAccId()+" for "+phenotypeOmimId);
+                return omimIds.get(0).getAccId();
+            }
+
+            logDaf.info("MULTIPLE GENE OMIMs for "+phenotypeOmimId + ", RGD:"+geneRgdId+" {"+Utils.concatenate(",", omimIds, "getAccId")+"}");
+            // just pick an OMIM id by random
+            return omimIds.get(0).getAccId();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     String getGeneRgdIdsForAllele(int rgdId) {

@@ -33,6 +33,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     private MapDAO mapDAO = new MapDAO();
     private NomenclatureDAO nomenDAO = new NomenclatureDAO();
     private NotesDAO notesDAO = new NotesDAO();
+    private OmimDAO omimDAO = new OmimDAO();
     private OntologyXDAO ontologyDAO = new OntologyXDAO();
     private QTLDAO qtlDAO = associationDAO.getQtlDAO();
     private ReferenceDAO refDAO = associationDAO.getReferenceDAO();
@@ -631,6 +632,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     public List<TranscriptFeature> getFeatures(int transcriptRgdId, int mapKey) throws Exception {
         return tdao.getFeatures(transcriptRgdId, mapKey);
+    }
+
+    public Omim getOmimByNr(String mimNr) throws Exception {
+        return omimDAO.getOmimByNr(mimNr);
     }
 
     public List<ObsoleteId> getObsoleteIdsForGenes() throws Exception {

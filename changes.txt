@@ -1,3 +1,6 @@
+May 05, 2020
+-daf extractor: export gene OMIM ids for OMIM annotations; updated to agr schema 1.0.1.1
+
 Jan 16, 2020
 -ortholog extractor: tweak up the file names to be consistent with other file naming
 
