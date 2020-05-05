@@ -8,7 +8,6 @@ import edu.mcw.rgd.process.Utils;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,10 +45,10 @@ public class Gp2ProteinGenerator extends BaseExtractor {
         String outputFile = speciesRec.getGp2ProteinFileName();
         if( outputFile==null )
             return;
-        System.out.println("Running gp2protein.rgd export to file "+ outputFile);
 
         // extract protein info from database and write it into data file
         String fileName = generateFile(outputFile, getExtractDir());
+        System.out.println("gp2protein.rgd exported to file "+ fileName);
 
         System.out.println("including:");
         System.out.println("  with UniProtKB/Swiss: "+genesWithUniProtKBSwiss);
@@ -66,12 +65,7 @@ public class Gp2ProteinGenerator extends BaseExtractor {
 
         // create uncompressed output file
         String fileName = tmpDir+'/'+fname;
-        BufferedWriter writer;
-        if( fileName.endsWith(".gz") ) {
-            writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(fileName))));
-        } else {
-            writer = new BufferedWriter(new FileWriter(fileName));
-        }
+        BufferedWriter writer = Utils.openWriter(fileName);
 
         // write the header
         SimpleDateFormat sdt = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
