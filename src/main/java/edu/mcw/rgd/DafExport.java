@@ -127,7 +127,12 @@ public class DafExport {
             xref.put("id", entry.getKey());
 
             List<String> pages = new ArrayList<>();
-            pages.add("homepage");
+            // for OMIM ids, the default page must be "gene"
+            if( entry.getKey().startsWith("OMIM:") ) {
+                pages.add("gene");
+            } else {
+                pages.add("homepage");
+            }
             xref.put("pages", pages);
 
             dataProvider.put("crossReference", xref);

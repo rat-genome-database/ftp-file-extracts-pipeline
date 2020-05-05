@@ -185,6 +185,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         // currently AGR does not support OMIM as data source, so we must use 'RGD'
         HashMap<String,String> dataProviders = new HashMap<>();
         if( rec.annot.getDataSrc().equals("OMIM") ) {
+
             dataProviders.put(getGeneOmimId(rec.annot.getAnnotatedObjectRgdId(), rec.termAccId), "curated");
             dataProviders.put("RGD", "loaded");
         } else {
@@ -227,14 +228,17 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
                 logDaf.info("NO GENE OMIM for "+phenotypeOmimId+ ", RGD:"+geneRgdId);
                 return "OMIM";
             }
+
+            String omimId = "OMIM:"+omimIds.get(0).getAccId();
+
             if( omimIds.size()==1 ) {
                 //logDaf.info("SINGLE GENE OMIM "+omimIds.get(0).getAccId()+" for "+phenotypeOmimId);
-                return omimIds.get(0).getAccId();
+                return omimId;
             }
 
             logDaf.info("MULTIPLE GENE OMIMs for "+phenotypeOmimId + ", RGD:"+geneRgdId+" {"+Utils.concatenate(",", omimIds, "getAccId")+"}");
             // just pick an OMIM id by random
-            return omimIds.get(0).getAccId();
+            return omimId;
 
         } catch(Exception e) {
             e.printStackTrace();
