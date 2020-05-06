@@ -181,17 +181,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         daf.setEvidenceCode(rec.annot.getEvidence());
         daf.setDbReference(pmids);
         daf.setCreatedDate(rec.createdDate);
-
-        // currently AGR does not support OMIM as data source, so we must use 'RGD'
-        HashMap<String,String> dataProviders = new HashMap<>();
-        if( rec.annot.getDataSrc().equals("OMIM") ) {
-
-            dataProviders.put(getGeneOmimId(rec.annot.getAnnotatedObjectRgdId(), rec.termAccId), "curated");
-            dataProviders.put("RGD", "loaded");
-        } else {
-            dataProviders.put("RGD", "curated");
-        }
-        daf.setDataProviders(dataProviders);
+        daf.setDataProviders(getDataProviders(rec));
 
         // handle gene alleles: inferredGeneAssociation non null only for gene alleles
         if( isGene ) {
@@ -201,6 +191,42 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         dafExport.addData(daf, rec.annot.getRefRgdId());
 
         return null;
+    }
+
+    List<HashMap> getDataProviders(AnnotRecord rec) {
+
+        List<HashMap> result = new ArrayList<HashMap>();
+
+        if( rec.annot.getDataSrc().equals("OMIM") ) {
+
+            // generate OMIM entry
+            HashMap entry = new HashMap();
+            entry.put("type", "curated");
+            HashMap crossRef = new HashMap();
+            entry.put("crossReference", crossRef);
+
+            crossRef.put("id", getGeneOmimId(rec.annot.getAnnotatedObjectRgdId(), rec.termAccId));
+            List<String> pages = new ArrayList<>();
+            pages.add("gene");
+            crossRef.put("pages", pages);
+
+            result.add(entry);
+        }
+
+        // now link to ontology annotation table
+        HashMap entry = new HashMap();
+        entry.put("type", result.isEmpty() ? "curated" : "loaded");
+        HashMap crossRef = new HashMap();
+        entry.put("crossReference", crossRef);
+
+        crossRef.put("id", rec.termAccId);
+        List<String> pages = new ArrayList<>();
+        pages.add("disease/"+SpeciesType.getCommonName(getSpeciesTypeKey()).toLowerCase());
+        crossRef.put("pages", pages);
+
+        result.add(entry);
+
+        return result;
     }
 
     String getGeneOmimId(int geneRgdId, String phenotypeOmimId) {

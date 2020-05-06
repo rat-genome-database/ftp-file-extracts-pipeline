@@ -78,7 +78,7 @@ public class DafExport {
         }
 
         data.DOid = a.getDoId();
-        data.dataProvider = getDataProviders(a.getDataProviders());
+        data.dataProvider = a.getDataProviders();
 
         String ecoId;
         try {
@@ -114,32 +114,6 @@ public class DafExport {
         } else {
             this.data.add(data);
         }
-    }
-
-    List<HashMap> getDataProviders(HashMap<String,String> dataProviders) {
-        List<HashMap> result = new ArrayList<>();
-
-        for( Map.Entry<String, String> entry: dataProviders.entrySet() ) {
-            HashMap dataProvider = new HashMap();
-            dataProvider.put("type", entry.getValue());
-
-            HashMap xref = new HashMap();
-            xref.put("id", entry.getKey());
-
-            List<String> pages = new ArrayList<>();
-            // for OMIM ids, the default page must be "gene"
-            if( entry.getKey().startsWith("OMIM:") ) {
-                pages.add("gene");
-            } else {
-                pages.add("homepage");
-            }
-            xref.put("pages", pages);
-
-            dataProvider.put("crossReference", xref);
-
-            result.add(dataProvider);
-        }
-        return result;
     }
 
     /**
