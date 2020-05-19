@@ -147,6 +147,10 @@ public class FtpFileExtractsManager {
                     beanId = "intExtractor";
                     break;
 
+                case "-cell_lines":
+                    beanId = "cellLineExtractor";
+                    break;
+
                 // other
                 case "-obsolete":
                     generateObsoleteIds = true;
