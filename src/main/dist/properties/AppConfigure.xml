@@ -290,6 +290,10 @@
         <property name="version" value="CellLineExtractor  -- build 2020-05-19" />
     </bean>
 
+    <bean id="agrHtpExtractor" class="edu.mcw.rgd.AgrHtpExtractor" scope="prototype">
+        <property name="version" value="AgrHtpExtractor  -- build 2020-05-22" />
+    </bean>
+
     <bean id="radoslavovExtractor" class="edu.mcw.rgd.RadoslavovExtractor" scope="prototype">
         <property name="version" value="RadoslavovExtractor v.1.1.3 as of Feb 21, 2017" />
         <property name="outputDir" value="UserReqFiles/Radoslavov" />

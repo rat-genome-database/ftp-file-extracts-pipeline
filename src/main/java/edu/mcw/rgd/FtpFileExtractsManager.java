@@ -151,6 +151,10 @@ public class FtpFileExtractsManager {
                     beanId = "cellLineExtractor";
                     break;
 
+                case "-agr_htp":
+                    beanId = "agrHtpExtractor";
+                    break;
+
                 // other
                 case "-obsolete":
                     generateObsoleteIds = true;
