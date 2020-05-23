@@ -2,24 +2,32 @@ package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.DataSourceFactory;
+import edu.mcw.rgd.dao.impl.OntologyXDAO;
 import edu.mcw.rgd.process.Utils;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AgrHtpExtractor extends BaseExtractor {
+
+    static String[] uberonSlimTermIdArray = new String[]{"UBERON:0001009","UBERON:0005409","UBERON:0000949","UBERON:0001008","UBERON:0002330","UBERON:0002193","UBERON:0002416",
+            "UBERON:0002423","UBERON:0002204","UBERON:0001016","UBERON:0000990","UBERON:0001004","UBERON:0001032","UBERON:0005726","UBERON:0007037","UBERON:0002105","UBERON:0002104",
+            "UBERON:0000924","UBERON:0000925","UBERON:0000926","UBERON:0003104","UBERON:0001013","UBERON:0000026","UBERON:0016887","UBERON:6005023","UBERON:0002539","Other"};
+
+    Set<String> uberonSlimTermIdSet;
+
+    public AgrHtpExtractor() {
+
+        uberonSlimTermIdSet = new HashSet<>();
+        Collections.addAll(uberonSlimTermIdSet, uberonSlimTermIdArray);
+    }
 
     static boolean versionPrintedOut = false;
 
@@ -41,7 +49,8 @@ public class AgrHtpExtractor extends BaseExtractor {
 
             List<DataSample> samples = loadDataSamples(ds.geoId);
             for( DataSample s: samples ) {
-                dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender);
+                List<String> uberonSlimTermIds = getUberonSlimTermIds(s.tissueUberonId);
+                dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue);
             }
         }
         dumpDataSamplesToJson(dataSamplesInJson);
@@ -136,7 +145,7 @@ public class AgrHtpExtractor extends BaseExtractor {
 
         List<DataSample> dataSamples = new ArrayList<>();
 
-        String sql = "SELECT sample_accession_id,sample_title,sample_age,sample_gender FROM rna_seq"
+        String sql = "SELECT sample_accession_id,sample_title,sample_age,sample_gender,sample_tissue,rgd_tissue_term_acc FROM rna_seq"
                 +" WHERE geo_accession_id=?";
 
         Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection();
@@ -150,12 +159,47 @@ public class AgrHtpExtractor extends BaseExtractor {
             rec.sampleTitle = rs.getString(2);
             rec.sampleAge = rs.getString(3);
             rec.gender = rs.getString(4);
+            rec.tissue = rs.getString(5);
+            rec.tissueUberonId = rs.getString(6);
 
             dataSamples.add(rec);
         }
         conn.close();
 
         return dataSamples;
+    }
+
+    Map<String, List<String>> cacheOfUberonSlimTermIds = new HashMap<>();
+
+    List<String> getUberonSlimTermIds(String uberonTermId) throws Exception {
+
+        if( uberonTermId==null ) {
+            List<String> result = new ArrayList<>();
+            result.add("Other");
+            return result;
+        }
+
+        if( uberonSlimTermIdSet.contains(uberonTermId) ) {
+            List<String> result = new ArrayList<>();
+            result.add(uberonTermId);
+            return result;
+        }
+
+        List<String> uberonSlimTermIds = cacheOfUberonSlimTermIds.get(uberonTermId);
+        if( uberonSlimTermIds == null ) {
+            OntologyXDAO odao = new OntologyXDAO();
+            uberonSlimTermIds = new ArrayList<>();
+
+            List<String> parentTermIds = odao.getAllActiveTermAncestorAccIds(uberonTermId);
+            for (String termId : parentTermIds) {
+                if (uberonSlimTermIdSet.contains(termId)) {
+                    uberonSlimTermIds.add(termId);
+                }
+            }
+            cacheOfUberonSlimTermIds.put(uberonTermId, uberonSlimTermIds);
+        }
+
+        return uberonSlimTermIds;
     }
 
     class Dataset {
@@ -172,5 +216,7 @@ public class AgrHtpExtractor extends BaseExtractor {
         public String sampleTitle;
         public String sampleAge;
         public String gender;
+        public String tissue;
+        public String tissueUberonId;
     }
 }

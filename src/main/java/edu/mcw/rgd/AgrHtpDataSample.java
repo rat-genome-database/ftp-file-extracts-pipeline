@@ -41,7 +41,8 @@ public class AgrHtpDataSample {
         return dataProvider;
     }
 
-    public void addDataObj(String expId, String sampleId, String sampleTitle, String sampleAge, String sex) {
+    public void addDataObj(String expId, String sampleId, String sampleTitle, String sampleAge, String sex,
+                           String tissueUberonId, List<String> tissueUberonSlimIds, String tissue) {
 
         DataSampleObj obj = new DataSampleObj();
 
@@ -62,7 +63,31 @@ public class AgrHtpDataSample {
             ageMap.put("age", sampleAge);
             obj.sampleAge = ageMap;
         }
+
+        obj.sampleLocation = getSampleLocation(tissueUberonId, tissueUberonSlimIds, tissue);
+
         this.data.add(obj);
+    }
+
+    List getSampleLocation(String tissueUberonId, List<String> tissueUberonSlimIds, String tissue) {
+
+        List result = new ArrayList();
+
+        HashMap loc = new HashMap();
+
+        loc.put("anatomicalStructureTermId", tissueUberonId==null ? "UBERON:0001062" : tissueUberonId);
+        loc.put("whereExpressedStatement", tissue);
+
+        List slims = new ArrayList();
+        for( String slimId: tissueUberonSlimIds ) {
+            HashMap id = new HashMap();
+            id.put("uberonTerm", slimId);
+            slims.add(id);
+        }
+        loc.put("anatomicalStructureUberonSlimTermIds", slims);
+
+        result.add(loc);
+        return result;
     }
 
     String normalizeSex(String sex) {
@@ -152,6 +177,7 @@ public class AgrHtpDataSample {
         public String taxonId = "NCBITaxon:10116";
         public HashMap sampleAge;
         public String sex;
+        public List sampleLocation;
     }
 
 }

@@ -43,5 +43,7 @@ rm $OUTDIR/phenotypes_rat.json
 rm $OUTDIR/genes_human.json
 rm $OUTDIR/genes_rat.json
 
+$APPHOME/run.sh -agr_htp
+
 echo "=== AGR files OK"
 echo ""

@@ -1,3 +1,6 @@
+May 22, 2020
+-agr htp extractor: first version
+
 May 19, 2020
 -cell line extractor: first version of cell line extractor
 
