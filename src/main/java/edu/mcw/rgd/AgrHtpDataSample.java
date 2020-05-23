@@ -46,8 +46,8 @@ public class AgrHtpDataSample {
 
         DataSampleObj obj = new DataSampleObj();
 
-        HashMap datasetId = new HashMap();
-        datasetId.put("primaryId", "GEO:"+expId);
+        List<String> datasetId = new ArrayList<>();
+        datasetId.add("GEO:"+expId);
         obj.datasetId = datasetId;
 
         HashMap sampleIdMap = new HashMap();
@@ -144,8 +144,8 @@ public class AgrHtpDataSample {
         Collections.sort(data, new Comparator<DataSampleObj>() {
             @Override
             public int compare(DataSampleObj o1, DataSampleObj o2) {
-                String dataset1 = o1.datasetId.get("primaryId").toString();
-                String dataset2 = o2.datasetId.get("primaryId").toString();
+                String dataset1 = o1.datasetId.get(0);
+                String dataset2 = o2.datasetId.get(0);
                 int r = dataset1.length() - dataset2.length();
                 if( r!=0 ) {
                     return r;
@@ -169,7 +169,7 @@ public class AgrHtpDataSample {
 
     class DataSampleObj {
         // required fields
-        public HashMap datasetId;
+        public List<String> datasetId;
         public HashMap sampleId;
 
         // optional fields
