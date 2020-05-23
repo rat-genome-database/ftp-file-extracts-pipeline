@@ -28,6 +28,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     private AliasDAO aliasDAO = new AliasDAO();
     private AnnotationDAO annotationDAO = new AnnotationDAO();
     private AssociationDAO associationDAO = new AssociationDAO();
+    private CellLineDAO cellLineDAO = new CellLineDAO();
     private GeneDAO geneDAO = associationDAO.getGeneDAO();
     private GenomicElementDAO genomicElementDAO = new GenomicElementDAO();
     private MapDAO mapDAO = new MapDAO();
@@ -636,6 +637,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     public Omim getOmimByNr(String mimNr) throws Exception {
         return omimDAO.getOmimByNr(mimNr);
+    }
+
+    public List<CellLine> getActiveCellLines() throws Exception {
+        return cellLineDAO.getActiveCellLines();
     }
 
     public List<ObsoleteId> getObsoleteIdsForGenes() throws Exception {

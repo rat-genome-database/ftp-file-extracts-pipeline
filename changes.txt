@@ -1,3 +1,9 @@
+May 22, 2020
+-agr htp extractor: first version
+
+May 19, 2020
+-cell line extractor: first version of cell line extractor
+
 May 05, 2020
 -daf extractor: export gene OMIM ids for OMIM annotations; updated to agr schema 1.0.1.1
 
