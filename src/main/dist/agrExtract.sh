@@ -9,15 +9,17 @@ OUTDIR=$APPHOME/data/agr
 
 echo "=== AGR files ... ==="
 # download all files in parallel
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/affectedGenomicModels/10116 -O $OUTDIR/affectedGenomicModels_rat.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/alleles/10116 -O $OUTDIR/alleles_rat.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/variants/10116 -O $OUTDIR/variants_rat.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/expression/9606 -O $OUTDIR/expression_human.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/expression/10116 -O $OUTDIR/expression_rat.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/9606 -O $OUTDIR/phenotypes_human.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/phenotypes/10116 -O $OUTDIR/phenotypes_rat.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/9606 -O $OUTDIR/genes_human.json &
-wget -nv http://pipelines.rgd.mcw.edu/rgdws/agr/10116 -O $OUTDIR/genes_rat.json &
+WGET="wget --no-check-certificate -nv"
+AGR_URL="https://pipelines.rgd.mcw.edu/rgdws/agr"
+$WGET ${AGR_URL}/affectedGenomicModels/10116 -O $OUTDIR/affectedGenomicModels_rat.json &
+$WGET ${AGR_URL}/alleles/10116 -O $OUTDIR/alleles_rat.json &
+$WGET ${AGR_URL}/variants/10116 -O $OUTDIR/variants_rat.json &
+$WGET ${AGR_URL}/expression/9606 -O $OUTDIR/expression_human.json &
+$WGET ${AGR_URL}/expression/10116 -O $OUTDIR/expression_rat.json &
+$WGET ${AGR_URL}/phenotypes/9606 -O $OUTDIR/phenotypes_human.json &
+$WGET ${AGR_URL}/phenotypes/10116 -O $OUTDIR/phenotypes_rat.json &
+$WGET ${AGR_URL}/9606 -O $OUTDIR/genes_human.json &
+$WGET ${AGR_URL}/10116 -O $OUTDIR/genes_rat.json &
 
 # make the downloaded json files human readable
 wait
