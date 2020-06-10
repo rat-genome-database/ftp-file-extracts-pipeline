@@ -20,7 +20,7 @@ public class AgrHtpDataset {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.1, build  May 22, 2020";
+                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.1, build June 10, 2020";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -54,6 +54,9 @@ public class AgrHtpDataset {
         DataObj obj = new DataObj();
         obj.title = title;
         obj.summary = summary;
+
+        obj.categoryTags= new ArrayList<>();
+        obj.categoryTags.add("unclassified");
 
         // date assigned is in format 'Jan 23 2006'
         SimpleDateFormat formatter = new SimpleDateFormat("MMM d yyyy");
