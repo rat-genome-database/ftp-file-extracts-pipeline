@@ -263,7 +263,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             }
             deconsolidatedAnnotsIncoming++;
 
-            int parPos = a.getNotes().indexOf("(");
+            int parPos = Utils.defaultString(a.getNotes()).indexOf("(");
             if( parPos<0 ) {
                 deconsolidatedAnnotsCreated += deconsolidateWithNotesInfoMissing(a, result);
                 continue;

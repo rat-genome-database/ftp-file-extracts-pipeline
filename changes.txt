@@ -1,3 +1,6 @@
+Jun 16, 2020
+-annot extractors: fixed bug rarely causing NullPointerException
+
 Jun 10, 2020
 -agr htp extractor: added extract of 'unclassified' category tag to all datasets
 
