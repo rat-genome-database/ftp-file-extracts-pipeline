@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author mtutaj
@@ -54,6 +55,7 @@ public class FtpFileExtractsManager {
         boolean generateObsoleteIds = false;
         String annotDirOverride = null;
         boolean agr = false; // generate for AGR
+        boolean singleThread = false;
 
         for( String arg: args ) {
             switch( arg.toLowerCase() ) {
@@ -160,6 +162,10 @@ public class FtpFileExtractsManager {
                     generateObsoleteIds = true;
                     break;
 
+                case "-single_thread":
+                    singleThread = true;
+                    break;
+
                 default:
                     if( arg.startsWith("-species=") ) {
                         speciesTypeKey = SpeciesType.parse(arg.substring(9));
@@ -190,12 +196,12 @@ public class FtpFileExtractsManager {
             throw new Exception("Unsupported species type");
         }
 
-        manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride);
+        manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride, singleThread);
 
         System.out.println("=== OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
-    void run(int speciesTypeKey, DefaultListableBeanFactory bf, String beanId, boolean agr, String annotDirOverride) {
+    void run(int speciesTypeKey, DefaultListableBeanFactory bf, String beanId, boolean agr, String annotDirOverride, boolean singleThread) {
 
         // for every species, create the bean anew to avoid potential conflicts
         List<Integer> speciesTypeKeys;
@@ -207,7 +213,13 @@ public class FtpFileExtractsManager {
         }
         Collections.shuffle(speciesTypeKeys);
 
-        speciesTypeKeys.parallelStream().forEach( key -> {
+        Stream<Integer> stream;
+        if( singleThread ) {
+            stream = speciesTypeKeys.stream();
+        } else {
+            stream = speciesTypeKeys.parallelStream();
+        }
+        stream.forEach( key -> {
             if( key>0 ) {
                 try {
                     BaseExtractor extractor = (BaseExtractor) bf.getBean(beanId);
@@ -239,8 +251,10 @@ public class FtpFileExtractsManager {
         "[MODULE] one of: -annotations | -array_ids | -assembly_comparison | -chinchilla | -daf_annotations | -db_snps"+
             " | -gaf_agr_annotations | -gaf_annotations | -genes | -gp2protein | -interactions | -markers | -marker_alleles"+
             " | -mirna_targets | -obsolete | -orthologs | -radoslavov | -qtls | -sequences | -strains | -uniprot_annotations\n"+
-        "[OPTIONS] optional species name: -species=rat|mouse|human|...|all (default) (all:rat,mouse,human,...)\n"+
-        "   optional annotation directory override: -annotDir=annotDirOverride;\n"+
+        "[OPTIONS] (purely optional, not mandatory):\n"+
+        "-species=rat|mouse|human|...|all (default) (all:rat,mouse,human,...)\n"+
+        "-single_thread    if specified, the module is run in a single thread; if not specified, (default), module is run in multiple threads\n"+
+        "-annotDir=annotDirOverride    if provided, specifies the annotation directory override\n"+
         "     overrides value of 'annotDir' from beans 'annotExtractor' and 'annotGafExtractor'";
 
         System.out.println(USAGE);
