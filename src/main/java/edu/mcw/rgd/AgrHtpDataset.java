@@ -20,7 +20,7 @@ public class AgrHtpDataset {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.1, build June 10, 2020";
+                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.3, build Aug 25, 2020";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -83,7 +83,7 @@ public class AgrHtpDataset {
 
             List publications = new ArrayList();
             publications.add(p);
-            obj.publication = publications;
+            obj.publications = publications;
         }
 
         this.data.add(obj);
@@ -114,7 +114,7 @@ public class AgrHtpDataset {
         // optional fields
         public String summary;
         public List<String> categoryTags;
-        public List<Publication> publication;
+        public List<Publication> publications;
     }
 
     class Publication {
