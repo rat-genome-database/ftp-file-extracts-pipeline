@@ -1,6 +1,7 @@
 Aug 25, 2020
 -agr htp extractor: updated to AGR schema 1.0.1.3
-
+ agr daf extractor: added export of strains exluding annots with IEA, IEP, QTM or TAS evidence codes
+ 
 Jul 13, 2020
 -added cmdline option -single_thread, which, when specified, enforces the code to run in a single thread
  uniprot annot extractor: -single_thread option passed to script

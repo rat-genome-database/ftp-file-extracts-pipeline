@@ -26,7 +26,7 @@ public class DafExport {
         public DafMetadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Daf Extractor, AGR schema 1.0.1.1, build  May 4, 2020";
+                release = "RGD Daf Extractor, AGR schema 1.0.1.3, build  Aug 25, 2020";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -49,7 +49,7 @@ public class DafExport {
     }
 
     class DafObjectRelation {
-        public String objectType = "gene";
+        public String objectType;
         public String associationType;
         public List<String> inferredGeneAssociation = null;
     }
@@ -64,7 +64,7 @@ public class DafExport {
         public String publicationId;
     }
 
-    public void addData(DafAnnotation a, int refRgdId) {
+    public DafData addData(DafAnnotation a, int refRgdId) {
 
         DafData data = new DafData();
         data.objectId = a.getDbObjectID();
@@ -75,6 +75,8 @@ public class DafExport {
             data.objectRelation.objectType = "allele";
             String[] parentGeneIds = a.getInferredGeneAssociation().split("[,]");
             data.objectRelation.inferredGeneAssociation = Arrays.asList(parentGeneIds);
+        } else {
+            data.objectRelation.objectType = a.getDbObjectType();
         }
 
         data.DOid = a.getDoId();
@@ -88,7 +90,7 @@ public class DafExport {
         }
         if( ecoId==null ) {
             System.out.println("WARN no ECO_ID for evidence code "+a.getEvidenceCode());
-            return;
+            return null;
         }
         data.evidence.evidenceCodes.add(ecoId);
 
@@ -114,6 +116,7 @@ public class DafExport {
         } else {
             this.data.add(data);
         }
+        return data;
     }
 
     /**

@@ -109,18 +109,12 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         if( isGene ) {
             // for genes evidence code must be a manual evidence code
             switch (rec.annot.getEvidence()) {
-                case "IAGP":
-                    assocType = "is_implicated_in";
-                    break;
-                case "IMP":
-                    assocType = "is_implicated_in";
-                    break;
                 case "IEP":
                     assocType = "is_marker_for";
                     break;
+                case "IAGP":
+                case "IMP":
                 case "IDA":
-                    assocType = "is_implicated_in";
-                    break;
                 case "IGI":
                     assocType = "is_implicated_in";
                     break;
@@ -129,8 +123,17 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
                     return null; // not a manual evidence code
             }
         } else {
-            // for strains
-            assocType = "is_model_of";
+            // for strains: skip annotations with IEA, IEP, QTM or TAS evidence codes
+            switch (rec.annot.getEvidence()) {
+                case "IEA":
+                case "IEP":
+                case "QTM":
+                case "TAS":
+                    return null;
+                default:
+                    assocType = "is_model_of";
+                    break;
+            }
         }
 
         // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
@@ -188,7 +191,8 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
         }
 
-        dafExport.addData(daf, rec.annot.getRefRgdId());
+        DafExport.DafData dafData = dafExport.addData(daf, rec.annot.getRefRgdId());
+        counters.increment(dafData.objectRelation.objectType+"RecordsExported");
 
         return null;
     }
@@ -304,6 +308,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     void onDone() {
         log.info("Records exported: "+counters.get("recordsExported"));
+        log.info("   for genes    : "+counters.get("geneRecordsExported"));
+        log.info("   for strains  : "+counters.get("strainRecordsExported"));
+        log.info("   for alleles  : "+counters.get("alleleRecordsExported"));
         log.info("DO+ records exported thanks to OMIM:PS conversions: "+counters.get("omimPSConversions"));
 
         Enumeration<String> counterNames = counters.getCounterNames();
@@ -342,7 +349,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
     }
 
     boolean processOnlyGenes() {
-        return true;
+        return false;
     }
 
     boolean loadUniProtIds() {
