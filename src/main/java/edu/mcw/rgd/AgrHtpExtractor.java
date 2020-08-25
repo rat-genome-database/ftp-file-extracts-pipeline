@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.impl.OntologyXDAO;
-import edu.mcw.rgd.process.Utils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -72,7 +70,8 @@ public class AgrHtpExtractor extends BaseExtractor {
         // dump DafAnnotation records to a file in JSON format
         try {
             String jsonFileName = "data/agr/HTPDATASAMPLES_RGD.json";
-            BufferedWriter jsonWriter = Utils.openWriter(jsonFileName);
+            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileName), "UTF8");
+            BufferedWriter jsonWriter = new BufferedWriter(out);
 
             jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(dataSamplesInJson));
 
@@ -96,7 +95,8 @@ public class AgrHtpExtractor extends BaseExtractor {
         // dump DafAnnotation records to a file in JSON format
         try {
             String jsonFileName = "data/agr/HTPDATASET_RGD.json";
-            BufferedWriter jsonWriter = Utils.openWriter(jsonFileName);
+            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileName), "UTF8");
+            BufferedWriter jsonWriter = new BufferedWriter(out);
 
             jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDatasets));
 

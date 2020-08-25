@@ -18,7 +18,7 @@ public class AgrHtpDataSample {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Samples, AGR schema 1.0.1.1, build  May 22, 2020";
+                release = "RGD Htp Extractor for Data Samples, AGR schema 1.0.1.3, build  Aug 25, 2020";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -48,7 +48,7 @@ public class AgrHtpDataSample {
 
         List<String> datasetId = new ArrayList<>();
         datasetId.add("GEO:"+expId);
-        obj.datasetId = datasetId;
+        obj.datasetIds = datasetId;
 
         HashMap sampleIdMap = new HashMap();
         sampleIdMap.put("primaryId", "GEO:"+sampleId);
@@ -64,7 +64,7 @@ public class AgrHtpDataSample {
             obj.sampleAge = ageMap;
         }
 
-        obj.sampleLocation = getSampleLocation(tissueUberonId, tissueUberonSlimIds, tissue);
+        obj.sampleLocations = getSampleLocation(tissueUberonId, tissueUberonSlimIds, tissue);
 
         this.data.add(obj);
     }
@@ -144,8 +144,8 @@ public class AgrHtpDataSample {
         Collections.sort(data, new Comparator<DataSampleObj>() {
             @Override
             public int compare(DataSampleObj o1, DataSampleObj o2) {
-                String dataset1 = o1.datasetId.get(0);
-                String dataset2 = o2.datasetId.get(0);
+                String dataset1 = o1.datasetIds.get(0);
+                String dataset2 = o2.datasetIds.get(0);
                 int r = dataset1.length() - dataset2.length();
                 if( r!=0 ) {
                     return r;
@@ -169,15 +169,17 @@ public class AgrHtpDataSample {
 
     class DataSampleObj {
         // required fields
-        public List<String> datasetId;
+        public List<String> datasetIds;
         public HashMap sampleId;
+        public String assayType = "MMO:0000000";
+        public String sampleType = "OBI:0000423"; // extract
 
         // optional fields
         public String sampleTitle;
         public String taxonId = "NCBITaxon:10116";
         public HashMap sampleAge;
         public String sex;
-        public List sampleLocation;
+        public List sampleLocations;
     }
 
 }
