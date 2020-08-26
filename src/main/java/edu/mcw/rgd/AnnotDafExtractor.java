@@ -123,8 +123,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
                     return null; // not a manual evidence code
             }
         } else {
-            // for strains: skip annotations with IEA, IEP, QTM or TAS evidence codes
+            // for strains: skip annotations with IDA, IEA, IEP, QTM or TAS evidence codes
             switch (rec.annot.getEvidence()) {
+                case "IDA":
                 case "IEA":
                 case "IEP":
                 case "QTM":
