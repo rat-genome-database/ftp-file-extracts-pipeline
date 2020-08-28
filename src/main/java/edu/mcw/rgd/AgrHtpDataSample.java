@@ -42,7 +42,7 @@ public class AgrHtpDataSample {
     }
 
     public void addDataObj(String expId, String sampleId, String sampleTitle, String sampleAge, String sex,
-                           String tissueUberonId, List<String> tissueUberonSlimIds, String tissue) {
+                           String tissueUberonId, List<String> tissueUberonSlimIds, String tissue, String assayType) {
 
         DataSampleObj obj = new DataSampleObj();
 
@@ -65,6 +65,8 @@ public class AgrHtpDataSample {
         }
 
         obj.sampleLocations = getSampleLocation(tissueUberonId, tissueUberonSlimIds, tissue);
+
+        obj.assayType = assayType;
 
         this.data.add(obj);
     }
@@ -171,7 +173,7 @@ public class AgrHtpDataSample {
         // required fields
         public List<String> datasetIds;
         public HashMap sampleId;
-        public String assayType = "MMO:0000000";
+        public String assayType;
         public String sampleType = "OBI:0000423"; // extract
 
         // optional fields

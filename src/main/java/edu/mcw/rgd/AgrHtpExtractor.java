@@ -48,7 +48,7 @@ public class AgrHtpExtractor extends BaseExtractor {
             List<DataSample> samples = loadDataSamples(ds.geoId);
             for( DataSample s: samples ) {
                 List<String> uberonSlimTermIds = getUberonSlimTermIds(s.tissueUberonId);
-                dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue);
+                dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue, s.assayType);
             }
         }
         dumpDataSamplesToJson(dataSamplesInJson);
@@ -145,10 +145,15 @@ public class AgrHtpExtractor extends BaseExtractor {
 
         List<DataSample> dataSamples = new ArrayList<>();
 
-        String sql = "SELECT sample_accession_id,sample_title,sample_age,sample_gender,sample_tissue,rgd_tissue_term_acc FROM rna_seq"
-                +" WHERE geo_accession_id=?";
+        String sql = "SELECT sample_accession_id,sample_title,sample_age,sample_gender,sample_tissue,rgd_tissue_term_acc,platform_name FROM rna_seq"
+                +" WHERE geo_accession_id=? AND sample_organism='Rattus norvegicus'";
 
         Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection();
+
+        String sql2 = "SELECT assay_type_acc FROM rna_seq_assays WHERE platform_name=?";
+        PreparedStatement ps2 = conn.prepareStatement(sql2);
+
+        int unknownAssayTypes = 0;
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, geoId);
         ResultSet rs = ps.executeQuery();
@@ -162,9 +167,25 @@ public class AgrHtpExtractor extends BaseExtractor {
             rec.tissue = rs.getString(5);
             rec.tissueUberonId = rs.getString(6);
 
+            String platformName = rs.getString(7);
+            ps2.setString(1, platformName);
+            ResultSet rs2 = ps2.executeQuery();
+            String assayTypeAcc = "MMO:0000000";
+            if( rs2.next() ) {
+                assayTypeAcc = rs2.getString(1);
+            } else {
+                System.out.println("unknown assay type for "+platformName);
+                unknownAssayTypes++;
+            }
+            rs2.close();
+            rec.assayType = assayTypeAcc;
+
             dataSamples.add(rec);
         }
         conn.close();
+        if( unknownAssayTypes!=0 ) {
+            System.out.println("unknown assay types = "+unknownAssayTypes+" for "+geoId);
+        }
 
         return dataSamples;
     }
@@ -218,5 +239,6 @@ public class AgrHtpExtractor extends BaseExtractor {
         public String gender;
         public String tissue;
         public String tissueUberonId;
+        public String assayType;
     }
 }
