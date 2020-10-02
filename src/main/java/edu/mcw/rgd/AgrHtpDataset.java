@@ -72,11 +72,11 @@ public class AgrHtpDataset {
         List pages = new ArrayList();
         pages.add("htp/dataset");
         preferredCrossReference.put("pages", pages);
-        obj.preferredCrossReference = preferredCrossReference;
+        datasetId.put("preferredCrossReference", preferredCrossReference);
 
         List crossReferences = new ArrayList();
         crossReferences.add(preferredCrossReference);
-        obj.crossReferences = crossReferences;
+        datasetId.put("crossReferences", crossReferences);
 
         if( pubmedId!=null ) {
 
@@ -121,9 +121,6 @@ public class AgrHtpDataset {
         public HashMap datasetId;
         public String title;
         public String dateAssigned;
-
-        public HashMap preferredCrossReference;
-        public List crossReferences;
 
         // optional fields
         public String summary;
