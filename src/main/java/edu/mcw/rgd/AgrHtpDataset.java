@@ -20,7 +20,7 @@ public class AgrHtpDataset {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.3, build Aug 25, 2020";
+                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.3, build Oct 02, 2020";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -67,6 +67,17 @@ public class AgrHtpDataset {
         datasetId.put("primaryId", "GEO:"+geoId);
         obj.datasetId = datasetId;
 
+        HashMap preferredCrossReference = new HashMap();
+        preferredCrossReference.put("id", "GEO:"+geoId);
+        List pages = new ArrayList();
+        pages.add("htp/dataset");
+        preferredCrossReference.put("pages", pages);
+        obj.preferredCrossReference = preferredCrossReference;
+
+        List crossReferences = new ArrayList();
+        crossReferences.add(preferredCrossReference);
+        obj.crossReferences = crossReferences;
+
         if( pubmedId!=null ) {
 
             String pmid = "PMID:"+pubmedId;
@@ -75,9 +86,9 @@ public class AgrHtpDataset {
             if( false ) { // optional 'crossReference'
                 p.crossReference = new HashMap<String, Object>();
                 p.crossReference.put("id", pmid);
-                List<String> pages = new ArrayList<>();
-                pages.add("reference");
-                p.crossReference.put("pages", pages);
+                List<String> pages2 = new ArrayList<>();
+                pages2.add("reference");
+                p.crossReference.put("pages", pages2);
             }
             p.publicationId = pmid;
 
@@ -110,6 +121,9 @@ public class AgrHtpDataset {
         public HashMap datasetId;
         public String title;
         public String dateAssigned;
+
+        public HashMap preferredCrossReference;
+        public List crossReferences;
 
         // optional fields
         public String summary;

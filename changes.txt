@@ -1,8 +1,11 @@
+Oct 02, 2020
+-agr htp extractor: HTPDATASET: added export of preferredCrossReference and crossReferences
+
 Aug 28, 2020
 -agr htp extractor: added export of assay types
 
 Aug 26, 2020
--agr daf extractor: added export of strains exluding annots with IDA, IEA, IEP, QTM or TAS evidence codes
+-agr daf extractor: added export of strains excluding annots with IDA, IEA, IEP, QTM or TAS evidence codes
 
 Aug 25, 2020
 -agr htp extractor: updated to AGR schema 1.0.1.3
