@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2020-10-02" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-01-11" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -283,7 +283,7 @@
     </bean>
 
     <bean id="intExtractor" class="edu.mcw.rgd.InteractionsExtractor" scope="prototype">
-        <property name="version" value="InteractionsExtractor  build 2019-10-07" />
+        <property name="version" value="InteractionsExtractor  -- build 2021-01-11" />
     </bean>
 
     <bean id="cellLineExtractor" class="edu.mcw.rgd.CellLineExtractor" scope="prototype">

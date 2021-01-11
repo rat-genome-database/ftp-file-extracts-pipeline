@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.dao.impl.*;
 import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.process.Utils;
 
 import java.io.PrintWriter;
@@ -19,11 +20,11 @@ public class InteractionsExtractor extends BaseExtractor {
     InteractionAttributesDAO adao= new InteractionAttributesDAO();
     InteractionsDAO idao= new InteractionsDAO();
     AssociationDAO assocDao= new AssociationDAO();
-    OntologyXDAO xdao=new OntologyXDAO();
 
     Map<String, String> intTypes=new HashMap<>();
     Map<Integer, Protein> proteins=new HashMap<>();
     Map<Integer, List<Gene>> geneProteinMap=new HashMap<>();
+    Set<String> unresolvedMIs = new HashSet<>();
 
     static boolean versionPrintedOut = false;
 
@@ -44,7 +45,7 @@ public class InteractionsExtractor extends BaseExtractor {
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.write(
             "# RGD-PIPELINE: ftp-file-extracts\n"
-            +"# MODULE: interactions   build 2019-10-07\n"
+            +"# MODULE: interactions   build 2021-01-11\n"
             +"# GENERATED-ON: "+dateFormat.format(new Date())+"\n"
             +"# CONTACT: rgd.data@mcw.edu\n"
             +"# FORMAT: tab delimited text\n"
@@ -64,6 +65,10 @@ public class InteractionsExtractor extends BaseExtractor {
         }
         tsvWriter.close();
 
+        for( String mi: unresolvedMIs ) {
+            System.out.println("    WARNING: unresolved interaction type for "+speciesInfo.getSpeciesName()+": " + mi);
+        }
+
         System.out.println("  "+speciesInfo.getSpeciesName()+" interactions: "+dataLines.size());
     }
 
@@ -82,12 +87,12 @@ public class InteractionsExtractor extends BaseExtractor {
         for (Interaction i : interactions) {
             Protein interactor1 = getProtein(i.getRgdId1());
             if (interactor1 == null) {
-                System.out.println("  null protein for RGD:" + i.getRgdId1());
+                System.out.println("    null protein for RGD:" + i.getRgdId1());
                 continue;
             }
             Protein interactor2 = getProtein(i.getRgdId2());
             if (interactor2 == null) {
-                System.out.println("  null protein for RGD:" + i.getRgdId2());
+                System.out.println("    null protein for RGD:" + i.getRgdId2());
                 continue;
             }
 
@@ -184,17 +189,18 @@ public class InteractionsExtractor extends BaseExtractor {
         return Utils.concatenate("; ", genes, "getRgdId");
     }
 
-    public String getInteractionType(String accId) {
+    public String getInteractionType(String accId) throws Exception {
 
         String interactionType = intTypes.get(accId);
         if( interactionType == null) {
-            try {
-                interactionType = xdao.getTermByAccId(accId).getTerm();
-                intTypes.put(accId, interactionType);
-            } catch (Exception e) {
-                System.out.println("interaction type: " + accId);
-                e.printStackTrace();
+            Term term = getDao().getTermByAccId(accId);
+            if( term==null ) {
+                interactionType = accId;
+                unresolvedMIs.add(accId);
+            } else {
+                interactionType = term.getTerm();
             }
+            intTypes.put(accId, interactionType);
         }
         return interactionType;
     }
