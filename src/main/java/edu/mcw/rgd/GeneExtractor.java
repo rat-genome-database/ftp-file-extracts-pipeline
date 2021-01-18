@@ -40,6 +40,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
     +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued column 27 UNIGENE ID\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -70,7 +71,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  TIGR_ID                TIGR ID(s)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -100,7 +101,7 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
@@ -130,6 +131,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
     +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -158,9 +160,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -168,8 +170,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)\n"
+    +"#36  (UNUSED)\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  HGNC_ID            Human Genome Nomenclature Committee ID\n"
@@ -188,9 +190,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tHGNC_ID\t(UNUSED)\tOMIM_ID\t(UNUSED)\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED))\t(UNUSED))\tGENE_TYPE\tENSEMBL_ID\tHGNC_ID\t(UNUSED)\tOMIM_ID\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
@@ -217,6 +219,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
     +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -245,9 +248,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -255,8 +258,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)\n"
+    +"#36  (UNUSED)\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  MGD_ID             MGD ID\n"
@@ -274,9 +277,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tMGD_ID\tCM_POS\t(UNUSED)\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED))\t(UNUSED))\tGENE_TYPE\tENSEMBL_ID\tMGD_ID\tCM_POS\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
@@ -291,6 +294,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -319,9 +323,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -329,8 +333,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
@@ -341,9 +345,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED))\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_BONOBO =
@@ -357,6 +361,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -385,9 +390,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -395,8 +400,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
@@ -407,9 +412,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED))\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED))\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_SQUIRREL =
@@ -423,6 +428,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -451,9 +457,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -461,8 +467,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
@@ -473,9 +479,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED))\t(UNUSED))\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_VERVET =
@@ -489,6 +495,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -517,9 +524,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -527,8 +534,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
@@ -539,9 +546,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED))\t(UNUSED))\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
 
@@ -556,6 +563,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -584,9 +592,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -594,8 +602,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly\n"
@@ -606,9 +614,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_PIG =
@@ -622,6 +630,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -650,9 +659,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -660,8 +669,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  VGNC_ID                VGNC ID\n"
@@ -673,9 +682,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_DOG =
@@ -689,6 +698,7 @@ public class GeneExtractor extends BaseExtractor {
     +"# NOTES: multiple values in a single column are separated by ';'\n"
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
+    +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -717,9 +727,9 @@ public class GeneExtractor extends BaseExtractor {
     +"#22  UNIPROT_ID             UniProtKB id(s)\n"
     +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
+    +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  UNIGENE_ID             UniGene ID(s)\n"
+    +"#27  (UNUSED)               blank\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -727,8 +737,8 @@ public class GeneExtractor extends BaseExtractor {
     +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
     +"#33  QTL_SYMBOL             QTL symbol\n"
     +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
+    +"#35  (UNUSED)               blank\n"
+    +"#36  (UNUSED)               blank\n"
     +"#37  GENE_TYPE              gene type\n"
     +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
     +"#39  VGNC_ID                VGNC ID\n"
@@ -740,9 +750,9 @@ public class GeneExtractor extends BaseExtractor {
     +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
-    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\tUNIGENE_ID\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
-    +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
+    +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     Logger log = Logger.getLogger(getClass());
@@ -898,18 +908,17 @@ public class GeneExtractor extends BaseExtractor {
                             rec.addGeneBankNucleoIds(xdbId.getAccId());
                             break;
                         case XdbId.XDB_KEY_TIGR:
-                            rec.addTigerIds(xdbId.getAccId());
+                            if( speciesType==SpeciesType.RAT ) { // TIGR IDs are available only for rat
+                                rec.addTigerIds(xdbId.getAccId());
+                            }
                             break;
                         case XdbId.XDB_KEY_GENEBANKPROT:
                             rec.addGeneBankProteinIds(xdbId.getAccId());
                             break;
-                        case XdbId.XDB_KEY_UNIGENE:
-                            rec.addUniGeneIds(xdbId.getLinkText());
-                            break;
                         case XdbId.XDB_KEY_HGNC:
                             rec.addHgncIds(xdbId.getAccId());
                             break;
-                        case 127:
+                        case XdbId.XDB_KEY_VGNC:
                             rec.addVgncIds(xdbId.getAccId());
                             break;
                         case XdbId.XDB_KEY_OMIM:
@@ -924,10 +933,12 @@ public class GeneExtractor extends BaseExtractor {
                     }
                 }
 
-                // get rgd id and gene symbol for splices
-                for (Gene splice : dao.getSplices(rec.getGeneKey())) {
-                    rec.addSpliceRgdIds(Integer.toString(splice.getRgdId()));
-                    rec.addSpliceSymbols(splice.getSymbol());
+                // get rgd id and gene symbol for splices: rat only
+                if( speciesType==SpeciesType.RAT ) {
+                    for (Gene splice : dao.getSplices(rec.getGeneKey())) {
+                        rec.addSpliceRgdIds(Integer.toString(splice.getRgdId()));
+                        rec.addSpliceSymbols(splice.getSymbol());
+                    }
                 }
 
                 // get rgd id and marker names for markers
@@ -1056,7 +1067,6 @@ public class GeneExtractor extends BaseExtractor {
             .append('\t')
             .append(checkNull(rec.getGeneBankProteinIds()))
             .append('\t')
-            .append(checkNull(rec.getUniGeneIds()))
             .append('\t')
 
             .append(checkNull(rec.getMarkerRgdIds()))

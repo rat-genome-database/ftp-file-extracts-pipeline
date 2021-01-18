@@ -42,7 +42,6 @@ public class GeneExtractRecord {
     Set<String> geneBankNucleoIds = new TreeSet<>();
     Set<String> tigerIds = new TreeSet<String>();
     Set<String> geneBankProteinIds = new TreeSet<String>();
-    Set<String> uniGeneIds = new TreeSet<String>();
     Set<String> hgncIds = new TreeSet<String>(); // human only
     Set<String> vgncIds = new TreeSet<String>(); // pig and dog only
     Set<String> omimIds = new TreeSet<String>(); // human only
@@ -208,15 +207,6 @@ public class GeneExtractRecord {
             if( geneBankProteinIds.startsWith("XP_")||geneBankProteinIds.startsWith("NP_") )
                 this.refSeqProteinIds.add(geneBankProteinIds);
         }
-    }
-
-    public String getUniGeneIds() {
-        return getString(uniGeneIds);
-    }
-
-    public void addUniGeneIds(String uniGeneIds) {
-        if( uniGeneIds!=null )
-            this.uniGeneIds.add(uniGeneIds);
     }
 
     public String getEnsemblGeneIds() {

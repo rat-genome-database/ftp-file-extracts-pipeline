@@ -1,3 +1,9 @@
+Jan 18, 2021
+-genes extractor:
+  1) refactored header generation
+  2) discontinued column UNIGENE_ID for rat
+  3) discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL for species other than rat
+
 Jan 11, 2021
 -interactions extractor: improved reporting of unresolved interaction types
 
