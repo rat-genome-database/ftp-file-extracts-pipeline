@@ -16,7 +16,7 @@ public class SslpExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: markers  build 2019-06-24\n"
+    +"# MODULE: markers  build 2021-01-19\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# markers extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -40,6 +40,7 @@ public class SslpExtractor extends BaseExtractor {
     +"### Oct 29 2018 discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows marker type.\n"
     +"### Nov 1 2018 renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.\n"
     +"### Jun 17 2019 data sorted by RGD ID; files exported into species specific directories\n"
+    +"### Jan 19 2021 discontinued column 15 with UniGene IDs\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 23 columns are in common between rat, mouse and human)\n"
@@ -58,7 +59,7 @@ public class SslpExtractor extends BaseExtractor {
     +"#12  REVERSE_SEQ             reverse sequence\n"
     +"#13  UNISTS_ID               UniSTS ID\n"
     +"#14  GENBANK_NUCLEOTIDE      GenBank Nucleotide ID(s)\n"
-    +"#15  UNIGENE_ID              UniGene ID(s)\n"
+    +"#15  (UNUSED)\n"
     +"#16  ALIAS_VALUE             known aliases for this marker\n"
     +"#17  ASSOCIATED_GENE_RGD_ID  RGD_IDs for gene associated with this marker\n"
     +"#18  ASSOCIATED_GENE_SYMBOL  symbol for gene associated with this marker\n"
@@ -91,7 +92,7 @@ public class SslpExtractor extends BaseExtractor {
     +"#\n"
     +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
     +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
-    +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
+    +"UNISTS_ID\tGENBANK_NUCLEOTIDE\t(UNUSED)\tALIAS_VALUE\t"
     +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
     +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
     +"CHROMOSOME_5.0\tSTART_POS_5.0\tSTOP_POS_5.0\t"
@@ -110,7 +111,7 @@ public class SslpExtractor extends BaseExtractor {
    +"#\n"
    +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
    +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
-   +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
+   +"UNISTS_ID\tGENBANK_NUCLEOTIDE\t(UNUSED)\tALIAS_VALUE\t"
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
    +"CHROMOSOME_37\tSTART_POS_37\tSTOP_POS_37\t"
@@ -128,7 +129,7 @@ public class SslpExtractor extends BaseExtractor {
    +"#\n"
    +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
    +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
-   +"UNISTS_ID\tGENBANK_NUCLEOTIDE\tUNIGENE_ID\tALIAS_VALUE\t"
+   +"UNISTS_ID\tGENBANK_NUCLEOTIDE\t(UNUSED)\tALIAS_VALUE\t"
    +"ASSOCIATED_GENE_RGD_ID\tASSOCIATED_GENE_SYMBOL\tCHROMOSOME\tFISH_BAND\t"
    +"CHROMOSOME_CELERA\tSTART_POS_CELERA\tSTOP_POS_CELERA\t"
    +"CHROMOSOME_37\tSTART_POS_37\tSTOP_POS_37\t"
@@ -201,7 +202,6 @@ public class SslpExtractor extends BaseExtractor {
                 rec.uncuratedPubmedID = getDao().getUncuratedPubmedIds(markerRgdID);
                 rec.uniSTSID = rec.getAccessionIds(XdbId.XDB_KEY_UNISTS);
                 rec.genBankNucleotideID = rec.getAccessionIds(XdbId.XDB_KEY_GENEBANKNU);
-                rec.uniGeneIDs = rec.getLinkText(XdbId.XDB_KEY_UNIGENE);
 
                 rec.curatedRefRGDIDs = getDao().getCuratedRefs(markerRgdID);
                 rec.curatedRefPubmedIDs = getDao().getCuratedPubmedIds(markerRgdID);
@@ -337,7 +337,7 @@ public class SslpExtractor extends BaseExtractor {
         buf.append(checkNull(rec.genBankNucleotideID));
         buf.append('\t');
 
-        buf.append(checkNull(rec.uniGeneIDs));
+        // UniGene Ids discontinued
         buf.append('\t');
 
         buf.append(checkNull(rec.aliases));
@@ -473,7 +473,6 @@ public class SslpExtractor extends BaseExtractor {
         public String uncuratedPubmedID;
         public String uniSTSID;
         public String genBankNucleotideID;
-        public String uniGeneIDs;
 
         public String curatedRefRGDIDs;
         public String curatedRefPubmedIDs;
