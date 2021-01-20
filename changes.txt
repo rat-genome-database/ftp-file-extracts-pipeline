@@ -1,5 +1,7 @@
 Jan 19, 2021
 -markers extractor: discontinued column UNIGENE_ID
+-gene extractor: mouse: export positions on assembly GRCm39 instead of assembly MGSCv36
+                 bonobo: added export of positions on assembly Mhudiblu_PPA_v0
 
 Jan 18, 2021
 -genes extractor:

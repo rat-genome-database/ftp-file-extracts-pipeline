@@ -116,7 +116,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build 2021-01-18"/>
+        <property name="version" value="Gene Extractor  build 2021-01-19"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
@@ -130,9 +130,9 @@
                 </entry>
                 <entry key="mouse">
                     <list>
-                        <value>18 37</value>
-                        <value>35 38</value>
-                        <value>14 36</value>
+                        <value>18 MGSCv37</value>
+                        <value>35 GRCm38</value>
+                        <value>239 GRCm39</value>
                     </list>
                 </entry>
                 <entry key="human">
@@ -149,7 +149,8 @@
                 </entry>
                 <entry key="bonobo">
                     <list>
-                        <value>511 1.1</value>
+                        <value>511 PanPan1.1</value>
+                        <value>513 Mhudiblu_PPA_v0</value>
                     </list>
                 </entry>
                 <entry key="dog">
