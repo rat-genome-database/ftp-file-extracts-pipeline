@@ -1,6 +1,7 @@
 Jan 22, 2021
 -added AgrRefExtractor: extracts all references from RGD in json format for submission to the Alliance
-
+    also generates REF-EXCHANGE file
+     
 Jan 19, 2021
 -markers extractor: discontinued column UNIGENE_ID
 -gene extractor: mouse: export positions on assembly GRCm39 instead of assembly MGSCv36

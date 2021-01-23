@@ -52,7 +52,8 @@ public class AgrRefs {
         obj.primaryId = primaryId;
         obj.title = Utils.NVL(r.getTitle(), "");
         if( r.getPubDate()!=null ) {
-            obj.datePublished = sdf2_agr.format(r.getPubDate());
+            //obj.datePublished = sdf2_agr.format(r.getPubDate()); //  '1931 Mar 30' (MGI submission)
+            obj.datePublished = sdf_agr.format(r.getPubDate());
         } else {
             obj.datePublished = "";
         }

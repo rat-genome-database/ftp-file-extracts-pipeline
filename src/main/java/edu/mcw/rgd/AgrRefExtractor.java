@@ -15,13 +15,9 @@ public class AgrRefExtractor extends BaseExtractor {
     static String[] allianceCategories = new String[]{"Research Article","Review Article","Thesis","Book","Other","Preprint",
             "Conference Publication","Personal Communication","Direct Data Submission","Internal Process Reference", "Unknown","Retraction"};
 
-    Set<String> allianceCategorySet;
     Map<String,String> rgdToAllianceCategories = new HashMap<>();
 
     public AgrRefExtractor() {
-
-        allianceCategorySet = new HashSet<>();
-        Collections.addAll(allianceCategorySet, allianceCategories);
 
         rgdToAllianceCategories.put("", "Unknown");
         rgdToAllianceCategories.put("ABSTRACT", "Other");
@@ -45,15 +41,20 @@ public class AgrRefExtractor extends BaseExtractor {
         System.out.println(getVersion());
 
         Map<Integer,String> pmidMap = getDao().loadPmidMap();
+        List<Reference> refsInRgd = getDao().getActiveReferences();
 
+
+        processReferences(refsInRgd, pmidMap);
+        processRefExchange(refsInRgd, pmidMap);
+
+    }
+
+    void processReferences(List<Reference> refsInRgd, Map<Integer,String> pmidMap) throws Exception {
         int refsWithPmids = 0;
         int totalRefs = 0;
 
-        // references
         AgrRefs refs = new AgrRefs();
 
-
-        List<Reference> refsInRgd = getDao().getActiveReferences();
         for( Reference r: refsInRgd ) {
             totalRefs++;
 
@@ -86,7 +87,7 @@ public class AgrRefExtractor extends BaseExtractor {
         // do not export fields with NULL values
         json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        // dump DafAnnotation records to a file in JSON format
+        // dump records to a file in JSON format
         String jsonFileNameTmp = "data/agr/REFERENCE_RGD.json.tmp";
         try {
             OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileNameTmp), "UTF8");
@@ -117,9 +118,48 @@ public class AgrRefExtractor extends BaseExtractor {
     }
 
 
+    void processRefExchange( List<Reference> refsInRgd, Map<Integer,String> pmidMap ) throws Exception {
 
+        // REF-EXCHANGE (small set of meta data that is exchanged from a MOD to ABC to establish and update PubMed corpus)
+        AgrRefExchange refExchange = new AgrRefExchange();
 
+        int entries = 0;
+        for( Reference r: refsInRgd ) {
 
-    class AgrRef {
+            String pmid = pmidMap.get(r.getRgdId());
+
+            if( pmid!=null ) {
+                RgdId id = getDao().getRgdId(r.getRgdId());
+
+                String allianceCategory = rgdToAllianceCategories.get(r.getReferenceType());
+
+                refExchange.addDataObj(pmid, r, id.getLastModifiedDate(), allianceCategory);
+
+                entries++;
+            }
+        }
+        refExchange.sort();
+        dumpRefExchangeToJson(refExchange);
+        System.out.println("total ref-exchange entries: "+entries);
+    }
+
+    void dumpRefExchangeToJson(AgrRefExchange agrRefs) throws ParseException, IOException {
+
+        // setup a JSON object array to collect all DafAnnotation objects
+        ObjectMapper json = new ObjectMapper();
+        // do not export fields with NULL values
+        json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        // dump records to a file in JSON format
+        String jsonFileName = "data/agr/REF-EXCHANGE_RGD.json";
+        try {
+            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileName), "UTF8");
+            BufferedWriter jsonWriter = new BufferedWriter(out);
+
+            jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(agrRefs));
+
+            jsonWriter.close();
+        } catch(IOException ignore) {
+        }
     }
 }
