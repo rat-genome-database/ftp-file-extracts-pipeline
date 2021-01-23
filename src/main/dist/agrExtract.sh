@@ -47,5 +47,7 @@ rm $OUTDIR/genes_rat.json
 
 $APPHOME/run.sh -agr_htp
 
+$APPHOME/run.sh -agr_ref
+
 echo "=== AGR files OK"
 echo ""

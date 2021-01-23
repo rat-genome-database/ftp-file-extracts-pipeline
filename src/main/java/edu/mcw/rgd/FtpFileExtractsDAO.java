@@ -132,6 +132,14 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         return pmidMap;
     }
 
+    public List<Reference> getActiveReferences() throws Exception {
+        return refDAO.getActiveReferences();
+    }
+
+    public List<Author> getAuthors(int refKey) throws Exception {
+        return refDAO.getAuthors(refKey);
+    }
+
     /**
      * return comma separated string of reference rgds in format "123;456;678"
      *

@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2021-01-19" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-01-22" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -293,6 +293,10 @@
 
     <bean id="agrHtpExtractor" class="edu.mcw.rgd.AgrHtpExtractor" scope="prototype">
         <property name="version" value="AgrHtpExtractor  -- build 2020-10-02" />
+    </bean>
+
+    <bean id="agrRefExtractor" class="edu.mcw.rgd.AgrRefExtractor" scope="prototype">
+        <property name="version" value="AgrRefExtractor  -- build 2021-01-22" />
     </bean>
 
     <bean id="radoslavovExtractor" class="edu.mcw.rgd.RadoslavovExtractor" scope="prototype">
