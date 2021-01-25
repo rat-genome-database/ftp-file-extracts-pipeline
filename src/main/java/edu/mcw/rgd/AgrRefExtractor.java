@@ -131,7 +131,7 @@ public class AgrRefExtractor extends BaseExtractor {
             if( pmid!=null ) {
                 RgdId id = getDao().getRgdId(r.getRgdId());
 
-                String allianceCategory = rgdToAllianceCategories.get(r.getReferenceType());
+                String allianceCategory = Utils.NVL(rgdToAllianceCategories.get(r.getReferenceType()), "Unknown");
 
                 refExchange.addDataObj(pmid, r, id.getLastModifiedDate(), allianceCategory);
 
