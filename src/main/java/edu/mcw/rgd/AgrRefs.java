@@ -23,7 +23,7 @@ public class AgrRefs {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Reference Extractor, AGR schema 1.0.1.4, build Jan 22, 2021";
+                release = "RGD Reference Extractor, AGR schema 1.0.1.4, build Jan 25, 2021";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -61,7 +61,7 @@ public class AgrRefs {
         obj.volume = r.getVolume();
         obj.pages = r.getPages();
         obj.ZABSTRACTZ = r.getRefAbstract();
-        obj.citation = r.getCitation();
+        obj.citation = Utils.NVL(r.getCitation(), " ");
         obj.allianceCategory = allianceCategory;
         obj.publisher = r.getPublisher();
         obj.issueName = r.getIssue();

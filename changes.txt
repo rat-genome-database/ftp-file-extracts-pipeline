@@ -1,3 +1,6 @@
+Jan 25, 2021
+-AgrRefExtractor tweaks
+
 Jan 22, 2021
 -added AgrRefExtractor: extracts all references from RGD in json format for submission to the Alliance
     also generates REF-EXCHANGE file
