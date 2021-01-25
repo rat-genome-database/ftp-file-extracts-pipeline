@@ -67,7 +67,7 @@ public class AgrRefs {
         obj.issueName = r.getIssue();
 
         HashMap modRefType = new HashMap();
-        modRefType.put("referenceType", r.getReferenceType());
+        modRefType.put("referenceType", Utils.NVL(r.getReferenceType(), "UNKNOWN"));
         modRefType.put("source", "RGD");
         obj.MODReferenceTypes.add(modRefType);
 
