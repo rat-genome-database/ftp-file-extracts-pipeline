@@ -69,7 +69,7 @@ public class AgrRefExtractor extends BaseExtractor {
 
             RgdId id = getDao().getRgdId(r.getRgdId());
 
-            String allianceCategory = rgdToAllianceCategories.get(r.getReferenceType());
+            String allianceCategory = Utils.NVL(rgdToAllianceCategories.get(r.getReferenceType()), "Unknown");
 
             refs.addDataObj(primaryId, r, id.getLastModifiedDate(), allianceCategory, getDao().getAuthors(r.getKey()));
         }
