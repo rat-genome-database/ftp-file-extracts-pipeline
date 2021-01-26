@@ -26,7 +26,7 @@ public class DafExport {
         public DafMetadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Daf Extractor, AGR schema 1.0.1.3, build  Aug 25, 2020";
+                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Jan 26, 2021";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -46,6 +46,7 @@ public class DafExport {
         public String objectName;
         public String negation; // optional, previously 'qualifier'
         public List<String> with;
+        public List<DafConditionRelation> conditionRelations;
     }
 
     class DafObjectRelation {
@@ -62,6 +63,11 @@ public class DafExport {
     class DafPublication {
         public Map<String,Object> crossReference;
         public String publicationId;
+    }
+
+    class DafConditionRelation {
+        public String conditionRelationType;
+        public List conditions;
     }
 
     public DafData addData(DafAnnotation a, int refRgdId) {
@@ -106,8 +112,44 @@ public class DafExport {
 
         if( a.getWithInfo()!=null ) {
             data.with = new ArrayList<>();
-            for( String with: a.getWithInfo().split("[\\|]") ) {
+            for( String with: a.getWithInfo().split("[\\|\\,\\ ]+") ) {
                 data.with.add(with);
+            }
+        }
+
+        // handle experimental conditions -- for strains
+        // handle annotation with a single condition only
+        if( a.getDbObjectType().equals("strain") && data.with!=null && data.with.size()==1 ) {
+            AgrExperimentalConditionMapper.Info info = AgrExperimentalConditionMapper.getInstance().getInfo(data.with.get(0));
+            if( info!=null ) {
+
+                // only a subset of qualifiers is allowed
+                String condRelType = null;
+                if( a.getQualifier()==null ) {
+                    condRelType = "has_qualifier";
+                } else if( a.getQualifier().contains("induced") || a.getQualifier().contains("induces") ) {
+                    condRelType = "induces";
+                } else if( a.getQualifier().contains("treatment") || a.getQualifier().contains("ameliorates") ) {
+                    condRelType = "ameliorates";
+                } else if( a.getQualifier().contains("exacerbates") ) {
+                    condRelType = "exacerbates";
+                }
+
+                if( condRelType!=null ) {
+
+                    DafConditionRelation condRel = new DafConditionRelation();
+                    condRel.conditionRelationType = condRelType;
+
+                    HashMap h = new HashMap();
+                    h.put("conditionClassId", info.zecoAcc);
+                    h.put("conditionId", info.xcoAcc);
+                    h.put("conditionStatement", info.conditionStatement);
+                    condRel.conditions = new ArrayList();
+                    condRel.conditions.add(h);
+
+                    data.conditionRelations = new ArrayList<>();
+                    data.conditionRelations.add(condRel);
+                }
             }
         }
 
@@ -116,6 +158,7 @@ public class DafExport {
         } else {
             this.data.add(data);
         }
+
         return data;
     }
 

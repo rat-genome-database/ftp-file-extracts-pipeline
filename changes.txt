@@ -1,3 +1,6 @@
+Jan 26, 2021
+-daf extractor: added export of experimental conditions
+
 Jan 25, 2021
 -AgrRefExtractor tweaks
 

@@ -1,0 +1,59 @@
+#Experimental condition mappings as of Jan 25, 2021
+#WITH_INFO	WITH_INFO term	conditionClassId	ZECO term	conditionStatement
+CHEBI:46631	clonidine	ZECO:0000111	chemical treatment	chemical treatment:clonidine
+CHEBI:50845	doxycycline	ZECO:0000111	chemical treatment	chemical treatment:doxycycline
+XCO:0000195	myelin oligodendrocyte glycoprotein	ZECO:0000105	biological treatment	biological treatment:myelin oligodendrocyte glycoprotein
+XCO:0000238	Kilham rat virus	ZECO:0000105	biological treatment	biological treatment:Kilham rat virus
+XCO:0000255	anti-glomerular basement membrane antibody	ZECO:0000105	biological treatment	biological treatment:anti-glomerular basement membrane antibody
+XCO:0000281	type II collagen	ZECO:0000105	biological treatment	biological treatment:type II collagen
+XCO:0000282	anti-Thy1 antibody	ZECO:0000105	biological treatment	biological treatment:anti-Thy1 antibody
+XCO:0000288	R16 peptide of interphotoreceptor retinoid-binding protein	ZECO:0000105	biological treatment	biological treatment:R16 peptide of interphotoreceptor retinoid-binding protein
+XCO:0000291	peripheral myelin protein 2 peptide 58-81	ZECO:0000105	biological treatment	biological treatment:peripheral myelin protein 2 peptide 58-81
+XCO:0000292	peripheral nerve myelin	ZECO:0000105	biological treatment	biological treatment:peripheral nerve myelin
+XCO:0000356	spinal cord homogenate	ZECO:0000105	biological treatment	biological treatment:spinal cord homogenate
+XCO:0000451	Herpes simplex virus type 1	ZECO:0000105	biological treatment	biological treatment:Herpes simplex virus type 1
+XCO:0000655	prion	ZECO:0000105	biological treatment	biological treatment:prion
+XCO:0000688	myelin basic protein	ZECO:0000105	biological treatment	biological treatment:myelin basic protein
+XCO:0000736	diphtheria toxin	ZECO:0000105	biological treatment	biological treatment:diphtheria toxin
+XCO:0000769	antiserum	ZECO:0000105	biological treatment	biological treatment:antiserum
+XCO:0000090	"7,12-dimethyltetraphene (DMBA)"	ZECO:0000111	chemical treatment	"chemical treatment:7,12-dimethyltetraphene (DMBA)"
+XCO:0000092	17 beta-estradiol	ZECO:0000111	chemical treatment	chemical treatment:17 beta-estradiol
+XCO:0000206	N-nitrosodiethylamine	ZECO:0000111	chemical treatment	chemical treatment:N-nitrosodiethylamine
+XCO:0000235	Poly I:C	ZECO:0000111	chemical treatment	chemical treatment:Poly I:C
+XCO:0000241	streptozotocin	ZECO:0000111	chemical treatment	chemical treatment:streptozotocin
+XCO:0000263	pristane	ZECO:0000111	chemical treatment	chemical treatment:pristane
+XCO:0000265	Freund's incomplete adjuvant	ZECO:0000111	chemical treatment	chemical treatment:Freund's incomplete adjuvant
+XCO:0000266	Freund's complete adjuvant	ZECO:0000111	chemical treatment	chemical treatment:Freund's complete adjuvant
+XCO:0000270	captopril	ZECO:0000111	chemical treatment	chemical treatment:captopril
+XCO:0000275	glucose	ZECO:0000111	chemical treatment	chemical treatment:glucose
+XCO:0000280	squalene	ZECO:0000111	chemical treatment	chemical treatment:squalene
+XCO:0000295	diethylstilbestrol	ZECO:0000111	chemical treatment	chemical treatment:diethylstilbestrol
+XCO:0000325	ethanol	ZECO:0000111	chemical treatment	chemical treatment:ethanol
+XCO:0000351	4-nitroquinoline N-oxide	ZECO:0000111	chemical treatment	chemical treatment:4-nitroquinoline N-oxide
+XCO:0000369	aurothiopropanol sulfonate	ZECO:0000111	chemical treatment	chemical treatment:aurothiopropanol sulfonate
+XCO:0000393	"1,2-dimethylhydrazine"	ZECO:0000111	chemical treatment	"chemical treatment:1,2-dimethylhydrazine"
+XCO:0000469	isotretinoin	ZECO:0000111	chemical treatment	chemical treatment:isotretinoin
+XCO:0000537	olmesartan medoxomil	ZECO:0000111	chemical treatment	chemical treatment:olmesartan medoxomil
+XCO:0000588	Perindopril	ZECO:0000111	chemical treatment	chemical treatment:Perindopril
+XCO:0000602	rosiglitazone	ZECO:0000111	chemical treatment	chemical treatment:rosiglitazone
+XCO:0000645	propofol	ZECO:0000111	chemical treatment	chemical treatment:propofol
+XCO:0000646	Azoxymethane	ZECO:0000111	chemical treatment	chemical treatment:Azoxymethane
+XCO:0000649	trans-4-hydroxy-L-proline	ZECO:0000111	chemical treatment	chemical treatment:trans-4-hydroxy-L-proline
+XCO:0000658	nisoldipine	ZECO:0000111	chemical treatment	chemical treatment:nisoldipine
+XCO:0000022	controlled sodium content diet	ZECO:0000112	diet	diet:controlled sodium content diet
+XCO:0000164	controlled sodium content drinking water	ZECO:0000112	diet	diet:controlled sodium content drinking water
+XCO:0000212	controlled copper content diet	ZECO:0000112	diet	diet:controlled copper content diet
+XCO:0000244	controlled fructose content diet	ZECO:0000112	diet	diet:controlled fructose content diet
+XCO:0000382	controlled captopril content drinking water	ZECO:0000112	diet	diet:controlled captopril content drinking water
+XCO:0000437	controlled N-propyl-N-nitrosourea content drinking water	ZECO:0000112	diet	diet:controlled N-propyl-N-nitrosourea content drinking water
+XCO:0000731	controlled enrasentan content diet	ZECO:0000112	diet	diet:controlled enrasentan content diet
+XCO:0000795	controlled sodium chloride content diet	ZECO:0000112	diet	diet:controlled sodium chloride content diet
+XCO:0000048	auditory stimulus	ZECO:0000131	stress	stress:auditory stimulus
+XCO:0000157	physical restraint	ZECO:0000131	stress	stress:physical restraint
+XCO:0000337	air-jet exposure	ZECO:0000131	stress	stress:air-jet exposure
+XCO:0000018	bilateral nephrectomy	ZECO:0000229	physical alteration	physical alteration:bilateral nephrectomy
+XCO:0000094	ovariectomy	ZECO:0000229	physical alteration	physical alteration:ovariectomy
+XCO:0000112	unilateral nephrectomy	ZECO:0000229	physical alteration	physical alteration:unilateral nephrectomy
+XCO:0000113	right nephrectomy	ZECO:0000229	physical alteration	physical alteration:right nephrectomy
+XCO:0000348	middle cerebral artery occlusion	ZECO:0000229	physical alteration	physical alteration:middle cerebral artery occlusion
+XCO:0000704	carotid artery occlusion	ZECO:0000229	physical alteration	physical alteration:carotid artery occlusion

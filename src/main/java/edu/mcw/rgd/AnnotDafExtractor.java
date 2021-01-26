@@ -195,6 +195,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         DafExport.DafData dafData = dafExport.addData(daf, rec.annot.getRefRgdId());
         counters.increment(dafData.objectRelation.objectType+"RecordsExported");
 
+        if( dafData.conditionRelations!=null ) {
+            counters.increment("condRelEntries");
+        }
         return null;
     }
 
@@ -312,6 +315,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         log.info("   for genes    : "+counters.get("geneRecordsExported"));
         log.info("   for strains  : "+counters.get("strainRecordsExported"));
         log.info("   for alleles  : "+counters.get("alleleRecordsExported"));
+        log.info("   with condition relations: "+counters.get("condRelEntries"));
         log.info("DO+ records exported thanks to OMIM:PS conversions: "+counters.get("omimPSConversions"));
 
         Enumeration<String> counterNames = counters.getCounterNames();

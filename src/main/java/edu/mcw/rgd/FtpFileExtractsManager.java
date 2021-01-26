@@ -200,8 +200,11 @@ public class FtpFileExtractsManager {
             throw new Exception("Unsupported species type");
         }
 
-        manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride, singleThread);
-
+        try {
+            manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride, singleThread);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
         System.out.println("=== OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 
