@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2021-01-26" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-02-12" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -116,16 +116,16 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build 2021-01-19"/>
+        <property name="version" value="Gene Extractor  build 2021-02-12"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
                 <entry key="rat">
                     <list><!-- mapKey followed by space character and assembly short name -->
-                        <value>6 3.1</value>
-                        <value>60 3.4</value>
-                        <value>70 5.0</value>
-                        <value>360 6.0</value>
+                        <value>372 mRatBN7.2</value>
+                        <value>60 RGSC_v3.4</value>
+                        <value>70 Rnor_5.0</value>
+                        <value>360 Rnor_6.0</value>
                     </list>
                 </entry>
                 <entry key="mouse">
