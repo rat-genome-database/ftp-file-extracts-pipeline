@@ -41,6 +41,9 @@ public class AgrHtpExtractor extends BaseExtractor {
         // datasets
         Map<String, Dataset> datasets = loadDataSets();
 
+        // mappings of 'sample_age' to stages
+        Map<String, HashMap> ageStages = loadStages();
+
         // data samples
         AgrHtpDataSample dataSamplesInJson = new AgrHtpDataSample();
         for( Dataset ds: datasets.values() ) {
@@ -48,7 +51,7 @@ public class AgrHtpExtractor extends BaseExtractor {
             List<DataSample> samples = loadDataSamples(ds.geoId);
             for( DataSample s: samples ) {
                 List<String> uberonSlimTermIds = getUberonSlimTermIds(s.tissueUberonId);
-                dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue, s.assayType);
+                dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue, s.assayType, ageStages);
             }
         }
         dumpDataSamplesToJson(dataSamplesInJson);
@@ -139,6 +142,43 @@ public class AgrHtpExtractor extends BaseExtractor {
         conn.close();
 
         return datasets;
+    }
+
+    Map<String, HashMap> loadStages() throws Exception {
+
+        Map<String, HashMap> stages = new HashMap<>();
+
+        String sql = "SELECT sample_age,stage,stage_slim FROM RNA_SEQ_STAGES";
+
+        // 'stage' structure corresponding to 'sample_age'
+        //
+        //"stage" : {
+        //    "stageName": "embryonic stage 16",
+        //    "stageUberonSlimTerm": {
+        //        "uberonTerm": "UBERON:0000068"
+        //    }
+        //}
+
+        Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection();
+        Statement ps = conn.createStatement();
+        ResultSet rs = ps.executeQuery(sql);
+        while( rs.next() ) {
+
+            String sampleAge = rs.getString("sample_age");
+            String stageName = rs.getString("stage");
+            String stageSlim = rs.getString("stage_slim");
+
+            HashMap stage = new HashMap();
+            stage.put("stageName", stageName);
+            HashMap stageUberonSlimTerm = new HashMap();
+            stageUberonSlimTerm.put("uberonTerm", stageSlim);
+            stage.put("stageUberonSlimTerm", stageUberonSlimTerm);
+
+            stages.put(sampleAge, stage);
+        }
+        conn.close();
+
+        return stages;
     }
 
     List<DataSample> loadDataSamples(String geoId) throws Exception {

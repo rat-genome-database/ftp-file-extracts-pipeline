@@ -1,3 +1,6 @@
+Feb 26, 2021
+ -agr htp extractor: added export of age stages for 'sampleAge'
+
 Feb 12, 2021
  -genes extractor: added export of mRatBN7.2 positions; discontinued export of RGSCv3.1 positions
 

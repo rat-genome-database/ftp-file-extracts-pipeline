@@ -18,7 +18,7 @@ public class AgrHtpDataSample {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Samples, AGR schema 1.0.1.3, build  Aug 25, 2020";
+                release = "RGD Htp Extractor for Data Samples, AGR schema 1.0.1.4, build  Feb 26, 2021";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -42,7 +42,8 @@ public class AgrHtpDataSample {
     }
 
     public void addDataObj(String expId, String sampleId, String sampleTitle, String sampleAge, String sex,
-                           String tissueUberonId, List<String> tissueUberonSlimIds, String tissue, String assayType) {
+                           String tissueUberonId, List<String> tissueUberonSlimIds, String tissue, String assayType,
+                           Map<String, HashMap> ageStages) {
 
         DataSampleObj obj = new DataSampleObj();
 
@@ -59,9 +60,14 @@ public class AgrHtpDataSample {
         obj.sex = normalizeSex(sex);
 
         if( sampleAge!=null ) {
-            HashMap ageMap = new HashMap();
-            ageMap.put("age", sampleAge);
-            obj.sampleAge = ageMap;
+            HashMap stage = ageStages.get(sampleAge);
+            // export 'sampleAge' only if it has valid mapping to a stage -- per communication with Jennifer in Feb 2021
+            if( stage!=null ) {
+                HashMap ageMap = new HashMap();
+                ageMap.put("age", sampleAge);
+                ageMap.put("stage", stage);
+                obj.sampleAge = ageMap;
+            }
         }
 
         obj.sampleLocations = getSampleLocation(tissueUberonId, tissueUberonSlimIds, tissue);
@@ -179,7 +185,7 @@ public class AgrHtpDataSample {
         // optional fields
         public String sampleTitle;
         public String taxonId = "NCBITaxon:10116";
-        public HashMap sampleAge;
+        public HashMap sampleAge; // age and stage
         public String sex;
         public List sampleLocations;
     }
