@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2021-02-26" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-03-16" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -76,6 +76,7 @@
         <property name="speciesType" value="6" />
         <property name="cytoMapKey" value="600" />
         <property name="ensemblAssemblyMapKey" value="632" />
+        <property name="celeraAssemblyMapKey" value="634" /><!-- export data for this assembly in columns normally reserved for Celera assembly -->
     </bean>
 
     <bean id="bonoboInfo" class="edu.mcw.rgd.SpeciesRecord">
@@ -116,7 +117,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build 2021-02-12"/>
+        <property name="version" value="Gene Extractor  build 2021-03-16"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
@@ -155,7 +156,12 @@
                 </entry>
                 <entry key="dog">
                     <list>
-                        <value>631 3.1</value>
+                        <value>631 CanFam3.1</value>
+                        <value>633 Dog10K_Boxer_Tasha</value>
+                        <value>634 ROS_Cfam_1.0</value>
+                        <value>635 UMICH_Zoey_3.1</value>
+                        <value>636 UNSW_CanFamBas_1.0</value>
+                        <value>637 UU_Cfam_GSD_1.0</value>
                     </list>
                 </entry>
                 <entry key="squirrel">

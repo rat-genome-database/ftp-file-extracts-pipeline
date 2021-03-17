@@ -692,7 +692,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_DOG =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2021-03-16\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -702,6 +702,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Mar 16 2021  added positions for assemblies: Dog10K_Boxer_Tasha, ROS_Cfam_1.0, UMICH_Zoey_3.1, UNSW_CanFamBas_1.0, UU_Cfam_GSD_1.0\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -710,19 +711,19 @@ public class GeneExtractor extends BaseExtractor {
     +"#2   SYMBOL             official gene symbol\n"
     +"#3   NAME    	          gene name\n"
     +"#4   GENE_DESC          gene description (if available)\n"
-    +"#5   (UNUSED)           blank\n"
-    +"#6   CHROMOSOME_#REF1# chromosome for reference assembly build #REF1#\n"
-    +"#7   (UNUSED)           blank\n\n"
+    +"#5   CHROMOSOME_#REF3# chromosome for #REF3# assembly\n"
+    +"#6   CHROMOSOME_#REF1# chromosome for #REF1# assembly\n"
+    +"#7   CHROMOSOME_#REF2# chromosome for #REF2# assembly\n"
     +"#8   FISH_BAND          fish band information\n"
-    +"#9   (UNUSED)           blank\n"
-    +"#10  (UNUSED)           blank\n"
-    +"#11  (UNUSED)           blank\n"
-    +"#12  START_POS_#REF1#   start position for reference assembly build #REF1#\n"
-    +"#13  STOP_POS_#REF1#    stop position for reference assembly build #REF1#\n"
-    +"#14  STRAND_#REF1#      strand information for reference assembly build #REF1#\n"
-    +"#15  (UNUSED)           blank\n"
-    +"#16  (UNUSED)           blank\n"
-    +"#17  (UNUSED)           blank\n"
+    +"#9   START_POS_#REF3#   start position for #REF3# assembly\n"
+    +"#10  STOP_POS_#REF3#    stop position for #REF3# assembly\n"
+    +"#11  STRAND_#REF3#      strand information for #REF3# assembly\n"
+    +"#12  START_POS_#REF1#   start position for #REF1# assembly\n"
+    +"#13  STOP_POS_#REF1#    stop position for #REF1# assembly\n"
+    +"#14  STRAND_#REF1#      strand information for #REF1# assembly\n"
+    +"#15  START_POS_#REF2#   start position for #REF2# assembly\n"
+    +"#16  STOP_POS_#REF2#    stop position for #REF2# assembly\n"
+    +"#17  STRAND_#REF2#      strand information for #REF2# assembly\n"
     +"#18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene\n"
     +"#19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene\n"
     +"#20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation\n"
@@ -749,14 +750,29 @@ public class GeneExtractor extends BaseExtractor {
     +"#41  START_POS_ENSEMBL      start position for primary Ensembl assembly\n"
     +"#42  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly\n"
     +"#43  STRAND_ENSEMBL         strand information for primary Ensembl assembly\n"
+    +"#44  CHROMOSOME_#REF4# chromosome for #REF4# assembly\n"
+    +"#45  START_POS_#REF4#   start position for #REF4# assembly\n"
+    +"#46  STOP_POS_#REF4#    stop position for #REF4# assembly\n"
+    +"#47  STRAND_#REF4#      strand information for #REF4# assembly\n"
+    +"#48  CHROMOSOME_#REF5# chromosome for #REF5# assembly\n"
+    +"#49  START_POS_#REF5#   start position for #REF5# assembly\n"
+    +"#50  STOP_POS_#REF5#    stop position for #REF5# assembly\n"
+    +"#51  STRAND_#REF5#      strand information #REF5# for assembly\n"
+    +"#52  CHROMOSOME_#REF6# chromosome for #REF6# assembly\n"
+    +"#53  START_POS_#REF6#   start position for #REF6# assembly\n"
+    +"#54  STOP_POS_#REF6#    stop position for #REF6# assembly\n"
+    +"#55  STRAND_#REF6#      strand information for #REF6# assembly\n"
     +"#\n"
-    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
-    +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
-    +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
+    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_#REF3#\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
+    +"FISH_BAND\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
+    +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
     +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
-    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL\t"
+    +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
+    +"CHROMOSOME_#REF5#\tSTART_POS_#REF5#\tSTOP_POS_#REF5#\tSTRAND_#REF5#\t"
+    +"CHROMOSOME_#REF6#\tSTART_POS_#REF6#\tSTOP_POS_#REF6#\tSTRAND_#REF6#";
 
     Logger log = Logger.getLogger(getClass());
     private java.util.Map<String,List<String>> mapKeys;
@@ -783,8 +799,8 @@ public class GeneExtractor extends BaseExtractor {
         final PrintWriter writer = new PrintWriter(outputFileName);
 
 
-        String assembly1, assembly2, assembly3, assembly4;
-        final int mapKey1, mapKey2, mapKey3, mapKey4;
+        String assembly1, assembly2, assembly3, assembly4, assembly5, assembly6;
+        final int mapKey1, mapKey2, mapKey3, mapKey4, mapKey5, mapKey6;
 
         List<String> mapInfos = getMapKeys().get(si.getSpeciesName().toLowerCase());
         if( mapInfos.size()>=1 ) {
@@ -815,6 +831,20 @@ public class GeneExtractor extends BaseExtractor {
         } else {
             assembly4 = null; mapKey4 = 0;
         }
+        if( mapInfos.size()>=5 ) {
+            String mapInfo = mapInfos.get(4);
+            assembly5 = mapInfo.substring(1+mapInfo.indexOf(' '));
+            mapKey5 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
+        } else {
+            assembly5 = null; mapKey5 = 0;
+        }
+        if( mapInfos.size()>=6 ) {
+            String mapInfo = mapInfos.get(5);
+            assembly6 = mapInfo.substring(1+mapInfo.indexOf(' '));
+            mapKey6 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
+        } else {
+            assembly6 = null; mapKey6 = 0;
+        }
 
 
         // prepare header common lines
@@ -841,6 +871,10 @@ public class GeneExtractor extends BaseExtractor {
             headerLines = headerLines.replace("#REF3#", assembly3);
         if( assembly4!=null )
             headerLines = headerLines.replace("#REF4#", assembly4);
+        if( assembly5!=null )
+            headerLines = headerLines.replace("#REF5#", assembly5);
+        if( assembly6!=null )
+            headerLines = headerLines.replace("#REF6#", assembly6);
 
         String taxonomyName = SpeciesType.getTaxonomicName(speciesType);
         String speciesLongName = SpeciesType.getGenebankCommonName(speciesType);
@@ -879,6 +913,10 @@ public class GeneExtractor extends BaseExtractor {
                         rec.assembly3Map.add(md);
                     } else if (md.getMapKey() == mapKey4) {
                         rec.assembly4Map.add(md);
+                    } else if (md.getMapKey() == mapKey5) {
+                        rec.assembly5Map.add(md);
+                    } else if (md.getMapKey() == mapKey6) {
+                        rec.assembly6Map.add(md);
                     } else if (md.getMapKey() == si.getCeleraAssemblyMapKey()) {
                         rec.celeraMap.add(md);
                     } else if (md.getMapKey() == si.getEnsemblAssemblyMapKey()) {
@@ -887,6 +925,13 @@ public class GeneExtractor extends BaseExtractor {
                         rec.cytoMap.add(md);
                     } else if (md.getMapKey() == si.getCmMapKey()) {
                         rec.setAbsPos(md.getAbsPosition());
+                    }
+
+                    // hack for dog
+                    if( speciesType==SpeciesType.DOG ) {
+                        if (md.getMapKey() == si.getCeleraAssemblyMapKey()) {
+                            rec.celeraMap.add(md);
+                        }
                     }
                 }
 
@@ -1164,6 +1209,34 @@ public class GeneExtractor extends BaseExtractor {
             .append(getString(rec.ensemblMap, "getStopPos"))
             .append('\t')
             .append(getString(rec.ensemblMap, "getStrand"));
+
+        // dog has additional 3 assembly maps
+        if( speciesType==SpeciesType.DOG ) {
+            buf.append('\t')
+            .append(getString(rec.assembly4Map, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.assembly4Map, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.assembly4Map, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.assembly4Map, "getStrand"))
+            .append('\t')
+            .append(getString(rec.assembly5Map, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.assembly5Map, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.assembly5Map, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.assembly5Map, "getStrand"))
+            .append('\t')
+            .append(getString(rec.assembly6Map, "getChromosome"))
+            .append('\t')
+            .append(getString(rec.assembly6Map, "getStartPos"))
+            .append('\t')
+            .append(getString(rec.assembly6Map, "getStopPos"))
+            .append('\t')
+            .append(getString(rec.assembly6Map, "getStrand"));
+        }
 
         buf.append("\n");
 
