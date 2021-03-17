@@ -31,6 +31,8 @@ public class GeneExtractRecord {
     List<MapData> assembly2Map = new ArrayList<>();
     List<MapData> assembly3Map = new ArrayList<>();
     List<MapData> assembly4Map = new ArrayList<>();
+    List<MapData> assembly5Map = new ArrayList<>();
+    List<MapData> assembly6Map = new ArrayList<>();
     Double absPos; // absolute position for cM mouse map
     List<MapData> ensemblMap = new ArrayList<>();
 

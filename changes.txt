@@ -1,3 +1,9 @@
+Mar 16, 2021
+ -gene extractor for dog: added export of positions for assemblies: Dog10K_Boxer_Tasha, ROS_Cfam_1.0, UMICH_Zoey_3.1, UNSW_CanFamBas_1.0, UU_Cfam_GSD_1.0
+
+Feb 26, 2021
+ -agr htp extractor: added export of age stages for 'sampleAge'
+
 Feb 12, 2021
  -genes extractor: added export of mRatBN7.2 positions; discontinued export of RGSCv3.1 positions
 
