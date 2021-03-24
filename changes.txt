@@ -1,3 +1,6 @@
+Mar 23, 2021
+  - gp2protein.rgd file is no longer submitted to GO svn endpoint (that endpoint had been discontinued)
+
 Mar 16, 2021
  -gene extractor for dog: added export of positions for assemblies: Dog10K_Boxer_Tasha, ROS_Cfam_1.0, UMICH_Zoey_3.1, UNSW_CanFamBas_1.0, UU_Cfam_GSD_1.0
 

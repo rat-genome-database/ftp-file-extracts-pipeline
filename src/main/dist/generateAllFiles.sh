@@ -35,13 +35,16 @@ if [ -e "/home/rgddata/data_release/annotated_rgd_objects_by_ontology/with_terms
   rm /home/rgddata/data_release/annotated_rgd_objects_by_ontology/with_terms/*_orphaned
 fi
 
-echo "postprocessing gp2protein files ..."
-ANNOTDIR=$APPHOME/data/annotated_rgd_objects_by_ontology
-scp -p /home/rgddata/data_release/gp2* /home/rgddata/pipelines/goc_annotation/goc_svn/trunk/gp2protein
-cd /home/rgddata/pipelines/goc_annotation/goc_svn/trunk/gp2protein
-if [ "$SERVER" == "REED" ]; then
-  svn commit -m "Weekly submission of gp2protein.rgd"
-fi
+### March 2021: submission endpoint 'svn+ssh://rgddata@ext.geneontology.org/share/go/svn/trunk/gp2protein'
+###      stopped working; apparently GO moved away from svn permanently and it is using git instead
+#
+#echo "postprocessing gp2protein files ..."
+#ANNOTDIR=$APPHOME/data/annotated_rgd_objects_by_ontology
+#scp -p /home/rgddata/data_release/gp2* /home/rgddata/pipelines/goc_annotation/goc_svn/trunk/gp2protein
+#cd /home/rgddata/pipelines/goc_annotation/goc_svn/trunk/gp2protein
+#if [ "$SERVER" == "REED" ]; then
+#  svn commit -m "Weekly submission of gp2protein.rgd"
+#fi
 
 if [ "$SERVER" == "REED" ]; then
     $APPHOME/variantExtract.sh
