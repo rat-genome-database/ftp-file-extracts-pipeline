@@ -6,6 +6,7 @@ import edu.mcw.rgd.dao.impl.StrainDAO;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,15 +42,20 @@ public class VariantExtractor extends BaseExtractor {
         AtomicInteger dataRowsWritten = new AtomicInteger(0);
         AtomicInteger samplesWithData = new AtomicInteger(0);
         AtomicInteger samplesWithNoData = new AtomicInteger(0);
-        for( Sample sample: sampleDAO.getSamples(patientIds) ) {
-            int dataRows = run(sample);
-            if( dataRows>0 ) {
-                dataRowsWritten.addAndGet(dataRows);
-                samplesWithData.incrementAndGet();
-            } else {
-                samplesWithNoData.incrementAndGet();
+        sampleDAO.getSamples(patientIds).parallelStream().forEach( sample -> {
+
+            try {
+                int dataRows = run(sample);
+                if (dataRows > 0) {
+                    dataRowsWritten.addAndGet(dataRows);
+                    samplesWithData.incrementAndGet();
+                } else {
+                    samplesWithNoData.incrementAndGet();
+                }
+            } catch(Exception e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
 
         long timeEnd = System.currentTimeMillis();
         System.out.println(" variant generation complete: elapsed "+Utils.formatElapsedTime(timeStart,  timeEnd));
@@ -132,7 +138,9 @@ public class VariantExtractor extends BaseExtractor {
         // create output file if there are any rows
         String dataFileName = createOutputFile(sample);
         if( dataRows>0 ) {
-            Utils.writeStringToFile(buf.toString(), dataFileName);
+            BufferedWriter out = Utils.openWriter(dataFileName);
+            out.write(buf.toString());
+            out.close();
         } else {
             new File(dataFileName).deleteOnExit();
         }
@@ -173,7 +181,7 @@ public class VariantExtractor extends BaseExtractor {
             fileName += "Rnor5.0";
         else if( sample.getMapKey()==360 )
             fileName += "Rnor6.0";
-        String filePath = dirName+"/"+fileName+".txt";
+        String filePath = dirName+"/"+fileName+".txt.gz";
         return filePath;
     }
 
