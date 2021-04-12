@@ -153,7 +153,7 @@ public class VariantExtractor extends BaseExtractor {
 
         // directory is based on sample's strain name
         Strain strain = new StrainDAO().getStrain(sample.getStrainRgdId());
-        String fileNameS = ;
+        String fileNameS;
         fileNameS = strain.getSymbol()
                 .replace("<i>","").replace("</i>","")
                 .replace("<I>","").replace("</I>","")
