@@ -3,7 +3,7 @@ Apr 12, 2021
     1) updated to handle new variant table structure
     2) parallel processing to significantly reduce the run time
     3) generated files are stored compressed
-    
+
 Mar 23, 2021
   - gp2protein.rgd file is no longer submitted to GO svn endpoint (that endpoint had been discontinued)
 

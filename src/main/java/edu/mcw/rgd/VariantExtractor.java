@@ -153,7 +153,11 @@ public class VariantExtractor extends BaseExtractor {
 
         // directory is based on sample's strain name
         Strain strain = new StrainDAO().getStrain(sample.getStrainRgdId());
-        String fileNameS = strain.getSymbol();
+        String fileNameS = ;
+        fileNameS = strain.getSymbol()
+                .replace("<i>","").replace("</i>","")
+                .replace("<I>","").replace("</I>","")
+                .replace("<sup>","").replace("</sup>","");
 
         String separator = System.getProperty("file.separator");
         if( separator.equals("/") ) {
@@ -161,9 +165,7 @@ public class VariantExtractor extends BaseExtractor {
             fileNameS = fileNameS.replace('/', '_');
         } else {
             // Windows file system has many more restrictions on punctuation characters used in file names
-            fileNameS = fileNameS.replace("<i>","").replace("</i>","")
-                    .replace("<I>","").replace("</I>","")
-                    .replace("<sup>","").replace("</sup>","")
+            fileNameS = fileNameS
                     .replace("<","").replace(">","")
                     .replace(":","").replace("\\","")
                     .replace('/', '_');
