@@ -1,3 +1,6 @@
+Apr 12, 2021
+  - nonsynonymous variant extractor: updated to handle new variant table structure
+
 Mar 23, 2021
   - gp2protein.rgd file is no longer submitted to GO svn endpoint (that endpoint had been discontinued)
 
