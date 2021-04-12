@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2021-03-23" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-04-12" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -285,7 +285,7 @@
     </bean>
 
     <bean id="variantExtractor" class="edu.mcw.rgd.VariantExtractor" scope="prototype">
-        <property name="version" value="VariantExtractor v.1.0.1 as of Apr 13, 2015" />
+        <property name="version" value="VariantExtractor  -- build 2021-04-12" />
         <property name="outputSubDir" value="nonsynonymous_variants" />
     </bean>
 
