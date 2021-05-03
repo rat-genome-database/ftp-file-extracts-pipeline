@@ -1,3 +1,6 @@
+Apr 30, 2021
+  markers: added export of positions for rat assembly mRatBN7.2
+
 Apr 12, 2021
   - nonsynonymous variant extractor:
     1) updated to handle new variant table structure
