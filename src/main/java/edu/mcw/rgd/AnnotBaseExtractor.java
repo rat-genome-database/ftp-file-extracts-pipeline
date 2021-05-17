@@ -53,6 +53,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
 
     private SimpleDateFormat sdt = new SimpleDateFormat("yyyyMMdd");
 
+    private String date11MonthAgo;
+
     public String getPmid(int refRgdId) {
         return pmidMap.get(refRgdId);
     }
@@ -66,7 +68,15 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     }
 
 
-    boolean onInit() {return true; }
+    boolean onInit() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, -11*30); // date roughly 11 months ago
+        date11MonthAgo = formatDate(calendar.getTime());
+
+        return true;
+    }
+
     boolean acceptAnnotation(Annotation a) {
         return true;
     }
@@ -534,7 +544,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     //   since creation date of an annotation *never* changes, as of May 2016, per ticket RGDD-1194
     //   then all GO 'IEA' annotations must use LAST_MODIFIED_DATE instead of CREATED_DATE during export
     //   (note that LAST_MODIFIED_DATE for an annotation is updated during every pipeline run)
-    String determineCreatedDate(Annotation annot, CounterPool counters) throws ParseException {
+    String determineCreatedDateOrig(Annotation annot, CounterPool counters) throws ParseException {
 
         Date createdDate;
         if( annot.getTermAcc().startsWith("GO:") && annot.getEvidence().equals("IEA") ) {
@@ -556,6 +566,37 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             createdDate = annot.getCreatedDate();
         }
         return formatDate(createdDate);
+    }
+
+    /// note: new code, literally taken out from goc_annotation_pipeline project
+    String determineCreatedDate(Annotation a, CounterPool counters) throws ParseException {
+
+        // GO consortium rule GO:0000029:
+        // IEA annotations over an year old should be removed.
+        Date createdDate2;
+        Date createdDate = a.getOriginalCreatedDate();
+        if (createdDate == null) {
+            createdDate = a.getCreatedDate();
+        }
+        String sCreatedDate = formatDate(createdDate);
+        if (a.getTermAcc().startsWith("GO:") && a.getEvidence().equals("IEA")) {
+            if (Utils.stringsCompareTo(sCreatedDate, date11MonthAgo) < 0) {
+                if (getRefRgdIdsForGoPipelines().contains(a.getRefRgdId())) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.DATE, -90); // created date should be 3 months back from the current date
+                    createdDate2 = calendar.getTime();
+                } else {
+                    createdDate2 = a.getLastModifiedDate();
+                }
+            } else {
+                createdDate2 = createdDate;
+            }
+            counters.increment("GO_annots_with_IEA_evidence");
+        } else {
+            createdDate2 = createdDate;
+        }
+        return formatDate(createdDate2);
     }
 
     void handleMouseAndHumanPrimaryIds(AnnotRecord rec) throws Exception {

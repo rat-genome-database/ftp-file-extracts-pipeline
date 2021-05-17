@@ -16,7 +16,7 @@ public class SslpExtractor extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: markers  build 2021-01-19\n"
+    +"# MODULE: markers  build 2021-04-30\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# markers extracted from RGD database\n"
     +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -41,6 +41,7 @@ public class SslpExtractor extends BaseExtractor {
     +"### Nov 1 2018 renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.\n"
     +"### Jun 17 2019 data sorted by RGD ID; files exported into species specific directories\n"
     +"### Jan 19 2021 discontinued column 15 with UniGene IDs\n"
+    +"### Apr 30 2021 added export of positions for new rat assembly mRatBN7.2\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 23 columns are in common between rat, mouse and human)\n"
@@ -70,12 +71,12 @@ public class SslpExtractor extends BaseExtractor {
     +"#23  STOP_POS_CELERA         stop position for Celera assembly\n";
 
      final String HEADER_LINE_RAT =
-     "#24  CHROMOSOME_5.0          chromosome for the previous reference assembly v.5.0\n"
-    +"#25  START_POS_5.0           start position for previous reference assembly v.5.0\n"
-    +"#26  STOP_POS_5.0            stop position for previous reference assembly v.5.0\n"
-    +"#27  CHROMOSOME_3.4          chromosome for the old reference assembly v.3.4\n"
-    +"#28  START_POS_3.4           start position for old reference assembly v.3.4\n"
-    +"#29  STOP_POS_3.4            stop position for old reference assembly v.3.4\n"
+     "#24  CHROMOSOME_5.0          chromosome for Rnor_5.0 assembly\n"
+    +"#25  START_POS_5.0           start position for Rnor_5.0 assembly\n"
+    +"#26  STOP_POS_5.0            stop position for Rnor_5.0 assembly\n"
+    +"#27  CHROMOSOME_3.4          chromosome for RGSC_v3.4 assembly\n"
+    +"#28  START_POS_3.4           start position for RGSC_v3.4 assembly\n"
+    +"#29  STOP_POS_3.4            stop position for RGSC_v3.4 assembly\n"
     +"#30  (UNUSED)\n"
     +"#31  (UNUSED)\n"
     +"#32  CHR_FHHxACI             chromosome for FHH x ACI map\n"
@@ -86,9 +87,12 @@ public class SslpExtractor extends BaseExtractor {
     +"#37  POS_RH_2.0              absolute position (cR) on RH 2.0 map\n"
     +"#38  CHR_RH_3.4              chromosome for RH 3.4 map\n"
     +"#39  POS_RH_3.4              absolute position (cR) on RH 3.4 map\n"
-    +"#40  CHROMOSOME_6.0          chromosome for the current reference assembly v.6.0\n"
-    +"#41  START_POS_6.0           start position for current reference assembly v.6.0\n"
-    +"#42  STOP_POS_6.0            stop position for current reference assembly v.6.0\n"
+    +"#40  CHROMOSOME_6.0          chromosome for Rnor_6.0 assembly\n"
+    +"#41  START_POS_6.0           start position for Rnor_6.0 assembly\n"
+    +"#42  STOP_POS_6.0            stop position for Rnor_6.0 assembly\n"
+    +"#43  CHROMOSOME_7.2          chromosome for mRatBN7.2 assembly\n"
+    +"#44  START_POS_7.2           start position for mRatBN7.2 assembly\n"
+    +"#45  STOP_POS_7.2            stop position for mRatBN7.2 assembly\n"
     +"#\n"
     +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
     +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
@@ -99,7 +103,7 @@ public class SslpExtractor extends BaseExtractor {
     +"CHROMOSOME_3.4\tSTART_POS_3.4\tSTOP_POS_3.4\t"
     +"(UNUSED)\t(UNUSED)\t"
     +"CHR_FHHxACI\tPOS_FHHxACI\tCHR_SHRSPxBN\tPOS_SHRSPxBN\tCHR_RH_2.0\tPOS_RH_2.0\tCHR_RH_3.4\tPOS_RH_3.4\t"
-    +"CHROMOSOME_6.0\tSTART_POS_6.0\tSTOP_POS_6.0";
+    +"CHROMOSOME_6.0\tSTART_POS_6.0\tSTOP_POS_6.0\tCHROMOSOME_7.2\tSTART_POS_7.2\tSTOP_POS_7.2";
 
     final String HEADER_LINE_HUMAN =
     "#24  CHROMOSOME_37          chromosome for the current reference assembly v.37\n"
@@ -242,6 +246,11 @@ public class SslpExtractor extends BaseExtractor {
                     mds = rec.getMapData(360);
                     if( mds.size()>0 ) {
                         rec.mdRnor6 = mds;
+                    }
+
+                    mds = rec.getMapData(372);
+                    if( mds.size()>0 ) {
+                        rec.md7_2 = mds;
                     }
                 }
                 else if( speciesType==SpeciesType.MOUSE ) {
@@ -394,6 +403,9 @@ public class SslpExtractor extends BaseExtractor {
 
             // print chromosome, start and stop position for Rnor_6.0 assembly
             writeGenomicPositions(rec.mdRnor6, buf);
+
+            // print chromosome, start and stop position for mRatBN7.2 assembly
+            writeGenomicPositions(rec.md7_2, buf);
         }
         else if( speciesType==SpeciesType.HUMAN ) {
 
@@ -481,6 +493,7 @@ public class SslpExtractor extends BaseExtractor {
         public List<MapData> mdNewRef;
         public List<MapData> mdOldRef;
         public List<MapData> mdRnor6;// Rnor_6.0 for rat
+        public List<MapData> md7_2;// mRatBN7.2
 
         public List<XdbId> xdbIds;
 
