@@ -1,3 +1,6 @@
+Jun 01, 2021
+  scripts: updated to no longer generate false emails about orphaned annotations
+
 May 14, 2021
   annotations: ORIGINAL_CREATED_DATE is exported when available
 

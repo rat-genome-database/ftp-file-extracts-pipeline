@@ -29,12 +29,6 @@ $APPHOME/chinchilla.sh
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 mailx -s "[$SERVER] null value columns" mtutaj@mcw.edu < $APPHOME/logs/nullColumns.log
 
-# _orphaned files should not be in staging area
-echo "removing orphaned files ..."
-if [ -e "/home/rgddata/data_release/annotated_rgd_objects_by_ontology/with_terms/*_orphaned" ]; then
-  rm /home/rgddata/data_release/annotated_rgd_objects_by_ontology/with_terms/*_orphaned
-fi
-
 ### March 2021: submission endpoint 'svn+ssh://rgddata@ext.geneontology.org/share/go/svn/trunk/gp2protein'
 ###      stopped working; apparently GO moved away from svn permanently and it is using git instead
 #

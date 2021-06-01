@@ -15,22 +15,5 @@ fi
 
 $APPHOME/run.sh -annotations
 
-#email orphaned terms (if present)
-if [ -s "$ANNOTDIR/rattus_terms_orphaned" ]; then
-    cat "$ANNOTDIR/rattus_terms_orphaned" >> $ANNOTDIR/terms_orphaned
-fi
-if [ -s "$ANNOTDIR/mus_terms_orphaned" ]; then
-    cat "$ANNOTDIR/mus_terms_orphaned" >> $ANNOTDIR/terms_orphaned
-fi
-if [ -s "$ANNOTDIR/homo_terms_orphaned" ]; then
-    cat "$ANNOTDIR/homo_terms_orphaned" >> $ANNOTDIR/terms_orphaned
-fi
-
-if [ -s "$ANNOTDIR/terms_orphaned" ]; then
-  mailx -s "[$SERVER] orphaned annotations" $EMAILLIST < $ANNOTDIR/terms_orphaned
-else
-  echo "file $ANNOTDIR/terms_orphaned is empty"
-fi
-
 echo "=== ANNOTATIONS OK ==="
 echo ""
