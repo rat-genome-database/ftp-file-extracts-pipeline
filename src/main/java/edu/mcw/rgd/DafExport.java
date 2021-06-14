@@ -26,7 +26,7 @@ public class DafExport {
         public DafMetadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Jan 26, 2021";
+                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Jun 14, 2021";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -107,7 +107,10 @@ public class DafExport {
         data.objectName = a.getDbObjectSymbol();
 
         if( a.getQualifier()!=null ) {
-            data.negation = a.getQualifier().toLowerCase();
+            String q = a.getQualifier().toLowerCase();
+            if( q.equals("not") || q.equals("no_association") ) {
+                data.negation = "not";
+            }
         }
 
         if( a.getWithInfo()!=null ) {
@@ -126,7 +129,7 @@ public class DafExport {
                 // only a subset of qualifiers is allowed
                 String condRelType = null;
                 if( a.getQualifier()==null ) {
-                    condRelType = "has_qualifier";
+                    condRelType = "has_condition";
                 } else if( a.getQualifier().contains("induced") || a.getQualifier().contains("induces") ) {
                     condRelType = "induces";
                 } else if( a.getQualifier().contains("treatment") || a.getQualifier().contains("ameliorates") ) {

@@ -179,7 +179,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         daf.setDbObjectID(objectID);
         daf.setDbObjectSymbol(rec.annot.getObjectSymbol());
         daf.setAssociationType(assocType);
-        daf.setQualifier(checkNull(rec.annot.getQualifier()).equals("no_association") ? "NOT" : null);
+        daf.setQualifier(rec.annot.getQualifier());
         daf.setDoId(rec.termAccId);
         daf.setWithInfo(rec.annot.getWithInfo());
         daf.setEvidenceCode(rec.annot.getEvidence());
