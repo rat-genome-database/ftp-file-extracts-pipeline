@@ -5,6 +5,7 @@ import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.process.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
@@ -13,7 +14,7 @@ import java.util.TreeSet;
 /**
  * @author mtutaj
  * @since June 28, 2011
- * Extracts annotated rgd objects by ontology in GAF 2.1 format.
+ * Extracts annotated rgd objects by ontology in GAF 2.2 format.
  * The annotated objects being exported are genes, qtls and strains.
  * <p>
  * There is also an option to extract human GO annotations for AGR. Details specific to AGR extract:
@@ -26,11 +27,15 @@ import java.util.TreeSet;
  */
 public class AnnotGafExtractor extends AnnotBaseExtractor {
     final String HEADER_COMMON_LINES =
-        "!gaf-version: 2.1\n"+
+        "!gaf-version: 2.2\n"+
         "!{ As of December 2016, the gene_association.rgd file only contains 'RGD' in column 1 and RGD gene identifiers in column 2. }\n"+
-        "!{ The gene_protein_association.rgd file (available on the RGD ftp site) contains both RGD gene and UniProt protein IDs. }\n";
+        "!{ The gene_protein_association.rgd file (available on the RGD ftp site) contains both RGD gene and UniProt protein IDs. }\n"+
+        "!generated-by: RGD\n"+
+        "!date-generated-by: #DATEX#\n";
     final String AGR_HEADER_COMMON_LINES =
-            "!gaf-version: 2.1\n";
+        "!gaf-version: 2.2\n"+
+        "!generated-by: RGD\n"+
+        "!date-generated-by: #DATEX#\n";
     private String annotAgrDir;
     private boolean generateForAgr = false;
 
@@ -70,8 +75,16 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
         return suffix;
     }
 
+    static SimpleDateFormat _gafDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     String getHeaderCommonLines() {
-        return isGenerateForAgr() ? AGR_HEADER_COMMON_LINES : HEADER_COMMON_LINES;
+        // SpeciesRecord has a utility class that generates todays date and formats it as 'yyyy/MM/dd'
+        // however gaf 2.2 spec requires the date in the header to be in format yyyy-MM-dd
+        String todayDate;
+        synchronized(_gafDateFormat) {
+            todayDate = _gafDateFormat.format(new java.util.Date());
+        }
+        String header = isGenerateForAgr() ? AGR_HEADER_COMMON_LINES : HEADER_COMMON_LINES;
+        return header.replace("#DATEX#", todayDate);
     }
 
     boolean acceptAnnotation(Annotation a) {
@@ -117,7 +130,7 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
             references = mergeWithXrefSource(rec.references, rec.annot.getXrefSource());
         }
 
-        // column contents must comply with GAF 2.0 format
+        // column contents must comply with GAF 2.2 format
         String line = "RGD" +
                 '\t' +
                 objectID +
@@ -148,7 +161,9 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
                 '\t' +
                 checkNull(rec.annot.getDataSrc()) +
                 '\t' +
+                checkNull(rec.annot.getAnnotationExtension()) +
                 '\t' +
+                checkNull(rec.annot.getGeneProductFormId()) +
                 '\n';
         return line;
     }

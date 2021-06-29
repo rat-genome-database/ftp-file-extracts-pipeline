@@ -1,3 +1,6 @@
+Jun 29, 2021
+  gaf files: updated header to conform to gaf 2.2 spec
+
 Jun 01, 2021
   scripts: updated to no longer generate false emails about orphaned annotations
 
