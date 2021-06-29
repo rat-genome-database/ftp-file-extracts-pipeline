@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2021-06-14" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-06-29" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -267,7 +267,7 @@
     </bean>
 
     <bean id="annotGafExtractor" class="edu.mcw.rgd.AnnotGafExtractor" parent="annotBaseExtractor" scope="prototype">
-        <property name="version" value="AnnotGafExtractor  -- build 2021-05-14" />
+        <property name="version" value="AnnotGafExtractor  -- build 2021-06-29" />
         <property name="annotDir" value="data/annotated_rgd_objects_by_ontology" />
         <property name="annotAgrDir" value="../agr/" />
     </bean>
