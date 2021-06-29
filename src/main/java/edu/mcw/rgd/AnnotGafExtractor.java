@@ -31,11 +31,11 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
         "!{ As of December 2016, the gene_association.rgd file only contains 'RGD' in column 1 and RGD gene identifiers in column 2. }\n"+
         "!{ The gene_protein_association.rgd file (available on the RGD ftp site) contains both RGD gene and UniProt protein IDs. }\n"+
         "!generated-by: RGD\n"+
-        "!date-generated-by: #DATEX#\n";
+        "!date-generated: #DATEX#\n";
     final String AGR_HEADER_COMMON_LINES =
         "!gaf-version: 2.2\n"+
         "!generated-by: RGD\n"+
-        "!date-generated-by: #DATEX#\n";
+        "!date-generated: #DATEX#\n";
     private String annotAgrDir;
     private boolean generateForAgr = false;
 
