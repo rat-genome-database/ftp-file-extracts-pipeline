@@ -635,6 +635,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         return annotationDAO.getAnnotationsBySpecies(speciesType, objectKey);
     }
 
+    public List<Annotation> getAnnotationsBySpecies(int speciesTypeKey, String aspect, String source) throws Exception {
+        return annotationDAO.getAnnotationsBySpeciesAspectAndSource(speciesTypeKey, aspect, source);
+    }
+
     public List<Transcript> getTranscriptsForGene(int geneRgdId, int mapKey) throws Exception {
         return tdao.getTranscriptsForGene(geneRgdId, mapKey);
     }
