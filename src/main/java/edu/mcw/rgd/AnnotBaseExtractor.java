@@ -217,13 +217,20 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         }
     }
 
-    List<AnnotRecord> getAnnotRecords() throws Exception {
-
-        String taxon = "taxon:"+ SpeciesType.getTaxonomicId(speciesTypeKey);
+    List<Annotation> getAnnotations() throws Exception {
 
         List<Annotation> annots = processOnlyGenes()
                 ? getDao().getAnnotationsBySpecies(speciesTypeKey, RgdId.OBJECT_KEY_GENES)
                 : getDao().getAnnotationsBySpecies(speciesTypeKey);
+
+        return annots;
+    }
+
+    List<AnnotRecord> getAnnotRecords() throws Exception {
+
+        String taxon = "taxon:"+ SpeciesType.getTaxonomicId(speciesTypeKey);
+
+        List<Annotation> annots = getAnnotations();
 
         Collection<Annotation> annots2 = suppressDeconsolidation ? annots : deconsolidateAnnotations(annots);
         annots = null;
@@ -390,6 +397,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
              case RgdId.OBJECT_KEY_QTLS: rec.objectType = "qtl"; break;
              case RgdId.OBJECT_KEY_STRAINS: rec.objectType = "strain"; break;
              case RgdId.OBJECT_KEY_VARIANTS: rec.objectType = "variant"; break;
+             case RgdId.OBJECT_KEY_CELL_LINES: rec.objectType = "cell line"; break;
              default: rec.objectType = "";
                  logAnnot.warn("unknown object type "+objectKey+" for annot key="+rec.annot.getKey());
                  rec.excludeFromProcessing();

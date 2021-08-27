@@ -26,7 +26,7 @@ public class DafExport {
         public DafMetadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Jun 14, 2021";
+                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Aug 27, 2021";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -88,12 +88,7 @@ public class DafExport {
         data.DOid = a.getDoId();
         data.dataProvider = a.getDataProviders();
 
-        String ecoId;
-        try {
-            ecoId = EvidenceCode.getEcoId(a.getEvidenceCode());
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+        String ecoId = getEcoId(a.getEvidenceCode());
         if( ecoId==null ) {
             System.out.println("WARN no ECO_ID for evidence code "+a.getEvidenceCode());
             return null;
@@ -158,11 +153,23 @@ public class DafExport {
 
         if( data.evidence.publication.publicationId==null ) {
             System.out.println("annot skipped because publicationRef is empty");
+            return null;
         } else {
             this.data.add(data);
         }
 
         return data;
+    }
+
+    // as of Aug 2021, EvidenceCode.getEcoId() is not thread safe and it was causing problems
+    //  therefore we synchronise calls to it explicitly
+    synchronized String getEcoId(String evidenceCode) {
+
+        try {
+            return EvidenceCode.getEcoId(evidenceCode);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

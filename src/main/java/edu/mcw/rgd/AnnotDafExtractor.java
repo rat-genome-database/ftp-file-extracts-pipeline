@@ -2,11 +2,9 @@ package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.mcw.rgd.datamodel.Gene;
-import edu.mcw.rgd.datamodel.Omim;
-import edu.mcw.rgd.datamodel.XdbId;
+import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
-import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.log4j.Logger;
@@ -193,10 +191,12 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         }
 
         DafExport.DafData dafData = dafExport.addData(daf, rec.annot.getRefRgdId());
-        counters.increment(dafData.objectRelation.objectType+"RecordsExported");
+        if( dafData!=null ) {
+            counters.increment(dafData.objectRelation.objectType + "RecordsExported");
 
-        if( dafData.conditionRelations!=null ) {
-            counters.increment("condRelEntries");
+            if (dafData.conditionRelations != null) {
+                counters.increment("condRelEntries");
+            }
         }
         return null;
     }
@@ -341,6 +341,12 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         } catch(IOException ignore) {
         }
         log.info("");
+    }
+
+    List<Annotation> getAnnotations() throws Exception {
+        List<Annotation> annots = getDao().getAnnotationsBySpecies(getSpeciesTypeKey(), "D", "RGD");
+        annots.addAll(getDao().getAnnotationsBySpecies(getSpeciesTypeKey(), "D", "OMIM"));
+        return annots;
     }
 
     private String annotDir;
