@@ -28,12 +28,12 @@ public class StrainExtractor extends BaseExtractor {
         +"# NOTES: multiple values in a single column are separated by ';'\n"
         +"#        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD\n"
         +"RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGIN\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
-        +"\tALLELES\tALLELE_RGD_IDS\tCITATION_ID"
+        +"\tALLELES\tALLELE_RGD_IDS"
         +"\tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
         +"\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
         +"\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
         +"\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
-        +"\n";
+        +"\tCITATION_ID\n";
 
     /**
      * extract all strains to tab separated file and to xml file
@@ -98,12 +98,12 @@ public class StrainExtractor extends BaseExtractor {
             tsvWriter.print(checkWhiteSpace(getAlleles(strainAlleles)));
             tsvWriter.print('\t');
             tsvWriter.print(checkWhiteSpace(getAlleleRgdIds(strainAlleles)));
-            tsvWriter.print('\t');
-            tsvWriter.print(checkWhiteSpace(citationId));
             printTsvPositions(positions3_4, tsvWriter);
             printTsvPositions(positions5_0, tsvWriter);
             printTsvPositions(positions6_0, tsvWriter);
             printTsvPositions(positions7_2, tsvWriter);
+            tsvWriter.print('\t');
+            tsvWriter.print(checkWhiteSpace(citationId));
             tsvWriter.println();
 
             // dump columns in xml format
@@ -119,9 +119,10 @@ public class StrainExtractor extends BaseExtractor {
             writeXmlField(xmlWriter, checkNull(strain.getResearchUse()), "RESEARCH_USE");
             writeXmlField(xmlWriter, checkNull(getAlleles(strainAlleles)), "ALLELES");
             writeXmlField(xmlWriter, checkNull(getAlleleRgdIds(strainAlleles)), "ALLELE_RGD_IDS");
-            writeXmlField(xmlWriter, checkNull(citationId), "CITATION_ID");
 
             printXmlPositions(positions, xmlWriter);
+
+            writeXmlField(xmlWriter, checkNull(citationId), "CITATION_ID");
 
             xmlWriter.println("  </Strain>");
 
