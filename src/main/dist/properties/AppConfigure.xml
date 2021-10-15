@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2021-08-27" />
+        <property name="version" value="FtpFileExtractManager  -- build 2021-10-15" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -108,7 +108,7 @@
     </bean>
 
     <bean id="strainExtractor" class="edu.mcw.rgd.StrainExtractor" scope="prototype">
-        <property name="version" value="Strain Extractor  build 2019-06-17"/>
+        <property name="version" value="Strain Extractor  build 2021-10-15"/>
         <property name="tsvFileName" value="STRAINS.txt"/>
         <property name="xmlFileName" value="STRAINS.xml"/>
     </bean>

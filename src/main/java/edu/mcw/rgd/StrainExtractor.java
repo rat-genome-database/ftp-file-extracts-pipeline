@@ -1,9 +1,6 @@
 package edu.mcw.rgd;
 
-import edu.mcw.rgd.datamodel.Gene;
-import edu.mcw.rgd.datamodel.MapData;
-import edu.mcw.rgd.datamodel.SpeciesType;
-import edu.mcw.rgd.datamodel.Strain;
+import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
 
 import java.io.PrintWriter;
@@ -42,17 +39,19 @@ public class StrainExtractor extends BaseExtractor {
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.println(
         "# RGD-PIPELINE: ftp-file-extracts\n"
-       +"# MODULE: strains   build 2019-06-24\n"
+       +"# MODULE: strains   build 2021-10-15\n"
        +"# GENERATED-ON: #DATE#\n"
        +"# PURPOSE: information about active rat strains extracted from RGD database\n"
        +"# CONTACT: rgd.data@mcw.edu\n"
        +"# FORMAT: tab delimited text\n"
        +"# NOTES: multiple values in a single column are separated by ';'\n"
+       +"#        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD\n"
        +"RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGIN\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
-        +"\tALLELES\tALLELE_RGD_IDS"
+        +"\tALLELES\tALLELE_RGD_IDS\tCITATION_ID"
         +"\tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
         +"\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
         +"\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
+        +"\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
         );
         System.out.println("Processing file: "+tsvFilePath);
 
@@ -66,11 +65,14 @@ public class StrainExtractor extends BaseExtractor {
         int counter = 0;
         for( Strain strain: getStrainList() ) {
 
+            String citationId = getCitationId(strain.getRgdId());
+
             List<Gene> strainAlleles = getDao().getStrainsAlleles(strain.getRgdId());
             List<MapData> positions = getDao().getMapData(strain.getRgdId());
             List<MapData> positions3_4 = getPositionsForAssembly(positions, 60);
             List<MapData> positions5_0 = getPositionsForAssembly(positions, 70);
             List<MapData> positions6_0 = getPositionsForAssembly(positions, 360);
+            List<MapData> positions7_2 = getPositionsForAssembly(positions, 372);
 
             // dump columns in tsv format
             tsvWriter.print(strain.getRgdId());
@@ -92,9 +94,12 @@ public class StrainExtractor extends BaseExtractor {
             tsvWriter.print(checkWhiteSpace(getAlleles(strainAlleles)));
             tsvWriter.print('\t');
             tsvWriter.print(checkWhiteSpace(getAlleleRgdIds(strainAlleles)));
+            tsvWriter.print('\t');
+            tsvWriter.print(checkWhiteSpace(citationId));
             printTsvPositions(positions3_4, tsvWriter);
             printTsvPositions(positions5_0, tsvWriter);
             printTsvPositions(positions6_0, tsvWriter);
+            printTsvPositions(positions7_2, tsvWriter);
             tsvWriter.println();
 
             // dump columns in xml format
@@ -110,6 +115,7 @@ public class StrainExtractor extends BaseExtractor {
             writeXmlField(xmlWriter, checkNull(strain.getResearchUse()), "RESEARCH_USE");
             writeXmlField(xmlWriter, checkNull(getAlleles(strainAlleles)), "ALLELES");
             writeXmlField(xmlWriter, checkNull(getAlleleRgdIds(strainAlleles)), "ALLELE_RGD_IDS");
+            writeXmlField(xmlWriter, checkNull(citationId), "CITATION_ID");
 
             printXmlPositions(positions, xmlWriter);
 
@@ -157,6 +163,8 @@ public class StrainExtractor extends BaseExtractor {
                 assembly="Rnor_5.0";
             else if( md.getMapKey()==360 )
                 assembly="Rnor_6.0";
+            else if( md.getMapKey()==372 )
+                assembly="mRatBN7.2";
 
             xmlWriter.println("      <POSITION ASSEMBLY=\""+assembly+"\" CHR=\""+md.getChromosome()
                     +"\" START_POS=\""+md.getStartPos()+"\" STOP_POS=\""+md.getStopPos()
@@ -187,6 +195,30 @@ public class StrainExtractor extends BaseExtractor {
             tsvWriter.print(Utils.concatenate(";",positions,"getStopPos"));
             tsvWriter.print('\t');
             tsvWriter.print(Utils.concatenate(";",positions,"getMapPositionMethod"));
+        }
+    }
+
+    String getCitationId(int strainRgdId) throws Exception {
+
+        String RRRCid = null;
+        List<Alias> aliases = getDao().getAliases(strainRgdId);
+        if( !aliases.isEmpty() ) {
+            for( Alias a: aliases ) {
+                if( a.getValue().startsWith("RRRC:") ) {
+                    RRRCid = a.getValue().replace(':','_');
+                    if( RRRCid.length()==9 ) {
+                        // convert RRRC_00xx into RRRC_000xx
+                        RRRCid = "RRRC_0"+RRRCid.substring(5);
+                    }
+                    break;
+                }
+            }
+        }
+
+        if( RRRCid==null ) {
+            return "RRID:RGD_"+strainRgdId;
+        } else {
+            return "RRID:"+RRRCid;
         }
     }
 
