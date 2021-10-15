@@ -1,6 +1,8 @@
 Oct 15, 2021
-  strain extractor: added new column 'CITATION_ID' and columns to export positions on assembly mRatBN7.2
-  
+  strain extractor:
+      added new column 'CITATION_ID' and columns to export positions on assembly mRatBN7.2
+      'generated-on:' field is now properly filled out
+
 Aug 27, 2021
   daf extractor: performance improved; fix to safely run in multi-parallel env
 

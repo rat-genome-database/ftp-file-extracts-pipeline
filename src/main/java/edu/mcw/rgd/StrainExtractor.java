@@ -18,6 +18,23 @@ public class StrainExtractor extends BaseExtractor {
     String tsvFileName;
     String xmlFileName;
 
+    String TSV_HEADER =
+        "# RGD-PIPELINE: ftp-file-extracts\n"
+        +"# MODULE: strains   build 2021-10-15\n"
+        +"# GENERATED-ON: #DATE#\n"
+        +"# PURPOSE: information about active rat strains extracted from RGD database\n"
+        +"# CONTACT: rgd.data@mcw.edu\n"
+        +"# FORMAT: tab delimited text\n"
+        +"# NOTES: multiple values in a single column are separated by ';'\n"
+        +"#        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD\n"
+        +"RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGIN\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
+        +"\tALLELES\tALLELE_RGD_IDS\tCITATION_ID"
+        +"\tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
+        +"\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
+        +"\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
+        +"\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
+        +"\n";
+
     /**
      * extract all strains to tab separated file and to xml file
      * @throws Exception
@@ -34,25 +51,12 @@ public class StrainExtractor extends BaseExtractor {
         // create species specific output dir
         String outputDir = getSpeciesSpecificExtractDir(speciesRec);
 
+        String tsvHeader = TSV_HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
+
         // create tsv and xml files
         String tsvFilePath = outputDir+'/'+tsvFileName;
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
-        tsvWriter.println(
-        "# RGD-PIPELINE: ftp-file-extracts\n"
-       +"# MODULE: strains   build 2021-10-15\n"
-       +"# GENERATED-ON: #DATE#\n"
-       +"# PURPOSE: information about active rat strains extracted from RGD database\n"
-       +"# CONTACT: rgd.data@mcw.edu\n"
-       +"# FORMAT: tab delimited text\n"
-       +"# NOTES: multiple values in a single column are separated by ';'\n"
-       +"#        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD\n"
-       +"RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGIN\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
-        +"\tALLELES\tALLELE_RGD_IDS\tCITATION_ID"
-        +"\tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
-        +"\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
-        +"\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
-        +"\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
-        );
+        tsvWriter.print(tsvHeader);
         System.out.println("Processing file: "+tsvFilePath);
 
         String xmlFilePath = outputDir+'/'+xmlFileName;
