@@ -6,7 +6,8 @@ import edu.mcw.rgd.pipelines.PipelineRecord;
 import edu.mcw.rgd.pipelines.RecordPreprocessor;
 import edu.mcw.rgd.pipelines.RecordProcessor;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -55,7 +56,7 @@ public class DbSnpExtractor extends BaseExtractor {
     final String HEADER_LINE_MOUSE =
     "";
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LogManager.getLogger("db_snp");
 
     public void run(SpeciesRecord speciesInfo) throws Exception {
 

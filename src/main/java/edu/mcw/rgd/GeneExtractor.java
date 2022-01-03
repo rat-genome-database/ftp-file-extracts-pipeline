@@ -2,7 +2,8 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -774,7 +775,7 @@ public class GeneExtractor extends BaseExtractor {
     +"CHROMOSOME_#REF5#\tSTART_POS_#REF5#\tSTOP_POS_#REF5#\tSTRAND_#REF5#\t"
     +"CHROMOSOME_#REF6#\tSTART_POS_#REF6#\tSTOP_POS_#REF6#\tSTRAND_#REF6#";
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LogManager.getLogger("gene");
     private java.util.Map<String,List<String>> mapKeys;
     private String fileNamePrefix;
 

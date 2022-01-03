@@ -1,8 +1,5 @@
 package edu.mcw.rgd;
 
-import org.apache.log4j.Logger;
-
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,8 +28,6 @@ public class SslpAlleleExtractor extends BaseExtractor {
     +"#2   RGD_NAME                name of the marker allele in RGD\n"
     +"#3   STRAIN_MARKER_SIZE      marker size for given strain\n"
     +"MARKER_RGD_ID\tRGD_NAME";
-
-    Logger log = Logger.getLogger(getClass());
 
     public void run(SpeciesRecord speciesRec) throws Exception {
 

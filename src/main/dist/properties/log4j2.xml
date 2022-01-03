@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- <PatternLayout pattern="%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/> -->
+            <PatternLayout pattern="[%d{yyyy-MM-hh HH:mm:ss}] %msg%n"/>
+        </Console>
+
+        <RollingFile name="status" append="true" fileName="logs/status.log" filePattern="logs/status.log.%d{yyyy-MM}">
+            <PatternLayout pattern="%d %p [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <File name="summary" append="false" fileName="logs/summary.log">
+            <PatternLayout pattern="%m%n"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </File>
+        <RollingFile name="detail" append="true" fileName="logs/detail.log" filePattern="logs/detail.log.%d{yyyy-MM}">
+            <PatternLayout pattern="%d %p [%c] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+
+
+        <RollingFile name="qtl" append="true" fileName="logs/qtl.log" filePattern="logs/qtl.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="nullColumns" append="true" fileName="logs/nullColumns.log" filePattern="logs/nullColumns.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="annot" append="true" fileName="logs/annot.log" filePattern="logs/annot.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="daf" append="true" fileName="logs/daf.log" filePattern="logs/daf.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="db_snp" append="true" fileName="logs/db_snp.log" filePattern="logs/db_snp.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="gene" append="true" fileName="logs/gene.log" filePattern="logs/gene.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="ortho" append="true" fileName="logs/ortho.log" filePattern="logs/ortho.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="ortho2" append="true" fileName="logs/ortho2.log" filePattern="logs/ortho2.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="sslp" append="true" fileName="logs/sslp.log" filePattern="logs/sslp.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <!-- daily -->
+        <Logger name="status" level="debug" additivity="false">
+            <AppenderRef ref="status" level="info"/>
+            <AppenderRef ref="summary" level="info"/><!-- human readable -->
+            <AppenderRef ref="detail"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+
+        <!-- monthly -->
+        <Logger name="qtl" level="debug" additivity="false">
+            <AppenderRef ref="qtl"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="nullColumns" level="debug" additivity="false">
+            <AppenderRef ref="nullColumns"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="annot" level="debug" additivity="false">
+            <AppenderRef ref="annot"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="daf" level="debug" additivity="false">
+            <AppenderRef ref="daf"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+
+        <Logger name="db_snp" level="debug" additivity="false">
+            <AppenderRef ref="db_snp"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="gene" level="debug" additivity="false">
+            <AppenderRef ref="gene"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="ortho" level="debug" additivity="false">
+            <AppenderRef ref="ortho"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="ortho2" level="debug" additivity="false">
+            <AppenderRef ref="ortho2"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+        <Logger name="sslp" level="debug" additivity="false">
+            <AppenderRef ref="sslp"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+    </Loggers>
+</Configuration>

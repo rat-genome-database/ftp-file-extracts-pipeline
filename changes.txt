@@ -1,3 +1,6 @@
+Jan 03, 2022
+  updated log4j to avoid zero day exploit
+
 Oct 15, 2021
   strain extractor:
       added new column 'CITATION_ID' and columns to export positions on assembly mRatBN7.2

@@ -2,7 +2,8 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -41,7 +42,7 @@ public class ChinchillaExtractor extends BaseExtractor {
     +"#12  GENBANK_PROTEIN    GenBank Protein ID(s)\n"
     +"#13  GENE_REFSEQ_STATUS gene RefSeq Status (from NCBI)\n";
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LogManager.getLogger(getClass());
     private String orthologsFile;
     private String bedFile;
     private String genesFile;

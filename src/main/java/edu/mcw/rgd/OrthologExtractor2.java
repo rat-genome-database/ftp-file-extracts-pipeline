@@ -2,7 +2,8 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -31,7 +32,7 @@ public class OrthologExtractor2 extends BaseExtractor {
         "# Genes without known orthologs are listed at the bottom of the file.\n" +
         "#\n";
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LogManager.getLogger("ortho2");
     private String outputDir;
 
     private static boolean _versionPrinted = false;

@@ -7,7 +7,8 @@ import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -21,8 +22,8 @@ import java.util.*;
  */
 public class AnnotDafExtractor extends AnnotBaseExtractor {
 
-    Logger log = Logger.getLogger(AnnotDafExtractor.class);
-    Logger logDaf = Logger.getLogger("daf");
+    Logger log = LogManager.getLogger(AnnotDafExtractor.class);
+    Logger logDaf = LogManager.getLogger("daf");
 
     CounterPool counters;
 

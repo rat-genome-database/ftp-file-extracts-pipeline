@@ -2,7 +2,8 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
@@ -75,7 +76,7 @@ public class OrthologExtractor extends BaseExtractor {
         "MOUSE_ORTHOLOG_SYMBOL\tMOUSE_ORTHOLOG_RGD\tMOUSE_ORTHOLOG_NCBI_GENE_ID\tMOUSE_ORTHOLOG_MGI\tMOUSE_ORTHOLOG_SOURCE\t"+
         "HUMAN_ORTHOLOG_HGNC_ID\n";
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LogManager.getLogger("ortho");
     private String outputDir;
 
     public void run(SpeciesRecord speciesRec) throws Exception {

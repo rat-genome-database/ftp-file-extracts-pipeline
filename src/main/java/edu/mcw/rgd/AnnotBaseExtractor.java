@@ -8,7 +8,8 @@ import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
 import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     private int speciesTypeKey;
     private String version;
     private Set<Integer> refRgdIdsForGoPipelines;
-    private Logger logAnnot = Logger.getLogger("annot");
+    private Logger logAnnot = LogManager.getLogger("annot");
 
     // map of REF_RGD_IDs to PMID acc ids: used to significantly reduce database overhead
     // (issue one sql query vs millions of queries previously)

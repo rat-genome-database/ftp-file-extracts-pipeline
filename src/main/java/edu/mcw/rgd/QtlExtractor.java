@@ -3,7 +3,8 @@ package edu.mcw.rgd;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -162,7 +163,7 @@ public class QtlExtractor  extends BaseExtractor {
     FtpFileExtractsDAO dao;
     SpeciesRecord species;
 
-    Logger log = Logger.getLogger(getClass());
+    Logger log = LogManager.getLogger("qtl");
 
     /** examine all qtls and export them into tab separated files
      *

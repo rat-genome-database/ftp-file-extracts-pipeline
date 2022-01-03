@@ -2,7 +2,8 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.FileSystemResource;
@@ -24,7 +25,6 @@ public class FtpFileExtractsManager {
 
     String extractDir; // directory where the files will be generated
     FtpFileExtractsDAO dao = new FtpFileExtractsDAO();
-    //Log log = LogFactory.getLog("core");
     private String version;
     private Map<String, SpeciesRecord> speciesInfo;
 
@@ -253,7 +253,7 @@ public class FtpFileExtractsManager {
 
     static public void usage() {
 
-        String USAGE = "java -Dspring.config=$APPHOME/../properties/default_db.xml -Dlog4j.configuration=$APPHOME/properties/log4j.properties"+
+        String USAGE = "java -Dspring.config=$APPHOME/../properties/default_db.xml -Dlog4j.configurationFile=$APPHOME/properties/log4j2.xml"+
             " -jar ./lib/ftpFileExtracts.jar [MODULE] [OPTIONS]\n"+
         "[MODULE] one of: -annotations | -array_ids | -assembly_comparison | -chinchilla | -daf_annotations | -db_snps"+
             " | -gaf_agr_annotations | -gaf_annotations | -genes | -gp2protein | -interactions | -markers | -marker_alleles"+
@@ -278,7 +278,7 @@ public class FtpFileExtractsManager {
         FileContentQC qcContentChecker = new FileContentQC();
         String result = qcContentChecker.validate(fileName, module, speciesTypeKey);
         if( !result.isEmpty() ) {
-            Logger logNullColumns = Logger.getLogger("nullColumns");
+            Logger logNullColumns = LogManager.getLogger("nullColumns");
             logNullColumns.info(result);
         }
     }
