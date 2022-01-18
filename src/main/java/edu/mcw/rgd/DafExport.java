@@ -26,7 +26,7 @@ public class DafExport {
         public DafMetadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Aug 27, 2021";
+                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Jan 18, 2022";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -140,7 +140,11 @@ public class DafExport {
 
                     HashMap h = new HashMap();
                     h.put("conditionClassId", info.zecoAcc);
-                    h.put("conditionId", info.xcoAcc);
+                    if( info.xcoAcc!=null && info.xcoAcc.startsWith("CHEBI:") ) {
+                        h.put("chemicalOntologyId", info.xcoAcc);
+                    } else {
+                        h.put("conditionId", info.xcoAcc);
+                    }
                     h.put("conditionStatement", info.conditionStatement);
                     condRel.conditions = new ArrayList();
                     condRel.conditions.add(h);

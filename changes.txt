@@ -1,3 +1,6 @@
+Jan 18, 2022
+  daf extractor: CHEBI ids are exported as chemicalOntologyId, not as conditionId
+
 Jan 03, 2022
   updated log4j to avoid zero day exploit
 
