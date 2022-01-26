@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build 2022-01-18" />
+        <property name="version" value="FtpFileExtractManager  -- build 2022-01-25" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -55,7 +55,7 @@
         <property name="newRefAssemblyMapKeyForMarkers" value="70" />
         <property name="oldRefAssemblyMapKeyForMarkers" value="60" />
         <property name="celeraAssemblyMapKey" value="15" />
-        <property name="ensemblAssemblyMapKey" value="361" />
+        <property name="ensemblAssemblyMapKey" value="373" />
         <property name="cytoMapKey" value="99" />
 
         <property name="qtlFileName" value="QTLS_RAT.txt" />
@@ -117,7 +117,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build 2021-03-16"/>
+        <property name="version" value="Gene Extractor  build 2022-01-25"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
