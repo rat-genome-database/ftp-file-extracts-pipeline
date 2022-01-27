@@ -1,3 +1,6 @@
+Jan 27, 2022
+  sequence extractor: minor code tuneup
+
 Jan 25, 2022
   gene extractor: ensembl positions exported for rn7 (previously for rn6)
 
