@@ -1,3 +1,6 @@
+Feb 17, 2022
+  daf extractor: fixed code for WITH field handling
+
 Jan 27, 2022
   sequence extractor: minor code tuneup
 

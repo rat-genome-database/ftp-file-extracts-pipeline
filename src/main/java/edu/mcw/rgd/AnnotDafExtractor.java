@@ -191,7 +191,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             daf.setInferredGeneAssociation(getGeneRgdIdsForAllele(rec.annot.getAnnotatedObjectRgdId()));
         }
 
-        DafExport.DafData dafData = dafExport.addData(daf, rec.annot.getRefRgdId());
+        DafExport.DafData dafData = dafExport.addData(daf, rec.annot.getRefRgdId(), getDao());
         if( dafData!=null ) {
             counters.increment(dafData.objectRelation.objectType + "RecordsExported");
 

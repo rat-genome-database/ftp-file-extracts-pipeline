@@ -1,6 +1,9 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.EvidenceCode;
+import edu.mcw.rgd.datamodel.RgdId;
+import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.datamodel.XdbId;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
 
 import java.text.ParseException;
@@ -26,7 +29,7 @@ public class DafExport {
         public DafMetadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Jan 18, 2022";
+                release = "RGD Daf Extractor, AGR schema 1.0.1.4, build  Feb 17, 2022";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -70,7 +73,7 @@ public class DafExport {
         public List conditions;
     }
 
-    public DafData addData(DafAnnotation a, int refRgdId) {
+    public DafData addData(DafAnnotation a, int refRgdId, FtpFileExtractsDAO dao) {
 
         DafData data = new DafData();
         data.objectId = a.getDbObjectID();
@@ -103,56 +106,17 @@ public class DafExport {
 
         if( a.getQualifier()!=null ) {
             String q = a.getQualifier().toLowerCase();
-            if( q.equals("not") || q.equals("no_association") ) {
+            if( q.equals("not") || q.equals("no_association") || q.contains("control") ) {
                 data.negation = "not";
             }
         }
 
-        if( a.getWithInfo()!=null ) {
-            data.with = new ArrayList<>();
-            for( String with: a.getWithInfo().split("[\\|\\,\\ ]+") ) {
-                data.with.add(with);
+        try {
+            if (!handleWithInfo(a, data, dao)) {
+                return null;
             }
-        }
-
-        // handle experimental conditions -- for strains
-        // handle annotation with a single condition only
-        if( a.getDbObjectType().equals("strain") && data.with!=null && data.with.size()==1 ) {
-            AgrExperimentalConditionMapper.Info info = AgrExperimentalConditionMapper.getInstance().getInfo(data.with.get(0));
-            if( info!=null ) {
-
-                // only a subset of qualifiers is allowed
-                String condRelType = null;
-                if( a.getQualifier()==null ) {
-                    condRelType = "has_condition";
-                } else if( a.getQualifier().contains("induced") || a.getQualifier().contains("induces") ) {
-                    condRelType = "induces";
-                } else if( a.getQualifier().contains("treatment") || a.getQualifier().contains("ameliorates") ) {
-                    condRelType = "ameliorates";
-                } else if( a.getQualifier().contains("exacerbates") ) {
-                    condRelType = "exacerbates";
-                }
-
-                if( condRelType!=null ) {
-
-                    DafConditionRelation condRel = new DafConditionRelation();
-                    condRel.conditionRelationType = condRelType;
-
-                    HashMap h = new HashMap();
-                    h.put("conditionClassId", info.zecoAcc);
-                    if( info.xcoAcc!=null && info.xcoAcc.startsWith("CHEBI:") ) {
-                        h.put("chemicalOntologyId", info.xcoAcc);
-                    } else {
-                        h.put("conditionId", info.xcoAcc);
-                    }
-                    h.put("conditionStatement", info.conditionStatement);
-                    condRel.conditions = new ArrayList();
-                    condRel.conditions.add(h);
-
-                    data.conditionRelations = new ArrayList<>();
-                    data.conditionRelations.add(condRel);
-                }
-            }
+        } catch(Exception e) {
+            throw new RuntimeException(e);
         }
 
         if( data.evidence.publication.publicationId==null ) {
@@ -164,6 +128,192 @@ public class DafExport {
 
         return data;
     }
+
+    boolean handleWithInfo(DafAnnotation a, DafData data, FtpFileExtractsDAO dao) throws Exception {
+
+        if( a.getWithInfo()==null ) {
+            return true;
+        }
+
+        // only a subset of qualifiers is allowed
+        String condRelType = null;
+        if( a.getQualifier() == null ) {
+            condRelType = "has_condition";
+        } else if( a.getQualifier().contains("induced") || a.getQualifier().contains("induces") ) {
+            condRelType = "induces";
+        } else if( a.getQualifier().contains("treatment") || a.getQualifier().contains("ameliorates") ) {
+            condRelType = "ameliorates";
+        } else if( a.getQualifier().contains("exacerbates") ) {
+            condRelType = "exacerbates";
+        } else {
+            System.out.println("UNMAPPED QUALIFIER: "+a.getQualifier());
+            condRelType = "has_condition";
+        }
+
+        // remove all whitespace from WITH field to simplify parsing
+        String withInfo = a.getWithInfo().replaceAll("\\s", "");
+        List conditionRelations = new ArrayList();
+
+        // if the separator is '|', create separate conditionRelation object
+        // if the separator is ',', combine conditions
+        boolean or;
+
+        // out[0]: token;  out[1]: separator before token
+        String[] out = new String[2];
+        String str = withInfo;
+        for( ;; ) {
+            str = getNextToken(str, out);
+            if( out[0]==null ) {
+                break;
+            }
+
+            String withValue = out[0];
+            if( out[1]!=null && out[1].equals(",") ) {
+                or = false;
+            } else {
+                or = true;
+            }
+
+            withValue = transformRgdId(withValue, dao);
+            if( withValue==null ) {
+                return false;
+            }
+
+            if( withValue.startsWith("XCO:") ) {
+                AgrExperimentalConditionMapper.Info info = AgrExperimentalConditionMapper.getInstance().getInfo(withValue);
+                if (info == null) {
+                    System.out.println("UNEXPECTED WITH VALUE: " + withValue);
+                    return false;
+                }
+
+
+                HashMap h = new HashMap();
+                h.put("conditionClassId", info.zecoAcc);
+                if (info.xcoAcc != null && info.xcoAcc.startsWith("CHEBI:")) {
+                    h.put("chemicalOntologyId", info.xcoAcc);
+                } else {
+                    h.put("conditionId", info.xcoAcc);
+                }
+                h.put("conditionStatement", info.conditionStatement);
+
+                if (or) {
+                    DafConditionRelation condRel = new DafConditionRelation();
+                    condRel.conditionRelationType = condRelType;
+
+                    condRel.conditions = new ArrayList();
+                    condRel.conditions.add(h);
+
+                    conditionRelations.add(condRel);
+                } else {
+                    // 'and' operator: update last condition
+                    DafConditionRelation condRel = (DafConditionRelation) conditionRelations.get(conditionRelations.size() - 1);
+                    condRel.conditions.add(h);
+                }
+            } else {
+                // non-XCO with value
+                if( data.with==null ) {
+                    data.with = new ArrayList<>();
+                }
+                data.with.add(withValue);
+            }
+        }
+
+        if( !conditionRelations.isEmpty() ) {
+            data.conditionRelations = conditionRelations;
+
+            if( conditionRelations.size()>2 ) {
+                System.out.println("MULTI CONDRELS "+data.objectId+" "+data.DOid);
+            }
+        }
+        return true;
+    }
+
+    // convert human rgd ids to HGNC ids, and mouse rgd ids to MGI ids
+    String transformRgdId(String with, FtpFileExtractsDAO dao) throws Exception {
+
+        if (with.startsWith("RGD:")) {
+            Integer rgdId = Integer.parseInt(with.substring(4));
+            RgdId id = dao.getRgdId(rgdId);
+            if (id == null) {
+                System.out.println("ERROR: invalid RGD ID " + with + "; skipping annotation");
+                return null;
+            }
+
+            if (id.getSpeciesTypeKey() == SpeciesType.HUMAN) {
+                List<XdbId> xdbIds = dao.getXdbIds(rgdId, XdbId.XDB_KEY_HGNC);
+                if (xdbIds.isEmpty()) {
+                    System.out.println("ERROR: cannot map " + with + " to human HGNC ID");
+                    return null;
+                }
+                if (xdbIds.size() > 1) {
+                    System.out.println("WARNING: multiple HGNC ids for " + with);
+                }
+                String hgncId = xdbIds.get(0).getAccId();
+                return hgncId;
+            } else if (id.getSpeciesTypeKey() == SpeciesType.MOUSE) {
+                List<XdbId> xdbIds = dao.getXdbIds(rgdId, XdbId.XDB_KEY_MGD);
+                if (xdbIds.isEmpty()) {
+                    System.out.println("ERROR: cannot map " + with + " to mouse MGI ID");
+                    return null;
+                }
+                if (xdbIds.size() > 1) {
+                    System.out.println("WARNING: multiple MGI ids for " + with);
+                }
+                String mgiId = xdbIds.get(0).getAccId();
+                return mgiId;
+            } else if (id.getSpeciesTypeKey() == SpeciesType.RAT) {
+                return with;
+            } else {
+                System.out.println("ERROR: RGD id for species other than rat,mouse,human in WITH field");
+                return null;
+            }
+        }
+
+        return with;
+    }
+
+    // str: string to be parsed
+    // out: out[0]-extracted term; out[1]-separator before term
+    // return rest of string 'str' after extracting the token
+    String getNextToken(String str, String[] out) {
+
+        if( str==null ) {
+            out[0] = null;
+            out[1] = null;
+            return null;
+        }
+
+        int startPos = 0;
+        if( str.startsWith("|") ) {
+            out[1] = "|";
+            startPos = 1;
+        } else if( str.startsWith(",") ) {
+            out[1] = ",";
+            startPos = 1;
+        } else {
+            out[1] = null;
+        }
+
+        int endPos = str.length();
+
+        int barPos = str.indexOf('|', startPos);
+        if( barPos>=0 && barPos < endPos ) {
+            endPos = barPos;
+        }
+        int commaPos = str.indexOf(',', startPos);
+        if( commaPos>=0 && commaPos < endPos ) {
+            endPos = commaPos;
+        }
+
+        out[0] = str.substring(startPos, endPos);
+
+        if( endPos < str.length() ) {
+            return str.substring(endPos);
+        } else {
+            return null;
+        }
+    }
+
 
     // as of Aug 2021, EvidenceCode.getEcoId() is not thread safe and it was causing problems
     //  therefore we synchronise calls to it explicitly
