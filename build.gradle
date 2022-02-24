@@ -27,9 +27,9 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.13.1'
     compile 'org.apache.logging.log4j:log4j-api:2.17.1'
     compile 'org.apache.logging.log4j:log4j-core:2.17.1'
-    compile 'com.oracle.database.jdbc:ojdbc8:19.9.0.0'
-    compile 'org.springframework:spring-beans:5.3.14'
-    compile 'org.springframework:spring-jdbc:5.3.14'
+    compile 'com.oracle.database.jdbc:ojdbc8:19.10.0.0'
+    compile 'org.springframework:spring-beans:5.3.15'
+    compile 'org.springframework:spring-jdbc:5.3.15'
 
     compile fileTree(dir: 'lib', include: '*.jar')
 }

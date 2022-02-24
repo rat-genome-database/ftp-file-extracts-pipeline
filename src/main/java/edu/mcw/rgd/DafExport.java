@@ -210,11 +210,13 @@ public class DafExport {
                     condRel.conditions.add(h);
                 }
             } else {
+                // NOTE: per Alliance request, we suppress export of any WITH fields
+                //
                 // non-XCO with value
-                if( data.with==null ) {
-                    data.with = new ArrayList<>();
-                }
-                data.with.add(withValue);
+                //if( data.with==null ) {
+                //    data.with = new ArrayList<>();
+                //}
+                //data.with.add(withValue);
             }
         }
 
