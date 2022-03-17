@@ -142,7 +142,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             // see if this term could be mapped to an OMIM PS id
             String parentTermAcc = null;
             try {
-                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId, counters);
+                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId);
             } catch( Exception e ) {
                 throw new RuntimeException(e);
             }
@@ -150,14 +150,9 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
                 return null;
             }
 
-            if( parentTermAcc.startsWith("DOID:90") && parentTermAcc.length()==12 ) {
-                counters.increment("OMIM:PS conversion FAILED: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) has DO+ parent " + parentTermAcc);
-                return null;
-            } else {
-                counters.increment("OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
-                rec.termAccId = parentTermAcc;
-                counters.increment("omimPSConversions");
-            }
+            counters.increment("OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
+            rec.termAccId = parentTermAcc;
+            counters.increment("omimPSConversions");
         }
 
         counters.increment("recordsExported");

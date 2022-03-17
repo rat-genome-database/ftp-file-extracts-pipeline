@@ -10,7 +10,6 @@ import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
-import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.core.*;
 
@@ -611,17 +610,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     static final Map<String, Boolean> _isForCurationMap = new HashMap<>();
 
-    public String getOmimPSTermAccForChildTerm(String childTermAcc, CounterPool counters) throws Exception {
-        String sql = "SELECT term_acc FROM ont_synonyms WHERE synonym_name IN\n" +
-            "(SELECT phenotypic_series_number omim_ps FROM omim_phenotypic_series WHERE phenotype_mim_number IN\n"+
-            " (SELECT synonym_name FROM ont_synonyms WHERE term_acc=? AND synonym_name like 'OMIM:______')"+
-            ")";
+    public String getOmimPSTermAccForChildTerm(String childTermAcc) throws Exception {
+        String sql = "SELECT parent_term_acc FROM omim_ps_custom_do WHERE child_term_acc=?";
         List<String> termAccIds = StringListQuery.execute(ontologyDAO, sql, childTermAcc);
         if( termAccIds.isEmpty() ) {
-            return null;
-        }
-        if( termAccIds.size()>1 ) {
-            counters.increment("OMIM:PS problem: multiple OMIM:PS parents for child term "+childTermAcc+": "+Utils.concatenate(termAccIds,","));
             return null;
         }
         return termAccIds.get(0);

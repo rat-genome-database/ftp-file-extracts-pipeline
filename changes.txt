@@ -1,3 +1,6 @@
+Mar 17, 2022
+  daf extractor: sped up code to map DO custom terms to parent non-DO terms via OMIM:PS
+
 Feb 25, 2022
   daf extractor: updated eco-zeco mappings
 
