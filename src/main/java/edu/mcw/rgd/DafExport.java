@@ -115,6 +115,10 @@ public class DafExport {
             if (!handleWithInfo(a, data, dao)) {
                 return null;
             }
+
+            // TMP request: suppress export of WITH fields
+            data.with = null;
+
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
