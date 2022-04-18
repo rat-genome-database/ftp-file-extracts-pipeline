@@ -1,6 +1,7 @@
 package edu.mcw.rgd;
 
 import edu.mcw.rgd.datamodel.*;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +19,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_RAT =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2022-01-25\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -44,6 +45,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Jan 18 2021  discontinued column 27 UNIGENE ID\n"
     +"### Feb 12 2021  added export of positions on assembly mRatBN7.2; discontinued export of positions on assembly RGSCv3.1 (columns 6,12,13,14)\n"
     +"### Jan 25 2022  rat Ensembl positions exported for mRatBN7.2 assembly\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -74,7 +76,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  TIGR_ID                TIGR ID(s)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -104,7 +106,7 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
@@ -112,7 +114,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_HUMAN =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -135,6 +137,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -165,7 +168,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -194,14 +197,14 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tHGNC_ID\t(UNUSED)\tOMIM_ID\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_MOUSE =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-19\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -224,6 +227,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"### Jan 19 2021  export positions on assembly GRCm39 instead of assembly MGSCv36\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -254,7 +258,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -282,14 +286,14 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tMGD_ID\tCM_POS\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_CHINCHILLA =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -299,6 +303,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -329,7 +334,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -350,13 +355,13 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_BONOBO =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-19\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -367,6 +372,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"### Jan 19 2021  added Mhudiblu_PPA_v0 assembly positions\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -397,7 +403,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -418,13 +424,13 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_SQUIRREL =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -434,6 +440,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -464,7 +471,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -485,13 +492,13 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_VERVET =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -501,6 +508,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -531,7 +539,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -552,14 +560,14 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
 
     final String HEADER_MOLERAT=
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -569,6 +577,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -599,7 +608,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -620,13 +629,13 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_PIG =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-01-18\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -636,6 +645,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#\n"
     +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -666,7 +676,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -688,13 +698,13 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
 
     final String HEADER_DOG =
     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2021-03-16\n"
+    +"# MODULE: genes  build 2022-04-18\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -705,6 +715,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Mar 11 2020  added Ensembl map positions and VGNC IDs\n"
     +"### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL\n"
     +"### Mar 16 2021  added positions for assemblies: Dog10K_Boxer_Tasha, ROS_Cfam_1.0, UMICH_Zoey_3.1, UNSW_CanFamBas_1.0, UU_Cfam_GSD_1.0\n"
+    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -735,7 +746,7 @@ public class GeneExtractor extends BaseExtractor {
     +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
     +"#25  (UNUSED)               blank\n"
     +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  (UNUSED)               blank\n"
+    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
     +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
     +"#29  MARKER_SYMBOL          marker symbol\n"
     +"#30  OLD_SYMBOL             old symbol alias(es)\n"
@@ -769,7 +780,7 @@ public class GeneExtractor extends BaseExtractor {
     +"FISH_BAND\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
-    +"GENBANK_PROTEIN\t(UNUSED)\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+    +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL\t"
     +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
@@ -779,10 +790,14 @@ public class GeneExtractor extends BaseExtractor {
     Logger log = LogManager.getLogger("gene");
     private java.util.Map<String,List<String>> mapKeys;
     private String fileNamePrefix;
+    private java.util.Set<String> canonicalProteins;
+    private CounterPool counters;
 
     public void run(SpeciesRecord si) throws Exception {
 
         final int speciesType = si.getSpeciesType();
+
+        counters = new CounterPool();
 
         // generate regular file
         String outputFileName = generate(si);
@@ -800,6 +815,7 @@ public class GeneExtractor extends BaseExtractor {
         final int speciesType = si.getSpeciesType();
         final PrintWriter writer = new PrintWriter(outputFileName);
 
+        canonicalProteins = dao.getCanonicalProteins(speciesType);
 
         String assembly1, assembly2, assembly3, assembly4, assembly5, assembly6;
         final int mapKey1, mapKey2, mapKey3, mapKey4, mapKey5, mapKey6;
@@ -952,7 +968,8 @@ public class GeneExtractor extends BaseExtractor {
                             rec.addNcbiGeneIds(xdbId.getAccId());
                             break;
                         case XdbId.XDB_KEY_UNIPROT:
-                            rec.addUniprotIds(xdbId.getAccId());
+                            boolean isUniProtSource = Utils.defaultString(xdbId.getSrcPipeline()).startsWith("UniProt");
+                            rec.addUniprotIds(xdbId.getAccId(), canonicalProteins.contains(xdbId.getAccId()) && isUniProtSource);
                             break;
                         case XdbId.XDB_KEY_GENEBANKNU:
                             rec.addGeneBankNucleoIds(xdbId.getAccId());
@@ -1033,7 +1050,9 @@ public class GeneExtractor extends BaseExtractor {
         // close the output file
         writer.close();
 
-        log.info("   "+outputFileName+",  data lines written: "+lineMap.size());
+        log.info("   "+outputFileName+",  data lines written: "+lineMap.size()+"\n"
+            +"      canonical proteins written: "+counters.get("canonical_proteins")
+            +"      canonical proteins in RGD: "+canonicalProteins.size());
 
         return outputFileName;
     }
@@ -1057,6 +1076,11 @@ public class GeneExtractor extends BaseExtractor {
     }
 
     String generateLineContents(GeneExtractRecord rec, int speciesType) throws Exception {
+
+        String canonicalProtein = rec.getCanonicalUniprotIds();
+        if( !Utils.isStringEmpty(canonicalProtein) ) {
+            counters.increment("canonical_proteins");
+        }
 
         StringBuilder buf = new StringBuilder();
         buf.append(rec.getRgdId())
@@ -1117,6 +1141,7 @@ public class GeneExtractor extends BaseExtractor {
             .append('\t')
             .append(checkNull(rec.getGeneBankProteinIds()))
             .append('\t')
+            .append(checkNull(canonicalProtein))
             .append('\t')
 
             .append(checkNull(rec.getMarkerRgdIds()))

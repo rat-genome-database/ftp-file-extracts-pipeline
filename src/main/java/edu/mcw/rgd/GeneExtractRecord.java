@@ -41,6 +41,7 @@ public class GeneExtractRecord {
     Set<String> uncuratedPubmedIds = new TreeSet<String>();
     Set<String> ncbiGeneIds = new TreeSet<>();
     Set<String> uniprotIds = new TreeSet<>();
+    Set<String> canonicalUniprotIds = new TreeSet<>();
     Set<String> geneBankNucleoIds = new TreeSet<>();
     Set<String> tigerIds = new TreeSet<String>();
     Set<String> geneBankProteinIds = new TreeSet<String>();
@@ -169,14 +170,22 @@ public class GeneExtractRecord {
             this.ncbiGeneIds.add(ncbiGeneIds);
     }
 
+
     public String getUniprotIds() {
         return getString(uniprotIds);
     }
 
-    public void addUniprotIds(String uniprotIds) {
+    public void addUniprotIds(String uniprotId, boolean isCanonical) {
         if( uniprotIds!=null )
-            this.uniprotIds.add(uniprotIds);
+            this.uniprotIds.add(uniprotId);
+        if( isCanonical && canonicalUniprotIds!=null )
+            this.canonicalUniprotIds.add(uniprotId);
     }
+
+    public String getCanonicalUniprotIds() {
+        return getString(canonicalUniprotIds);
+    }
+
 
     public String getGeneBankNucleoIds() {
         return getString(geneBankNucleoIds);

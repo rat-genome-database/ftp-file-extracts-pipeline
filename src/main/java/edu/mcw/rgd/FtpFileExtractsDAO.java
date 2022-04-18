@@ -36,6 +36,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     private OmimDAO omimDAO = new OmimDAO();
     private OntologyXDAO ontologyDAO = new OntologyXDAO();
     private QTLDAO qtlDAO = associationDAO.getQtlDAO();
+    private ProteinDAO proteinDAO = new ProteinDAO();
     private ReferenceDAO refDAO = associationDAO.getReferenceDAO();
     private RGDManagementDAO rgdIdDAO = new RGDManagementDAO();
     private SSLPDAO markerDAO = associationDAO.getSslpDAO();
@@ -645,6 +646,18 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     public List<CellLine> getActiveCellLines() throws Exception {
         return cellLineDAO.getActiveCellLines();
+    }
+
+    public Set<String> getCanonicalProteins(int speciesTypeKey) throws Exception {
+        Set<String> canonicalProteinSet = new HashSet<>();
+
+        List<Protein> proteins = proteinDAO.getProteins(speciesTypeKey);
+        for( Protein p: proteins ) {
+            if( p.isCanonical() ) {
+                canonicalProteinSet.add(p.getUniprotId());
+            }
+        }
+        return canonicalProteinSet;
     }
 
     public List<ObsoleteId> getObsoleteIdsForGenes() throws Exception {
