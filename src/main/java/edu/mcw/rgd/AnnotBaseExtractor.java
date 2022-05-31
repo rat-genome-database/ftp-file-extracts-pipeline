@@ -373,11 +373,11 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         // filter out annotations for Not4Curation GO terms
         if( !getDao().isForCuration(rec.termAccId) ) {
             if( rec.termAccId.startsWith("GO:") ) {
-                logAnnot.warn(" term "+rec.termAccId+" ["+rec.termName+"] is Not4Curation! annotation export skipped" );
+                counters.increment("term "+rec.termAccId+" ["+rec.termName+"] is Not4Curation! annotation export skipped" );
                 rec.excludeFromProcessing();
                 return;
             }
-            logAnnot.warn(" term "+rec.termAccId+" ["+rec.termName+"] is Not4Curation!" );
+            counters.increment("term "+rec.termAccId+" ["+rec.termName+"] is Not4Curation!" );
         }
 
         int objectKey = rec.annot.getRgdObjectKey();
@@ -385,7 +385,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         if( term==null ) {
             rec.excludeFromProcessing();
             counters.increment("orphaned_annots");
-            logAnnot.warn(" term "+rec.annot.getTermAcc()+" ["+rec.annot.getTerm()+"] is obsolete! annotation export skipped" );
+            counters.increment("term "+rec.annot.getTermAcc()+" ["+rec.annot.getTerm()+"] is obsolete! annotation export skipped" );
             return;
         }
         else {

@@ -1,3 +1,6 @@
+May 31, 2022
+  annotation extractor: improved summary logging
+
 Apr 18, 2022
   genes extractor: added export of UniProt canonical proteins in column 27
 
