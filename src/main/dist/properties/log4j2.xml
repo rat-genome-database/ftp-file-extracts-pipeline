@@ -42,6 +42,12 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
         </RollingFile>
+        <RollingFile name="annot_issues" append="true" fileName="logs/annot_issues.log" filePattern="logs/annot_issues.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
         <RollingFile name="daf" append="true" fileName="logs/daf.log" filePattern="logs/daf.log.%d{yyyy-MM}">
             <PatternLayout pattern="[%d] - %m%n"/>
             <Policies>
@@ -102,10 +108,16 @@
             <AppenderRef ref="nullColumns"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
+
         <Logger name="annot" level="debug" additivity="false">
             <AppenderRef ref="annot"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
+        <Logger name="annot_issues" level="debug" additivity="false">
+            <AppenderRef ref="annot_issues"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+
         <Logger name="daf" level="debug" additivity="false">
             <AppenderRef ref="daf"/>
             <AppenderRef ref="Console" level="info"/>

@@ -44,6 +44,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     private String version;
     private Set<Integer> refRgdIdsForGoPipelines;
     private Logger logAnnot = LogManager.getLogger("annot");
+    private Logger logAnnotIssues = LogManager.getLogger("annot_issues");
 
     // map of REF_RGD_IDs to PMID acc ids: used to significantly reduce database overhead
     // (issue one sql query vs millions of queries previously)
@@ -266,6 +267,7 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
 
         int deconsolidatedAnnotsIncoming = 0;
         int deconsolidatedAnnotsCreated = 0;
+        int annotsSkippedFromDeconsolidation = 0;
 
         List<Annotation> result = new ArrayList<>(annotations.size());
 
@@ -283,7 +285,12 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
 
             int parPos = Utils.defaultString(a.getNotes()).indexOf("(");
             if( parPos<0 ) {
-                deconsolidatedAnnotsCreated += deconsolidateWithNotesInfoMissing(a, result);
+                int dcount = deconsolidateWithNotesInfoMissing(a, result);
+                if( dcount < 0 ) {
+                    annotsSkippedFromDeconsolidation++;
+                } else {
+                    deconsolidatedAnnotsCreated += dcount;
+                }
                 continue;
             }
             String notesOrig = a.getNotes().substring(0, parPos).trim();
@@ -307,13 +314,19 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
                 // find corresponding PMID info in NOTES field
                 int pmidPos = a.getNotes().indexOf(pmid);
                 if( pmidPos<0 ) {
-                    deconsolidatedAnnotsCreated += deconsolidateWithNotesInfoMissing(a, result);
+                    int dcount = deconsolidateWithNotesInfoMissing(a, result);
+                    if( dcount < 0 ) {
+                        annotsSkippedFromDeconsolidation++;
+                    } else {
+                        deconsolidatedAnnotsCreated += dcount;
+                    }
                     break;
                 }
                 int parStartPos = a.getNotes().lastIndexOf("(", pmidPos);
                 int parEndPos = a.getNotes().indexOf(")", pmidPos);
                 if( parStartPos<0 || parEndPos<parStartPos ) {
-                    logAnnot.warn("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING IT: notes info malformed PMID: "+a.dump("|"));
+                    annotsSkippedFromDeconsolidation++;
+                    logAnnotIssues.debug("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING IT: notes info malformed PMID: "+a.dump("|"));
                     continue;
                 }
                 String xrefInfo = a.getNotes().substring(parStartPos+1, parEndPos);
@@ -327,6 +340,9 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         }
 
         logAnnot.info(deconsolidatedAnnotsIncoming+" incoming annotations deconsolidated into "+deconsolidatedAnnotsCreated+" annotations");
+        if( annotsSkippedFromDeconsolidation>0 ) {
+            logAnnot.info(annotsSkippedFromDeconsolidation + " incoming annotations skipped from deconsolidation due to some issues");
+        }
         return result;
     }
 
@@ -342,8 +358,8 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         for( String xref: xrefs ){
             // extract PMID from xrefSrc
             if( !xref.startsWith("PMID:") ) {
-                logAnnot.warn("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING: notes info missing, not all PMIDs: "+a.dump("|"));
-                return 0;
+                logAnnotIssues.debug("CANNOT DECONSOLIDATE ANNOTATION! SKIPPING: notes info missing, not all PMIDs: "+a.dump("|"));
+                return -1;
             }
         }
 
