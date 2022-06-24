@@ -23,6 +23,8 @@ public class FtpFileExtractsManager {
 
     public static final String MULTIVAL_SEPARATOR = ";"; // multi-value field separator
 
+    static Logger log = LogManager.getLogger("status");
+
     String extractDir; // directory where the files will be generated
     FtpFileExtractsDAO dao = new FtpFileExtractsDAO();
     private String version;
@@ -36,7 +38,7 @@ public class FtpFileExtractsManager {
         try {
             main2(args);
         } catch(Exception e) {
-            e.printStackTrace();
+            Utils.printStackTrace(e, log);
             System.exit(-2);
         }
     }
@@ -200,11 +202,7 @@ public class FtpFileExtractsManager {
             throw new Exception("Unsupported species type");
         }
 
-        try {
-            manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride, singleThread);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        manager.run(speciesTypeKey, bf, beanId, agr, annotDirOverride, singleThread);
         System.out.println("=== OK === elapsed "+ Utils.formatElapsedTime(time0, System.currentTimeMillis()));
     }
 

@@ -1,6 +1,8 @@
 Jun 23, 2022
   annotation extractors: improved logging
-
+  daf extractor: fixed rare NullPointer exception
+  improved exception handling
+  
 May 31, 2022
   annotation extractor: improved summary logging
 

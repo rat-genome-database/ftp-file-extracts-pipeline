@@ -5,6 +5,7 @@ import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.datamodel.XdbId;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
+import edu.mcw.rgd.process.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -339,7 +340,7 @@ public class DafExport {
         Collections.sort(data, new Comparator<DafData>() {
             @Override
             public int compare(DafData o1, DafData o2) {
-                int r = o1.objectName.compareToIgnoreCase(o2.objectName);
+                int r = Utils.stringsCompareToIgnoreCase(o1.objectName, o2.objectName);
                 if( r!=0 ) {
                     return r;
                 }
