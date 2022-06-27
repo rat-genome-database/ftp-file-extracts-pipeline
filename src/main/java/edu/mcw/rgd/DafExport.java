@@ -128,7 +128,9 @@ public class DafExport {
             System.out.println("annot skipped because publicationRef is empty");
             return null;
         } else {
-            this.data.add(data);
+            synchronized (this.data) {
+                this.data.add(data);
+            }
         }
 
         return data;

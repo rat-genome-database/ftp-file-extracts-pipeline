@@ -1,3 +1,6 @@
+Jun 27, 2022
+  daf extractor: fixed rare NullPointer exception (2nd attempt)
+
 Jun 23, 2022
   annotation extractors: improved logging
   daf extractor: fixed rare NullPointer exception
