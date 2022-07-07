@@ -1,3 +1,6 @@
+Jul 07, 2022
+  strain extractor: fixed export of 'CitationId'
+
 Jun 27, 2022
   daf extractor: fixed rare NullPointer exception (2nd attempt)
 

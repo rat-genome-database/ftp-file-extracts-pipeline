@@ -20,7 +20,7 @@ public class StrainExtractor extends BaseExtractor {
 
     String TSV_HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: strains   build 2021-10-15\n"
+        +"# MODULE: strains   build 2022-07-07\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: information about active rat strains extracted from RGD database\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
@@ -206,17 +206,13 @@ public class StrainExtractor extends BaseExtractor {
     String getCitationId(int strainRgdId) throws Exception {
 
         String RRRCid = null;
-        List<Alias> aliases = getDao().getAliases(strainRgdId);
-        if( !aliases.isEmpty() ) {
-            for( Alias a: aliases ) {
-                if( a.getValue().startsWith("RRRC:") ) {
-                    RRRCid = a.getValue().replace(':','_');
-                    if( RRRCid.length()==9 ) {
-                        // convert RRRC_00xx into RRRC_000xx
-                        RRRCid = "RRRC_0"+RRRCid.substring(5);
-                    }
-                    break;
-                }
+        List<XdbId> xids = getDao().getXdbIds(strainRgdId, 141);
+        if( !xids.isEmpty() ) {
+            String accId = xids.get(0).getAccId();
+            if( accId.length()==4 ) {
+                RRRCid = "RRRC_0" + accId;
+            } else {
+                RRRCid = "RRRC_" + accId;
             }
         }
 
