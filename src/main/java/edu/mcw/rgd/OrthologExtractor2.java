@@ -17,7 +17,7 @@ public class OrthologExtractor2 extends BaseExtractor {
 
     final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
-        "# MODULE: orthologs-2-version-2020-01-16\n"+
+        "# MODULE: orthologs-2-version-2022-08-26\n"+
         "# GENERATED-ON: #DATE#\n"+
         "# RGD Ortholog FTP file for #SPECIES#\n" +
         "# From: RGD\n" +
@@ -164,6 +164,9 @@ public class OrthologExtractor2 extends BaseExtractor {
 
         String speciesName = SpeciesType.getCommonName(speciesTypeKey2).toUpperCase();
 
+        int multiOrthosRgd = 0;
+        int multiOrthosSymbol = 0;
+
         List<Ortholog> orthologs = getDao().getOrthologs(speciesTypeKey1, speciesTypeKey2);
 
         // build a map of orthologs
@@ -178,11 +181,11 @@ public class OrthologExtractor2 extends BaseExtractor {
                 if( symbol1.equals(symbol2) ) {
                     // RGD source takes preference
                     if( orthologInMap.getXrefDataSrc().equals("RGD") ) {
-                        System.out.println("multi orthologs, resolved by RGD source");
+                        multiOrthosRgd++;
                     }
                     else if( o.getXrefDataSrc().equals("RGD") ) {
                         orthologMap.put(o.getSrcRgdId(), o);
-                        System.out.println("multi orthologs, resolved by RGD source");
+                        multiOrthosRgd++;
                     }
                     else {
                         System.out.println("cannot resolve multi orthologs, same symbol");
@@ -192,20 +195,20 @@ public class OrthologExtractor2 extends BaseExtractor {
                 } else {
                     String symbol = getDao().getSymbolForGene(o.getSrcRgdId());
                     if( symbol.equalsIgnoreCase(symbol1) ) {
-                        System.out.println("multi orthologs, resolved by symbol");
+                        multiOrthosSymbol++;
                     } else
                     if( symbol.equalsIgnoreCase(symbol2) ) {
                         orthologMap.put(o.getSrcRgdId(), o);
-                        System.out.println("multi orthologs, resolved by symbol");
+                        multiOrthosSymbol++;
                     } else {
 
                         // RGD source takes preference
                         if( orthologInMap.getXrefDataSrc().equals("RGD") ) {
-                            System.out.println("multi orthologs, resolved by RGD source");
+                            multiOrthosRgd++;
                         }
                         else if( o.getXrefDataSrc().equals("RGD") ) {
                             orthologMap.put(o.getSrcRgdId(), o);
-                            System.out.println("multi orthologs, resolved by RGD source");
+                            multiOrthosRgd++;
                         }
                         else {
                             System.out.println("cannot resolve multi orthologs, diff symbol");
@@ -215,6 +218,12 @@ public class OrthologExtractor2 extends BaseExtractor {
                     }
                 }
             }
+        }
+        if( multiOrthosRgd!=0 ) {
+            System.out.println("multi orthologs, resolved by RGD source: "+multiOrthosRgd);
+        }
+        if( multiOrthosSymbol!=0 ) {
+            System.out.println("multi orthologs, resolved by symbol: "+multiOrthosSymbol);
         }
 
         // generate columns in the header for species2

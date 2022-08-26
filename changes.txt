@@ -1,3 +1,6 @@
+Aug 26, 2022
+  ortholog extractor: tuned up logging (less spam)
+
 Jul 07, 2022
   strain extractor: fixed export of 'CitationId'
 
