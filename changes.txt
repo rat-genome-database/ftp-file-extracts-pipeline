@@ -1,3 +1,9 @@
+Sep 27, 2022
+  assembly comparison extractor:
+    count of genes exported in the header
+    fix in sql queries for some files
+    added new combinations of rat assemblies to be reported
+
 Aug 26, 2022
   ortholog extractor: tuned up logging (less spam)
 

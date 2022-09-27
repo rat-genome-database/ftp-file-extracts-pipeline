@@ -1,13 +1,12 @@
 package edu.mcw.rgd;
 
+import edu.mcw.rgd.dao.spring.StringListQuery;
 import edu.mcw.rgd.datamodel.MapData;
-import edu.mcw.rgd.datamodel.MappedGene;
 import edu.mcw.rgd.datamodel.SpeciesType;
 import edu.mcw.rgd.process.Utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -87,8 +86,8 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
         String header =
                 "# genes having position on rat assembly "+assemblyNew+",\n" +
                 "# but not having position on assembly "+assemblyOld+"\n" +
-                "# generated on: "+sdt2.format(now)+"\n" +
-                "#\n";
+                "# generated on: "+sdt2.format(now)+"\n";
+
         String[] colNames = {"RGD_ID","GENE_SYMBOL","GENE_TYPE","CHROMOSOME","START_POS","STOP_POS"};
         String fileName = dir + "/genes_on_" + assemblyNew + "_only_" + today + ".txt";
         String sql =
@@ -100,15 +99,15 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
           "and g.rgd_id=m.rgd_id and m.map_key="+mapKeyNew+" "+
           "order by gene_symbol_lc ";
 
-        generateFile(fileName, header, sql, colNames);
+        generateFile(fileName, header, sql, colNames, null, null);
 
 
         // generate file with genes only on the old assembly
         header =
                 "# genes having position on rat assembly "+assemblyOld+",\n" +
                 "# but not having position on assembly "+assemblyNew+"\n" +
-                "# generated on: "+sdt2.format(now)+"\n" +
-                "#\n";
+                "# generated on: "+sdt2.format(now)+"\n";
+
         fileName = dir + "/genes_on_" + assemblyOld + "_only_" + today + ".txt";
         sql =
           "select g.rgd_id,g.gene_symbol,g.gene_type_lc GENE_TYPE,m.chromosome,m.start_pos,m.stop_pos "+
@@ -119,52 +118,50 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
           "and g.rgd_id=m.rgd_id and m.map_key="+mapKeyOld+" "+
           "order by gene_symbol_lc ";
 
-        generateFile(fileName, header, sql, colNames);
+        generateFile(fileName, header, sql, colNames, null, null);
 
 
         // generate file with genes on different chromosomes
         header =
                 "#genes that are on different chromosomes in the assemblies ("+assemblyOld+","+assemblyNew+")\n" +
-                "# generated on: "+sdt2.format(now)+"\n" +
-                "#\n";
+                "# generated on: "+sdt2.format(now)+"\n";
+
         fileName = dir + "/genes_diff_chr_" + today + ".txt";
         generateGenesWithPosOnDiffChr(fileName, header, mapKeyOld, mapKeyNew, assemblyOld, assemblyNew);
-        /*
-        String[] colNames2 = {"RGD_ID","GENE_SYMBOL","GENE_TYPE","CHR_"+assemblyOld,"CHR_"+assemblyNew};
-        sql =
-          "select c1.rgd_id,g.gene_symbol,g.gene_type_lc GENE_TYPE,c1.chromosome \"CHR_"+assemblyOld+"\",c2.chromosome \"CHR_"+assemblyNew+"\" from (  \n" +
-          "  select distinct g.rgd_id,chromosome from genes g,rgd_ids r,maps_data m\n" +
-          "  where g.rgd_id=r.rgd_id and object_status='ACTIVE' and m.rgd_id=g.rgd_id and map_key="+mapKeyOld+"\n" +
-          "  ) c1, (\n" +
-          "  select distinct g.rgd_id,chromosome from genes g,rgd_ids r,maps_data m\n" +
-          "  where g.rgd_id=r.rgd_id and object_status='ACTIVE' and m.rgd_id=g.rgd_id and map_key="+mapKeyNew+"\n" +
-          ") c2,\n" +
-          "rgd_ids r, genes g\n" +
-          "where c1.chromosome<>c2.chromosome and c1.rgd_id=c2.rgd_id  and c1.rgd_id=r.rgd_id and object_status='ACTIVE'\n" +
-          "and r.rgd_id=g.rgd_id\n"+
-          "order by gene_symbol_lc ";
 
-        generateFile(fileName, header, sql, colNames2);
-        */
-
-        // generate file with genes not having positions on neither the old or the new assembly
+        // generate file with genes not having positions on neither the old nor the new assembly
         header =
                 "#genes not positioned on "+assemblyOld+" assembly nor "+assemblyNew+" assembly\n" +
-                "# generated on: "+sdt2.format(now)+"\n" +
-                "#\n";
-        String[] colNames3 = {"RGD_ID","GENE_SYMBOL","GENE_TYPE","NUCLEOTIDE_ACC_IDS","PROTEIN_ACC_IDS"};
+                "# generated on: "+sdt2.format(now)+"\n";
+
+        String[] colNames3 = {"RGD_ID","GENE_SYMBOL","GENE_TYPE"};
         fileName = dir + "/genes_no_pos_" + today + ".txt";
         sql =
-          "select g.rgd_id,g.gene_symbol,g.gene_type_lc GENE_TYPE,\n" +
-          "     (select listagg(acc_id,',') within group (order by acc_id) FROM rgd_acc_xdb x where x.rgd_id=g.rgd_id and xdb_key=1) NUCL_IDS,\n" +
-          "     (select listagg(acc_id,',') within group (order by acc_id) FROM rgd_acc_xdb x where x.rgd_id=g.rgd_id and xdb_key=7) PROT_IDS\n" +
+          "select g.rgd_id,g.gene_symbol,g.gene_type_lc GENE_TYPE\n" +
           "  from genes g,rgd_ids r\n" +
           "  where g.rgd_id=r.rgd_id and object_status='ACTIVE' AND species_type_key=3 AND gene_type_lc not in('allele','splice')\n" +
           "  and not exists(select 1 from maps_data m where m.rgd_id=g.rgd_id and map_key="+mapKeyOld+")\n" +
           "  and not exists(select 1 from maps_data m where m.rgd_id=g.rgd_id and map_key="+mapKeyNew+")\n"+
           "order by gene_symbol_lc ";
 
-        generateFile(fileName, header, sql, colNames3);
+        String[] sqlForExtraCols = {"SELECT acc_id FROM rgd_acc_xdb x WHERE xdb_key=1 AND x.rgd_id=?",
+                "SELECT acc_id FROM rgd_acc_xdb x WHERE xdb_key=7 AND x.rgd_id=?"};
+        String[] extraColNames = {"NUCLEOTIDE_ACC_IDS","PROTEIN_ACC_IDS"};
+
+        /* original code
+        String[] colNames3 = {"RGD_ID","GENE_SYMBOL","GENE_TYPE","NUCLEOTIDE_ACC_IDS","PROTEIN_ACC_IDS"};
+        fileName = dir + "/genes_no_pos_" + today + ".txt";
+        sql =
+                "select g.rgd_id,g.gene_symbol,g.gene_type_lc GENE_TYPE,\n" +
+                        "     (select listagg(acc_id,',') within group (order by acc_id) FROM rgd_acc_xdb x where x.rgd_id=g.rgd_id and xdb_key=1) NUCL_IDS,\n" +
+                        "     (select listagg(acc_id,',') within group (order by acc_id) FROM rgd_acc_xdb x where x.rgd_id=g.rgd_id and xdb_key=7) PROT_IDS\n" +
+                        "  from genes g,rgd_ids r\n" +
+                        "  where g.rgd_id=r.rgd_id and object_status='ACTIVE' AND species_type_key=3 AND gene_type_lc not in('allele','splice')\n" +
+                        "  and not exists(select 1 from maps_data m where m.rgd_id=g.rgd_id and map_key="+mapKeyOld+")\n" +
+                        "  and not exists(select 1 from maps_data m where m.rgd_id=g.rgd_id and map_key="+mapKeyNew+")\n"+
+                        "order by gene_symbol_lc ";
+*/
+        generateFile(fileName, header, sql, colNames3, sqlForExtraCols, extraColNames);
 
         System.out.println("===OK===");
     }
@@ -177,12 +174,7 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
         String[] colNames2 = {"RGD_ID","GENE_SYMBOL","GENE_TYPE","CHR_"+assemblyOld,"CHR_"+assemblyNew,
                 "START_POS_"+assemblyOld, "STOP_POS_"+assemblyOld, "START_POS_"+assemblyNew, "STOP_POS_"+assemblyNew,};
 
-        try(BufferedWriter out = new BufferedWriter(new FileWriter(fileName))) {
-
-            out.write(header);
-
-            out.write(Utils.concatenate(colNames2, "\t"));
-            out.write("\n");
+        try(BufferedWriter out = Utils.openWriter(fileName)) {
 
             // rat genes having positions for both assemblies
             String sql = "SELECT g.rgd_id,g.gene_symbol,g.gene_type_lc FROM genes g,rgd_ids r\n" +
@@ -192,13 +184,21 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
                     "ORDER BY gene_symbol_lc";
             String[] colNames = {"RGD_ID","GENE_SYMBOL","GENE_TYPE"};
             List<String[]> genesInfo = getDao().getRows(sql, colNames);
+
+            out.write(header);
+            out.write("# count of genes in the file: "+genesInfo.size()+"\n");
+            out.write("#\n");
+
+            out.write(Utils.concatenate(colNames2, "\t"));
+            out.write("\n");
+
             for( String[] info: genesInfo ) {
                 if( info[0].equals("RGD_ID") ) { continue; }
                 int rgdId = Integer.parseInt(info[0]);
                 List<MapData> md1s = getDao().getMapData(rgdId, mapKeyOld);
                 List<MapData> md2s = getDao().getMapData(rgdId, mapKeyNew);
 
-                // if there is a shared chromosome, remove thee positions from both lists
+                // if there is a shared chromosome, remove these positions from both lists
                 removeSharedChr(md1s, md2s);
 
                 String chrOld, startPosOld, stopPosOld;
@@ -258,29 +258,6 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
                 }
             }
         }
-
-        /*
-        header =
-                "#genes that are on different chromosomes in the assemblies ("+assemblyOld+","+assemblyNew+")\n" +
-                        "# generated on: "+sdt2.format(now)+"\n" +
-                        "#\n";
-        String[] colNames2 = {"RGD_ID","GENE_SYMBOL","GENE_TYPE","CHR_"+assemblyOld,"CHR_"+assemblyNew};
-        fileName = dir + "/genes_diff_chr_" + today + ".txt";
-        sql =
-                "select c1.rgd_id,g.gene_symbol,g.gene_type_lc GENE_TYPE,c1.chromosome \"CHR_"+assemblyOld+"\",c2.chromosome \"CHR_"+assemblyNew+"\" from (  \n" +
-                        "  select distinct g.rgd_id,chromosome from genes g,rgd_ids r,maps_data m\n" +
-                        "  where g.rgd_id=r.rgd_id and object_status='ACTIVE' and m.rgd_id=g.rgd_id and map_key="+mapKeyOld+"\n" +
-                        "  ) c1, (\n" +
-                        "  select distinct g.rgd_id,chromosome from genes g,rgd_ids r,maps_data m\n" +
-                        "  where g.rgd_id=r.rgd_id and object_status='ACTIVE' and m.rgd_id=g.rgd_id and map_key="+mapKeyNew+"\n" +
-                        ") c2,\n" +
-                        "rgd_ids r, genes g\n" +
-                        "where c1.chromosome<>c2.chromosome and c1.rgd_id=c2.rgd_id  and c1.rgd_id=r.rgd_id and object_status='ACTIVE'\n" +
-                        "and r.rgd_id=g.rgd_id\n"+
-                        "order by gene_symbol_lc ";
-
-        generateFile(fileName, header, sql, colNames2);
-        */
     }
 
     void removeSharedChr(List<MapData> md1s, List<MapData> md2s) {
@@ -323,14 +300,20 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
         return true;
     }
 
-    void generateFile(String fileName, String header, String sql, String[] colNames) throws Exception {
+    void generateFile(String fileName, String header, String sql, String[] colNames, String[] sqlExtraCols, String[] extraColNames) throws Exception {
 
         System.out.println("  "+fileName);
 
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write(header);
+        List<String[]> rows = getDao().getRows(sql, colNames);
+        int rowNr = 0;
 
-            for( String[] row: getDao().getRows(sql, colNames) ) {
+        try(BufferedWriter writer = Utils.openWriter(fileName)) {
+            writer.write(header);
+            writer.write("# count of genes in the file: "+(rows.size()-1)+"\n");
+            writer.write("#\n");
+
+            for( String[] row: rows ) {
+
                 int i = 0;
                 for( String col: row ) {
                     if( i>0 )
@@ -339,7 +322,30 @@ public class AssemblyComparisonExtractor extends BaseExtractor {
                         writer.write(col);
                     i++;
                 }
+
+                if( sqlExtraCols!=null ) {
+                    if( rowNr>0 ) {
+                        for (String sqlExtra : sqlExtraCols) {
+                            writer.write('\t');
+
+                            String rgdId = row[0];
+                            List<String> values = StringListQuery.execute(getDao(), sqlExtra, rgdId);
+                            if (!values.isEmpty()) {
+                                String singleValue = Utils.concatenate(values, ",");
+                                writer.write(singleValue);
+                            }
+                        }
+                    } else {
+                        // just print extra column names
+                        for (String extraColName : extraColNames) {
+                            writer.write('\t');
+                            writer.write(extraColName);
+                        }
+                    }
+                }
+
                 writer.write('\n');
+                rowNr++;
             }
         }
     }

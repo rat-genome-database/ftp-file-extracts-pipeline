@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build Aug 26, 2022" />
+        <property name="version" value="FtpFileExtractManager  -- build Sep 27, 2022" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -321,10 +321,22 @@
     </bean>
 
     <bean id="assemblyComparisonExtractor" class="edu.mcw.rgd.AssemblyComparisonExtractor" scope="prototype">
-        <property name="version" value="Assembly Comparison Extractor v.1.1 as of Jan 23, 2018"/>
+        <property name="version" value="Assembly Comparison Extractor   build Sep 27, 2022"/>
         <property name="outputDir" value="data/GENES_RAT_assembly_comparison"/>
         <property name="assemblies">
             <list>
+                <value>301-302</value>
+                <value>301-303</value>
+                <value>302-303</value>
+
+                <value>301-372</value>
+                <value>302-372</value>
+                <value>303-372</value>
+
+                <value>372-360</value>
+                <value>372-70</value>
+                <value>372-60</value>
+
                 <value>360-70</value>
                 <value>70-60</value>
                 <value>360-60</value>
@@ -332,8 +344,13 @@
         </property>
         <property name="assemblyNames">
             <map>
-                <entry key="360" value="6.0" />
-                <entry key="70" value="5.0" />
+                <entry key="301" value="UTH_Shr" />
+                <entry key="302" value="UTH_Shrsp" />
+                <entry key="303" value="UTH_WKY" />
+                <entry key="372" value="rn7" />
+
+                <entry key="360" value="rn6" />
+                <entry key="70" value="rn5" />
                 <entry key="60" value="3.4" />
             </map>
         </property>
