@@ -1,3 +1,6 @@
+Oct 05, 2022
+  daf extractor: human: improved handling of OMIM:PS associations
+
 Sep 27, 2022
   assembly comparison extractor:
     count of genes exported in the header

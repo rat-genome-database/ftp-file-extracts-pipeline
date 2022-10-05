@@ -614,6 +614,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     public String getOmimPSTermAccForChildTerm(String childTermAcc) throws Exception {
         String sql = "SELECT parent_term_acc FROM omim_ps_custom_do WHERE child_term_acc=?";
         List<String> termAccIds = StringListQuery.execute(ontologyDAO, sql, childTermAcc);
+
+        // remove custom DO terms from the results
+        termAccIds.removeIf(termAccId -> termAccId.length() == 12 && termAccId.startsWith("DOID:9"));
+
         if( termAccIds.isEmpty() ) {
             return null;
         }
