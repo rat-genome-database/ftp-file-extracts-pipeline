@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build Oct 05, 2022" />
+        <property name="version" value="FtpFileExtractManager  -- build Oct 26, 2022" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -191,7 +191,7 @@
 
 
     <bean id="qtlExtractor" class="edu.mcw.rgd.QtlExtractor" scope="prototype">
-        <property name="version" value="Qtl Extractor  build 2019-06-24"/>
+        <property name="version" value="Qtl Extractor  build Oct 26, 2022"/>
     </bean>
 
     <bean id="dbSnpExtractor" class="edu.mcw.rgd.DbSnpExtractor" scope="prototype">

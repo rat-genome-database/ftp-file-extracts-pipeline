@@ -36,7 +36,7 @@ public class QtlExtractor  extends BaseExtractor {
 
     final String HEADER_COMMON_LINES =
         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: qtls  build 2019-06-24\n"
+        +"# MODULE: qtls  build 2022-10-26\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: information about active #SPECIES# qtls extracted from RGD database\n"
         +"# CONTACT: rgd.developers@mcw.edu\n"
@@ -44,7 +44,6 @@ public class QtlExtractor  extends BaseExtractor {
         +"# NOTES: multiple values in a single column are separated by ';'\n"
         +"#\n"
         +"### Apr  1 2011  RATMAP_IDs and RHDB_IDs are discontinued\n"
-        +"### Dec 19 2011  no data changes; improved internal QC\n"
         +"### Oct 22 2012  fixed export of positional information for mouse qtls (positions on assembly build 38 were exported as positions on assembly 37)\n"
         +"### Oct 23 2012  fixed description of columns for human qtls\n"
         +"### Nov 20 2012  rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported\n"
@@ -55,6 +54,7 @@ public class QtlExtractor  extends BaseExtractor {
         +"### Jan 08 2016  TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE\n"
         +"### Jan 11 2016  rat: added columns STRAIN_RGD_ID3 and STRAIN_RGD_SYMBOL3 for qtls that have 3+ crossed strains\n"
         +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
+        +"### Oct 26 2022  added generation of positions on rn7 assembly\n"
         +"#\n"
         +"#COLUMN INFORMATION:\n"
         +"# (First 25 columns are in common between rat, mouse and human)\n"
@@ -96,31 +96,36 @@ public class QtlExtractor  extends BaseExtractor {
     // additional columns for rat
     final String HEADER_RAT =
         "#26 (UNUSED)\n"
-        +"#27 5.0_MAP_POS_CHR     chromosome for previous assembly 5.0\n"
-        +"#28 5.0_MAP_POS_START   start position for previous assembly 5.0\n"
-        +"#29 5.0_MAP_POS_STOP    stop position for previous assembly 5.0\n"
-        +"#30 5.0_MAP_POS_METHOD  qtl positioning method for previous assembly 5.0\n"
-        +"#31 3.4_MAP_POS_CHR     chromosome for old assembly 3.4\n"
-        +"#32 3.4_MAP_POS_START   start position for old assembly 3.4\n"
-        +"#33 3.4_MAP_POS_STOP    stop position for old assembly 3.4\n"
-        +"#34 3.4_MAP_POS_METHOD  qtl positioning method for old assembly 3.4\n"
+        +"#27 5.0_MAP_POS_CHR     chromosome for assembly Rnor_5.0\n"
+        +"#28 5.0_MAP_POS_START   start position for assembly Rnor_5.0\n"
+        +"#29 5.0_MAP_POS_STOP    stop position for assembly Rnor_5.0\n"
+        +"#30 5.0_MAP_POS_METHOD  qtl positioning method for assembly Rnor_5.0\n"
+        +"#31 3.4_MAP_POS_CHR     chromosome for assembly RGSC 3.4\n"
+        +"#32 3.4_MAP_POS_START   start position for assembly RGSC 3.4\n"
+        +"#33 3.4_MAP_POS_STOP    stop position for assembly RGSC 3.4\n"
+        +"#34 3.4_MAP_POS_METHOD  qtl positioning method for assembly RGSC 3.4\n"
         +"#35 CROSS_TYPE          strain cross type\n"
         +"#36 CROSS_PAIR          pairing of strains for cross\n"
         +"#37 STRAIN_RGD_ID1      RGD_ID of first strain crossed\n"
         +"#38 STRAIN_RGD_ID2      RGD_ID of second strain crossed\n"
         +"#39 STRAIN_RGD_SYMBOL1  symbol of first strain crossed\n"
         +"#40 STRAIN_RGD_SYMBOL2  symbol of second strain crossed\n"
-        +"#41 6.0_MAP_POS_CHR     chromosome for current assembly 6.0\n"
-        +"#42 6.0_MAP_POS_START   start position for current assembly 6.0\n"
-        +"#43 6.0_MAP_POS_STOP    stop position for current assembly 6.0\n"
-        +"#44 6.0_MAP_POS_METHOD  qtl positioning method for current assembly 6.0\n"
+        +"#41 6.0_MAP_POS_CHR     chromosome for assembly Rnor_6.0\n"
+        +"#42 6.0_MAP_POS_START   start position for assembly Rnor_6.0\n"
+        +"#43 6.0_MAP_POS_STOP    stop position for assembly Rnor_6.0\n"
+        +"#44 6.0_MAP_POS_METHOD  qtl positioning method for assembly Rnor_6.0\n"
         +"#45 STRAIN_RGD_ID3      RGD_ID of third strain crossed\n"
         +"#46 STRAIN_RGD_SYMBOL3  symbol of third strain crossed\n"
+        +"#47 7.2_MAP_POS_CHR     chromosome for assembly mRatBN7.2\n"
+        +"#48 7.2_MAP_POS_START   start position for assembly mRatBN7.2\n"
+        +"#49 7.2_MAP_POS_STOP    stop position for assembly mRatBN7.2\n"
+        +"#50 7.2_MAP_POS_METHOD  qtl positioning method for assembly mRatBN7.2\n"
         +"#\n#COLUMNS#"
         +"\t(UNUSED)\t5.0_MAP_POS_CHR\t5.0_MAP_POS_START\t5.0_MAP_POS_STOP\t5.0_MAP_POS_METHOD"
         +"\t3.4_MAP_POS_CHR\t3.4_MAP_POS_START\t3.4_MAP_POS_STOP\t3.4_MAP_POS_METHOD"
         +"\tCROSS_TYPE\tCROSS_PAIR\tSTRAIN_RGD_ID1\tSTRAIN_RGD_ID2\tSTRAIN_RGD_SYMBOL1\tSTRAIN_RGD_SYMBOL2"
-        +"\t6.0_MAP_POS_CHR\t6.0_MAP_POS_START\t6.0_MAP_POS_STOP\t6.0_MAP_POS_METHOD\tSTRAIN_RGD_ID3\tSTRAIN_RGD_SYMBOL3";
+        +"\t6.0_MAP_POS_CHR\t6.0_MAP_POS_START\t6.0_MAP_POS_STOP\t6.0_MAP_POS_METHOD\tSTRAIN_RGD_ID3\tSTRAIN_RGD_SYMBOL3"
+        +"\t7.2_MAP_POS_CHR\t7.2_MAP_POS_START\t7.2_MAP_POS_STOP\t7.2_MAP_POS_METHOD";
 
     // additional columns for mouse
     final String HEADER_MOUSE =
@@ -244,6 +249,7 @@ public class QtlExtractor  extends BaseExtractor {
                     rec.mapData1 = dao.getMapData(qtl.getRgdId(), 70); // Rnor_5.0
                     rec.mapData2 = dao.getMapData(qtl.getRgdId(), 60); // RGSC 3.4
                     rec.mapData3 = dao.getMapData(qtl.getRgdId(), 360);// Rnor_6.0
+                    rec.mapData4 = dao.getMapData(qtl.getRgdId(), 372);// mRatBN7.2
                 }
                 else if( speciesType==SpeciesType.MOUSE ) {
                     rec.mapData1 = dao.getMapData(qtl.getRgdId(), 18);
@@ -493,7 +499,7 @@ public class QtlExtractor  extends BaseExtractor {
         if( rec.mapData3!=null )
             writeMapData(buf, rec.mapData3);
 
-        // RGD_ID and symbol of 3rd strain crossed
+        // rat: RGD_ID and symbol of 3rd strain crossed, and rn7 positions
         if( speciesType==SpeciesType.RAT ) {
             // 45. STRAIN_RGD_ID3 RGD_ID of third strain crossed
             buf.append(checkNull(strains[2]));
@@ -501,6 +507,8 @@ public class QtlExtractor  extends BaseExtractor {
             // 46. STRAIN_RGD_SYMBOL3 symbol of third strain crossed
             buf.append(checkNull(strains[5]));
             buf.append('\t');
+
+            writeMapData(buf, rec.mapData4);
         }
 
         // terminate the line
