@@ -1,3 +1,6 @@
+Dec 02, 2022
+  marker allele extractor: added export of rn7 positions and PCR forward/reverse primer sequences
+
 Oct 26, 2022
   qtl extractor: rat: added export of rn7 positions
 

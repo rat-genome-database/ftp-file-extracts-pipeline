@@ -386,7 +386,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
                 return getSymbolForGene(rgdId.getRgdId());
 
             case 3: // MARKERS
-                SSLP marker = markerDAO.getSSLP(rgdId.getRgdId());
+                SSLP marker = getMarker(rgdId.getRgdId());
                 return marker != null ? marker.getName() : null;
 
             default:
@@ -402,6 +402,11 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     String getSymbolForGene(int geneRgdId) throws Exception {
         Gene gene = geneDAO.getGene(geneRgdId);
         return gene != null ? gene.getSymbol() : null;
+    }
+
+    SSLP getMarker(int markerRgdId) throws Exception {
+        SSLP marker = markerDAO.getSSLP(markerRgdId);
+        return marker;
     }
 
     /**
