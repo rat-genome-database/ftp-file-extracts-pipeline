@@ -43,10 +43,39 @@ public class AgrRefExtractor extends BaseExtractor {
         Map<Integer,String> pmidMap = getDao().loadPmidMap();
         List<Reference> refsInRgd = getDao().getActiveReferences();
 
+        // refs in RGD less duplicate DOIs
+        refsInRgd = removeDuplicateDOIs(refsInRgd);
 
         processReferences(refsInRgd, pmidMap);
         processRefExchange(refsInRgd, pmidMap);
 
+    }
+
+    List<Reference> removeDuplicateDOIs( List<Reference> refs ) {
+
+        // sometimes there are two references with the same DOI -- Alliance doesn't accept multiple references
+        // with the same DOI -- our strategy is to submit the latest reference in RGD from the conflicts
+
+        // first sort the references by RGD_ID so oldest references will come at the beginning of the list
+        Collections.sort(refs, new Comparator<Reference>() {
+            @Override
+            public int compare(Reference o1, Reference o2) {
+                return o1.getRgdId() - o2.getRgdId();
+            }
+        });
+
+        int duplicateRefsRemoved = 0;
+        Map<String, Reference> doiMap = new HashMap<>();
+        for( Reference r: refs ) {
+            String doi = Utils.NVL(r.getDoi(), Integer.toString(r.getRgdId()));
+            Reference prevRef = doiMap.put(doi, r);
+            if( prevRef!=null ) {
+                duplicateRefsRemoved++;
+            }
+        }
+        System.out.println("  *** references with duplicate DOIs skipped: "+ duplicateRefsRemoved);
+
+        return new ArrayList<>(doiMap.values());
     }
 
     void processReferences(List<Reference> refsInRgd, Map<Integer,String> pmidMap) throws Exception {

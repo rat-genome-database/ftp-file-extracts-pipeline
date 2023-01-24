@@ -1,3 +1,6 @@
+Jan 24, 2023
+  agr ref extractor: filter out references with duplicate DOIs from submission
+
 Dec 02, 2022
   marker allele extractor: added export of rn7 positions and PCR forward/reverse primer sequences
 

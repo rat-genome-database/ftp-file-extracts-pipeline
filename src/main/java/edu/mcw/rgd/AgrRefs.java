@@ -23,7 +23,7 @@ public class AgrRefs {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Reference Extractor, AGR schema 1.0.1.4, build Jan 25, 2021";
+                release = "RGD Reference Extractor, build Dec 14, 2022";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
