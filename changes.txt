@@ -1,3 +1,6 @@
+Jan 27, 2023
+  updated build.gradle to be gradle 6.x + compatible
+
 Jan 24, 2023
   agr ref extractor: filter out references with duplicate DOIs from submission
 
