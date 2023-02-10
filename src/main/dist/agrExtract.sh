@@ -2,8 +2,8 @@
 #
 # abort the script if any of stages below will fail
 set -e
-
-APPHOME=/home/rgddata/pipelines/ftpFileExtracts
+APPNAME="ftp-file-extracts-pipeline"
+APPHOME=/home/rgddata/pipelines/$APPNAME
 OUTDIR=$APPHOME/data/agr
 # note: python -m json.tool is formatting the json files in human readable pretty format
 

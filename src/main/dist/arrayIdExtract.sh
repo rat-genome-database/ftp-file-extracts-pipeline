@@ -1,7 +1,8 @@
 # export array ids for genes
 set -e
 
-APPHOME=/home/rgddata/pipelines/ftpFileExtracts
+APPNAME="ftp-file-extracts-pipeline"
+APPHOME=/home/rgddata/pipelines/$APPNAME
 
 echo "=== ARRAY IDS ... ==="
 $APPHOME/run.sh -array_ids

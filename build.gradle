@@ -13,7 +13,7 @@ apply plugin: 'application'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 mainClassName = 'edu.mcw.rgd.FtpFileExtractsManager'
-String myAppName = 'ftpFileExtracts'
+String myAppName = 'ftp-file-extracts-pipeline'
 
 project.archivesBaseName = myAppName
 
@@ -24,7 +24,7 @@ repositories {
 dependencies {
     implementation 'org.apache.commons:commons-dbcp2:2.9.0'
     implementation 'commons-net:commons-net:3.9.0'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
     implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
     implementation 'com.oracle.database.jdbc:ojdbc8:21.8.0.0'

@@ -1,3 +1,6 @@
+Feb 10, 2023
+  renamed to 'ftp-file-extracts-pipeline'
+
 Jan 27, 2023
   updated build.gradle to be gradle 6.x + compatible
 

@@ -3,7 +3,7 @@
 # FTP file extracts pipeline
 #
 . /etc/profile
-APPNAME=ftpFileExtracts
+APPNAME="ftp-file-extracts-pipeline"
 
 # abort the script if any of stages below will fail
 set -e

@@ -1,6 +1,7 @@
 set -e
 
-APPHOME=/home/rgddata/pipelines/ftpFileExtracts
+APPNAME="ftp-file-extracts-pipeline"
+APPHOME=/home/rgddata/pipelines/$APPNAME
 
 echo "=== GP2PROTEIN ... ==="
 $APPHOME/run.sh -gp2protein

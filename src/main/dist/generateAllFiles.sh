@@ -1,5 +1,6 @@
 . /etc/profile
-APPHOME=/home/rgddata/pipelines/ftpFileExtracts
+APPNAME="ftp-file-extracts-pipeline"
+APPHOME=/home/rgddata/pipelines/$APPNAME
 
 # abort the script if any of stages below will fail
 set -e
