@@ -1,13 +1,13 @@
 package edu.mcw.rgd;
 
+import edu.mcw.rgd.datamodel.Gene;
 import edu.mcw.rgd.datamodel.SpeciesType;
+import edu.mcw.rgd.process.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author mtutaj
@@ -65,6 +65,33 @@ public abstract class BaseExtractor {
         new File(outputDir).mkdirs(); // ensure the species specific directory does exist
         return outputDir;
     }
+
+    public List<GeneExtractRecord> loadGeneRecords(int speciesTypeKey) throws Exception {
+        List<Gene> genesInRgd = getDao().getActiveGenes(speciesTypeKey);
+        List<GeneExtractRecord> result = new ArrayList<>(genesInRgd.size());
+
+        for( Gene gene: genesInRgd ) {
+            GeneExtractRecord rec = new GeneExtractRecord();
+            rec.setGeneKey(gene.getKey());
+            rec.setRgdId(gene.getRgdId());
+            rec.setGeneSymbol(gene.getSymbol());
+            rec.setGeneFullName(gene.getName());
+            rec.setGeneDesc(Utils.getGeneDescription(gene));
+            rec.setRefSeqStatus(gene.getRefSeqStatus());
+
+            // NCBI cannot handle gene types of type 'protein_coding'
+            // replace 'protein_coding' into 'protein-coding'
+            String geneType = gene.getType();
+            if( geneType!=null && geneType.equals("protein_coding") ) {
+                geneType = "protein-coding";
+            }
+            rec.setGeneType(geneType);
+
+            result.add(rec);
+        }
+        return result;
+    }
+
 
     public FtpFileExtractsDAO getDao() {
         return dao;

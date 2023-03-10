@@ -20,7 +20,7 @@ public class ChinchillaExtractor extends BaseExtractor {
 
     final String GENES_HEADER =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: chinchilla-genes-version-2019-12-02\n"
+    +"# MODULE: chinchilla-genes-version-2023-03-10\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active chinchilla genes extracted from RGD database\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
@@ -75,7 +75,7 @@ public class ChinchillaExtractor extends BaseExtractor {
         final PrintWriter bedWriter = new PrintWriter(bedFileName);
         bedWriter.println("track name=\"chinchillaRefSeqData\" description=\"format: GeneSymbol|RgdId|GeneId|NucleotideAccIds|ProteinAccIds\" useScore=0");
 
-        List<GeneExtractRecord> genesToProcess = getGeneList();
+        List<GeneExtractRecord> genesToProcess = loadGeneRecords(speciesType);
         AtomicInteger recCount = new AtomicInteger();
 
         genesToProcess.parallelStream().forEach( rec -> {
@@ -134,26 +134,6 @@ public class ChinchillaExtractor extends BaseExtractor {
         log.info("### extracted "+recCount.intValue()+"  rows;  elapsed "+Utils.formatElapsedTime(time0, System.currentTimeMillis()));
 
         return outputFileName;
-    }
-
-    List<GeneExtractRecord> getGeneList() throws Exception {
-
-        List<Gene> genesInRgd = getDao().getActiveGenes(speciesType);
-        List<GeneExtractRecord> result = new ArrayList<>(genesInRgd.size());
-        for( Gene gene: genesInRgd ) {
-            log.debug("processing gene "+gene.getSymbol()+", RGD:"+gene.getRgdId());
-            GeneExtractRecord rec = new GeneExtractRecord();
-            rec.setGeneKey(gene.getKey());
-            rec.setRgdId(gene.getRgdId());
-            rec.setGeneSymbol(gene.getSymbol());
-            rec.setGeneFullName(gene.getName());
-            rec.setGeneDesc(Utils.getGeneDescription(gene));
-            rec.setGeneType(gene.getType());
-            rec.setRefSeqStatus(gene.getRefSeqStatus());
-
-            result.add(rec);
-        }
-        return result;
     }
 
     String generateLine(GeneExtractRecord rec) throws Exception {

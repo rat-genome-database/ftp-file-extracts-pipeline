@@ -19,7 +19,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_RAT =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2022-04-18\n"
+    +"# MODULE: genes  build 2023-03-10\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
     +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
@@ -46,6 +46,7 @@ public class GeneExtractor extends BaseExtractor {
     +"### Feb 12 2021  added export of positions on assembly mRatBN7.2; discontinued export of positions on assembly RGSCv3.1 (columns 6,12,13,14)\n"
     +"### Jan 25 2022  rat Ensembl positions exported for mRatBN7.2 assembly\n"
     +"### Apr 18 2022  added export of canonical proteins in column 27\n"
+    +"### Mar 10 2023  no more 'protein_coding' gene types: 'protein-coding' used instead\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"# (First 38 columns are in common between all species)\n"
@@ -1055,24 +1056,6 @@ public class GeneExtractor extends BaseExtractor {
             +"      canonical proteins in RGD: "+canonicalProteins.size());
 
         return outputFileName;
-    }
-
-    List<GeneExtractRecord> loadGeneRecords(int speciesTypeKey) throws Exception {
-        List<Gene> genesInRgd = getDao().getActiveGenes(speciesTypeKey);
-        List<GeneExtractRecord> result = new ArrayList<>(genesInRgd.size());
-
-        for( Gene gene: genesInRgd ) {
-            GeneExtractRecord rec = new GeneExtractRecord();
-            rec.setGeneKey(gene.getKey());
-            rec.setRgdId(gene.getRgdId());
-            rec.setGeneSymbol(gene.getSymbol());
-            rec.setGeneFullName(gene.getName());
-            rec.setGeneDesc(Utils.getGeneDescription(gene));
-            rec.setGeneType(gene.getType());
-            rec.setRefSeqStatus(gene.getRefSeqStatus());
-            result.add(rec);
-        }
-        return result;
     }
 
     String generateLineContents(GeneExtractRecord rec, int speciesType) throws Exception {

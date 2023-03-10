@@ -1,3 +1,7 @@
+Mar 10, 2023
+  genes: replace 'protein_coding' genbe type with 'protein-coding'
+    per RGDD-2342: geneNCBI can't handle "protein_coding" gene "Type"
+
 Feb 10, 2023
   renamed to 'ftp-file-extracts-pipeline'
 
