@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build Mar 10, 2023" />
+        <property name="version" value="FtpFileExtractManager  -- build May 19, 2023" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -83,6 +83,7 @@
         <property name="speciesType" value="5" />
         <property name="cytoMapKey" value="500" />
         <property name="ensemblAssemblyMapKey" value="512" />
+        <property name="celeraAssemblyMapKey" value="514" /><!-- export data for this assembly in columns normally reserved for Celera assembly -->
     </bean>
 
     <bean id="squirrelInfo" class="edu.mcw.rgd.SpeciesRecord">
@@ -117,7 +118,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build Mar 10, 2023"/>
+        <property name="version" value="Gene Extractor  build May 19, 2023"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
