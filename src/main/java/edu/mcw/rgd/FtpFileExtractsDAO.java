@@ -673,7 +673,8 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
         String sql = "SELECT DISTINCT s.common_name Species, g.rgd_id old_gene_rgd_id, g.gene_symbol old_gene_symbol,\n"+
             "r.object_status old_gene_status, g.gene_type_lc old_gene_type, new_rgd_id new_gene_rgd_id,\n"+
-            "gh.gene_symbol new_gene_symbol, gh.gene_type_lc new_gene_type, r2.object_status new_gene_status\n" +
+            "gh.gene_symbol new_gene_symbol, gh.gene_type_lc new_gene_type, r2.object_status new_gene_status,\n"+
+            "TO_CHAR(r.last_modified_date,'YYYY-MM-DD')\n" +
             "FROM genes g,rgd_ids r,species_types s,rgd_id_history h,genes gh,rgd_ids r2\n" +
             "WHERE r.rgd_id=g.rgd_id AND r.object_status<>'ACTIVE' AND s.species_type_key=r.species_type_key\n" +
             "AND g.rgd_id=h.old_rgd_id(+) AND h.new_rgd_id=gh.rgd_id(+)\n" +
@@ -694,6 +695,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
                 row.newGeneSymbol = rs.getString(7);
                 row.newGeneType = rs.getString(8);
                 row.newGeneStatus = rs.getString(9);
+                row.dateObsoleted = rs.getString(10);
                 return row;
             }
         });
@@ -862,4 +864,5 @@ class ObsoleteId {
     public String newGeneSymbol;
     public String newGeneStatus;
     public String newGeneType;
+    public String dateObsoleted;
 }

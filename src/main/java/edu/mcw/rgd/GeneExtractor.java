@@ -1284,12 +1284,13 @@ public class GeneExtractor extends BaseExtractor {
 
         final String HEADER =
          "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: obsolete-ids-version-1.0\n"
+        +"# MODULE: obsolete-ids-version-1.1\n"
         +"# GENERATED-ON: #DATE#\n"
         +"# PURPOSE: list of RGD IDs for genes that have been retired or withdrawn from RGD database\n"
         +"# CONTACT: rgd.data@mcw.edu\n"
         +"# FORMAT: tab delimited text\n"
         +"#\n"
+        +"### As of Sep 5, 2023 added column DATE_DISCONTINUED.\n"
         +"### As of Oct 8, 2013 generates obsolete RGD IDs for genes.\n"
         +"#\n"
         +"#COLUMN INFORMATION:\n"
@@ -1302,11 +1303,12 @@ public class GeneExtractor extends BaseExtractor {
         +"#7   NEW_GENE_SYMBOL    new gene symbol (if any)\n"
         +"#8   NEW_GENE_STATUS    old gene status (if any)\n"
         +"#9   NEW_GENE_TYPE      new gene type (if any)\n"
+        +"#10  DATE_DISCONTINUED  date the gene has been discontinued\n"
 
         +"#\n"
         +"SPECIES\t"
         +"OLD_GENE_RGD_ID\tOLD_GENE_SYMBOL\tOLD_GENE_STATUS\tOLD_GENE_TYPE\t"
-        +"NEW_GENE_RGD_ID\tNEW_GENE_SYMBOL\tNEW_GENE_STATUS\tNEW_GENE_TYPE\n";
+        +"NEW_GENE_RGD_ID\tNEW_GENE_SYMBOL\tNEW_GENE_STATUS\tNEW_GENE_TYPE\tDATE_DISCONTINUED\n";
 
         // prepare header common lines
         String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
@@ -1333,6 +1335,8 @@ public class GeneExtractor extends BaseExtractor {
                 .append(checkNull(id.newGeneStatus))
                 .append('\t')
                 .append(checkNull(id.newGeneType))
+                .append('\t')
+                .append(checkNull(id.dateObsoleted))
                 .append('\n');
         }
         writer.close();
