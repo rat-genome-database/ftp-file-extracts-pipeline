@@ -1,3 +1,6 @@
+Sep 29, 2023
+  run.sh: increased maximum java heap space needed to 32GB to avoid running out-of-memory
+
 Sep 05, 2023
   obsolete-genes: added export of new column DATE_DISCONTINUED
 
