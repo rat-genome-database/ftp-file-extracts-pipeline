@@ -214,7 +214,9 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
             if( accIds==null ) {
                 hgncMgiMap.put(xdbId.getRgdId(), xdbId.getAccId());
             } else {
-                hgncMgiMap.put(xdbId.getRgdId(), accIds+","+xdbId.getAccId());
+                if( !accIds.contains(xdbId.getAccId()) ) {
+                    hgncMgiMap.put(xdbId.getRgdId(), accIds + "," + xdbId.getAccId());
+                }
             }
         }
     }

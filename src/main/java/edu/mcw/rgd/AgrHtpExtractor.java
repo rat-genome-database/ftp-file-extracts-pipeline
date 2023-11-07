@@ -44,11 +44,13 @@ public class AgrHtpExtractor extends BaseExtractor {
         // mappings of 'sample_age' to stages
         Map<String, HashMap> ageStages = loadStages();
 
+        Set<String> platformsWithoutMMO = new TreeSet<>();
+
         // data samples
         AgrHtpDataSample dataSamplesInJson = new AgrHtpDataSample();
         for( Dataset ds: datasets.values() ) {
 
-            List<DataSample> samples = loadDataSamples(ds.geoId);
+            List<DataSample> samples = loadDataSamples(ds.geoId, platformsWithoutMMO);
             for( DataSample s: samples ) {
                 List<String> uberonSlimTermIds = getUberonSlimTermIds(s.tissueUberonId);
                 dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue, s.assayType, ageStages);
@@ -56,8 +58,17 @@ public class AgrHtpExtractor extends BaseExtractor {
         }
         dumpDataSamplesToJson(dataSamplesInJson);
 
-
         dumpDataSetsToJson(datasets);
+
+        // dump platforms without MMO
+        if( platformsWithoutMMO.size()>0 ) {
+            System.out.println("platforms without MMO:");
+            System.out.println("===");
+            for (String platform: platformsWithoutMMO ) {
+                System.out.println(platform);
+            }
+            System.out.println("===");
+        }
     }
 
     void dumpDataSamplesToJson(AgrHtpDataSample dataSamplesInJson) throws ParseException {
@@ -181,7 +192,7 @@ public class AgrHtpExtractor extends BaseExtractor {
         return stages;
     }
 
-    List<DataSample> loadDataSamples(String geoId) throws Exception {
+    List<DataSample> loadDataSamples(String geoId, Set<String> platformsWithoutMMO) throws Exception {
 
         List<DataSample> dataSamples = new ArrayList<>();
 
@@ -193,7 +204,6 @@ public class AgrHtpExtractor extends BaseExtractor {
         String sql2 = "SELECT assay_type_acc FROM rna_seq_assays WHERE platform_name=?";
         PreparedStatement ps2 = conn.prepareStatement(sql2);
 
-        int unknownAssayTypes = 0;
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, geoId);
         ResultSet rs = ps.executeQuery();
@@ -214,8 +224,7 @@ public class AgrHtpExtractor extends BaseExtractor {
             if( rs2.next() ) {
                 assayTypeAcc = rs2.getString(1);
             } else {
-                System.out.println("unknown assay type for "+platformName);
-                unknownAssayTypes++;
+                platformsWithoutMMO.add(platformName);
             }
             rs2.close();
             rec.assayType = assayTypeAcc;
@@ -223,9 +232,6 @@ public class AgrHtpExtractor extends BaseExtractor {
             dataSamples.add(rec);
         }
         conn.close();
-        if( unknownAssayTypes!=0 ) {
-            System.out.println("unknown assay types = "+unknownAssayTypes+" for "+geoId);
-        }
 
         return dataSamples;
     }
