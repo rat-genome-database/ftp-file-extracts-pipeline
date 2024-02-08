@@ -18,22 +18,24 @@ public class StrainExtractor extends BaseExtractor {
     String tsvFileName;
     String xmlFileName;
 
-    String TSV_HEADER =
-        "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: strains   build 2022-07-07\n"
-        +"# GENERATED-ON: #DATE#\n"
-        +"# PURPOSE: information about active rat strains extracted from RGD database\n"
-        +"# CONTACT: rgd.data@mcw.edu\n"
-        +"# FORMAT: tab delimited text\n"
-        +"# NOTES: multiple values in a single column are separated by ';'\n"
-        +"#        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD\n"
-        +"RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGIN\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
-        +"\tALLELES\tALLELE_RGD_IDS"
-        +"\tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
-        +"\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
-        +"\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
-        +"\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
-        +"\tCITATION_ID\n";
+    String TSV_HEADER = """
+        # RGD-PIPELINE: ftp-file-extracts
+        # MODULE: strains   build Feb 08, 2024
+        # GENERATED-ON: #DATE#
+        # PURPOSE: information about active rat strains extracted from RGD database
+        # CONTACT: rgd.data@mcw.edu
+        # FORMAT: tab delimited text
+        # NOTES: multiple values in a single column are separated by ';'
+        #        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD
+        #        as of Feb 08, 2024, column ORIGIN was renamed to ORIGINATION, and new column DESCRIPTION was added
+        RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGINATION\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
+        \tALLELES\tALLELE_RGD_IDS"
+        \tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
+        \tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
+        \tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
+        \tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
+        \tCITATION_ID\tDESCRIPTION\n";
+        """;
 
     /**
      * extract all strains to tab separated file and to xml file
@@ -85,7 +87,7 @@ public class StrainExtractor extends BaseExtractor {
             tsvWriter.print('\t');
             tsvWriter.print(checkWhiteSpace(strain.getName()));
             tsvWriter.print('\t');
-            tsvWriter.print(checkWhiteSpace(strain.getOrigin()));
+            tsvWriter.print(checkWhiteSpace(strain.getOrigination()));
             tsvWriter.print('\t');
             tsvWriter.print(checkWhiteSpace(strain.getSource()));
             tsvWriter.print('\t');
@@ -104,6 +106,8 @@ public class StrainExtractor extends BaseExtractor {
             printTsvPositions(positions7_2, tsvWriter);
             tsvWriter.print('\t');
             tsvWriter.print(checkWhiteSpace(citationId));
+            tsvWriter.print('\t');
+            tsvWriter.print(checkWhiteSpace(strain.getDescription()));
             tsvWriter.println();
 
             // dump columns in xml format
@@ -112,7 +116,7 @@ public class StrainExtractor extends BaseExtractor {
             writeXmlField(xmlWriter, checkNull(Integer.toString(strain.getRgdId())), "RGD_ID");
             writeXmlField(xmlWriter, checkNull(strain.getSymbol()), "STRAIN_SYMBOL");
             writeXmlField(xmlWriter, checkNull(strain.getName()), "FULL_NAME");
-            writeXmlField(xmlWriter, checkNull(strain.getOrigin()), "ORIGIN");
+            writeXmlField(xmlWriter, checkNull(strain.getOrigination()), "ORIGINATION");
             writeXmlField(xmlWriter, checkNull(strain.getSource()), "SOURCE");
             writeXmlField(xmlWriter, checkNull(strain.getStrainTypeName()), "STRAIN_TYPE");
             writeXmlField(xmlWriter, checkNull(strain.getLastStatus()), "AVAILABILITY");
@@ -123,6 +127,7 @@ public class StrainExtractor extends BaseExtractor {
             printXmlPositions(positions, xmlWriter);
 
             writeXmlField(xmlWriter, checkNull(citationId), "CITATION_ID");
+            writeXmlField(xmlWriter, checkNull(strain.getDescription()), "DESCRIPTION");
 
             xmlWriter.println("  </Strain>");
 

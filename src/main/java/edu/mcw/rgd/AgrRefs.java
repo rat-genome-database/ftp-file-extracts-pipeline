@@ -23,7 +23,7 @@ public class AgrRefs {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Reference Extractor, build Dec 14, 2022";
+                release = "RGD Reference Extractor, build Feb 8, 2024";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -79,7 +79,7 @@ public class AgrRefs {
 
             author.put("firstName", a.getFirstName());
             author.put("lastName", a.getLastName());
-            author.put("authorRank", new Integer(i));
+            author.put("authorRank", i);
 
             obj.authors.add(author);
             i++;

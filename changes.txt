@@ -1,5 +1,7 @@
 Feb 08, 2024
     gaf agr: for IBA annotations, replace PMID:21873635 with GO_REF:0000033
+    agr refs: fix for java 17
+    strains: replaced field ORIGIN with ORIGINATION, added new field DESCRIPTION
 
 Dec 08, 2023
   updated jar dependencies
