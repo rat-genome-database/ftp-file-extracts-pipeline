@@ -115,6 +115,21 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
         return Utils.concatenate(refs, "|");
     }
 
+    String replaceRefs(String references, String oldRef, String newRef) {
+
+        Set<String> refs = new TreeSet<>();
+
+        String[] objs = references.split("[\\|\\,\\;]");
+        Collections.addAll(refs, objs);
+
+        if( refs.contains(oldRef) ) {
+            refs.remove(oldRef);
+            refs.add(newRef);
+        }
+
+        return Utils.concatenate(refs, "|");
+    }
+
     String writeLine(AnnotRecord rec) {
 
         String objectID, references;
@@ -125,6 +140,13 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
             }
             objectID = rec.hgncId;
             references = rec.annot.getXrefSource();
+
+            // patch: for IBA annotations, if 'references' contains PMID:21873635, GO_REF:0000033 will be appended
+            //      this is to prevent a bug in ontobio python lib
+            if( rec.annot.getEvidence().equals("IBA") && references!=null && references.contains("PMID:21873635") ) {
+                references = replaceRefs(references, "PMID:21873635", "GO_REF:0000033");
+            }
+
         } else {
             objectID = rec.annot.getAnnotatedObjectRgdId().toString();
             references = mergeWithXrefSource(rec.references, rec.annot.getXrefSource());
