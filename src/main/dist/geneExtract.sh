@@ -8,6 +8,5 @@ APPHOME=/home/rgddata/pipelines/$APPNAME
 
 echo "=== GENES ... ==="
 $APPHOME/run.sh -genes
-$APPHOME/run.sh -obsolete
 echo "=== GENES OK ==="
 echo ""

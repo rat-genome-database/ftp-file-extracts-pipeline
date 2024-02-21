@@ -85,6 +85,13 @@
                 <TimeBasedTriggeringPolicy interval="1"/>
             </Policies>
         </RollingFile>
+
+        <RollingFile name="obsoleteIds" append="true" fileName="logs/obsoleteIds.log" filePattern="logs/obsoleteIds.log.%d{yyyy-MM}">
+            <PatternLayout pattern="[%d] - %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
@@ -141,6 +148,11 @@
         </Logger>
         <Logger name="sslp" level="debug" additivity="false">
             <AppenderRef ref="sslp"/>
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+
+        <Logger name="obsoleteIds" level="debug" additivity="false">
+            <AppenderRef ref="obsoleteIds"/>
             <AppenderRef ref="Console" level="info"/>
         </Logger>
     </Loggers>

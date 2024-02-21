@@ -183,13 +183,11 @@ public class FtpFileExtractsManager {
             }
         }
 
-        // generate a file with obsolete rgd ids for genes
+        // generates three files with obsolete rgd ids for genes, strains and alleles
         if( generateObsoleteIds ) {
-            GeneExtractor ge = (GeneExtractor) bf.getBean("geneExtractor");
-            ge.getCmdLineProperties().put("generate_obsolete_ids", "true");
-            ge.setExtractDir(manager.getExtractDir());
-            ge.setDao(manager.dao);
-            ge.generateObsoleteIds();
+            ObsoleteIdExtractor oe = (ObsoleteIdExtractor) bf.getBean("obsoleteIdExtractor");
+            oe.setExtractDir(manager.getExtractDir());
+            oe.run();
             return;
         }
 
