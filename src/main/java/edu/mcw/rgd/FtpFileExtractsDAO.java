@@ -843,6 +843,67 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
         return results;
     }
+
+    public List<ObsoleteStrainId> getObsoleteIdsForStrains() throws Exception {
+        String sqlQuery = """
+    SELECT DISTINCT s.common_name Species, str1.rgd_id old_strain_rgd_id, str1.strain_symbol old_strain_symbol,
+    r.object_status old_strain_status, new_rgd_id new_strain_rgd_id,
+    str2.strain_symbol new_strain_symbol, r2.object_status new_strain_status,
+    TO_CHAR(r.last_modified_date, 'YYYY-MM-DD')
+    FROM strains str1, rgd_ids r, species_types s, rgd_id_history h, strains str2, rgd_ids r2
+    WHERE r.rgd_id = str1.rgd_id AND r.object_status <> 'ACTIVE' AND s.species_type_key = r.species_type_key
+    AND str1.rgd_id = h.old_rgd_id(+) AND h.new_rgd_id = str2.rgd_id(+)
+    AND h.new_rgd_id = r2.rgd_id(+)
+    ORDER BY str1.rgd_id
+    """;
+        JdbcTemplate jt = new JdbcTemplate(this.getDataSource());
+        return jt.query(sqlQuery, new RowMapper() {
+            public Object mapRow(ResultSet rs, int i) throws SQLException {
+                ObsoleteStrainId row = new ObsoleteStrainId();
+                row.species = rs.getString(1).toLowerCase();
+                row.oldStrainRgdId = rs.getInt(2);
+                row.oldStrainSymbol = rs.getString(3);
+                row.oldStrainStatus = rs.getString(4);
+                row.newStrainRgdId = rs.getInt(5);
+                row.newStrainSymbol = rs.getString(6);
+                row.newStrainStatus = rs.getString(7);
+                row.dateObsoleted = rs.getString(8);
+                return row;
+            }
+        });
+    }
+
+    public List<ObsoleteId> getObsoleteIdsForAlleles() throws Exception{
+         String sqlQuery= """
+                 SELECT DISTINCT s.common_name Species, g.rgd_id old_gene_rgd_id, g.gene_symbol old_gene_symbol,
+                 r.object_status old_gene_status, g.gene_type_lc old_gene_type, new_rgd_id new_gene_rgd_id,
+                 gh.gene_symbol new_gene_symbol, gh.gene_type_lc new_gene_type, r2.object_status new_gene_status,
+                 TO_CHAR(r.last_modified_date,'YYYY-MM-DD')
+                 FROM genes g,rgd_ids r,species_types s,rgd_id_history h,genes gh,rgd_ids r2
+                 WHERE r.rgd_id=g.rgd_id AND r.object_status<>'ACTIVE' AND s.species_type_key=r.species_type_key
+                 AND g.rgd_id=h.old_rgd_id(+) AND h.new_rgd_id=gh.rgd_id(+)
+                 AND h.new_rgd_id=r2.rgd_id(+)
+                 AND NVL(g.gene_type_lc,'?') IN('splice','allele')
+                 ORDER BY g.rgd_id
+                 """;
+        JdbcTemplate jt = new JdbcTemplate(this.getDataSource());
+        return jt.query(sqlQuery, new RowMapper() {
+            public Object mapRow(ResultSet rs, int i) throws SQLException {
+                ObsoleteId row = new ObsoleteId();
+                row.species = rs.getString(1).toLowerCase();
+                row.oldGeneRgdId = rs.getInt(2);
+                row.oldGeneSymbol = rs.getString(3);
+                row.oldGeneStatus = rs.getString(4);
+                row.oldGeneType = rs.getString(5);
+                row.newGeneRgdId = rs.getInt(6);
+                row.newGeneSymbol = rs.getString(7);
+                row.newGeneType = rs.getString(8);
+                row.newGeneStatus = rs.getString(9);
+                row.dateObsoleted = rs.getString(10);
+                return row;
+            }
+        });
+    }
 }
 
 // represents marker alleles for one marker
@@ -864,5 +925,16 @@ class ObsoleteId {
     public String newGeneSymbol;
     public String newGeneStatus;
     public String newGeneType;
+    public String dateObsoleted;
+}
+
+class ObsoleteStrainId{
+    public String species;
+    public int oldStrainRgdId;
+    public String oldStrainSymbol;
+    public String oldStrainStatus;
+    public int newStrainRgdId;
+    public String newStrainSymbol;
+    public String newStrainStatus;
     public String dateObsoleted;
 }

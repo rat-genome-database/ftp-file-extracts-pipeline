@@ -804,9 +804,6 @@ public class GeneExtractor extends BaseExtractor {
         // generate regular file
         String outputFileName = generate(si);
         FtpFileExtractsManager.qcFileContent(outputFileName, "genes", speciesType);
-
-        // generate obsolete ids
-        outputFileName = generateObsoleteIds();
     }
 
     String generate(final SpeciesRecord si) throws Exception {
@@ -1272,77 +1269,6 @@ public class GeneExtractor extends BaseExtractor {
         return Utils.concatenate(";", mds, method);
     }
 
-    String generateObsoleteIds() throws Exception {
-
-        // check if the property 'generate_obsolete_ids' is enabled
-        if( getCmdLineProperties().get("generate_obsolete_ids")==null )
-            return null;
-
-        String outputFileName = getExtractDir()+"/GENES_OBSOLETE_IDS.txt";
-        log.info("generating file with obsolete ids for genes: "+outputFileName);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
-
-        final String HEADER =
-         "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: obsolete-ids-version-1.1\n"
-        +"# GENERATED-ON: #DATE#\n"
-        +"# PURPOSE: list of RGD IDs for genes that have been retired or withdrawn from RGD database\n"
-        +"# CONTACT: rgd.data@mcw.edu\n"
-        +"# FORMAT: tab delimited text\n"
-        +"#\n"
-        +"### As of Sep 5, 2023 added column DATE_DISCONTINUED.\n"
-        +"### As of Oct 8, 2013 generates obsolete RGD IDs for genes.\n"
-        +"#\n"
-        +"#COLUMN INFORMATION:\n"
-        +"#1   SPECIES	          name of the species\n"
-        +"#2   OLD_GENE_RGD_ID    old gene RGD ID\n"
-        +"#3   OLD_GENE_SYMBOL    old gene symbol\n"
-        +"#4   OLD_GENE_STATUS    old gene status\n"
-        +"#5   OLD_GENE_TYPE      old gene type\n"
-        +"#6   NEW_GENE_RGD_ID    new gene RGD ID (if any)\n"
-        +"#7   NEW_GENE_SYMBOL    new gene symbol (if any)\n"
-        +"#8   NEW_GENE_STATUS    old gene status (if any)\n"
-        +"#9   NEW_GENE_TYPE      new gene type (if any)\n"
-        +"#10  DATE_DISCONTINUED  date the gene has been discontinued\n"
-
-        +"#\n"
-        +"SPECIES\t"
-        +"OLD_GENE_RGD_ID\tOLD_GENE_SYMBOL\tOLD_GENE_STATUS\tOLD_GENE_TYPE\t"
-        +"NEW_GENE_RGD_ID\tNEW_GENE_SYMBOL\tNEW_GENE_STATUS\tNEW_GENE_TYPE\tDATE_DISCONTINUED\n";
-
-        // prepare header common lines
-        String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
-        writer.write(header);
-
-        for( ObsoleteId id: getDao().getObsoleteIdsForGenes() ) {
-            writer
-                .append(id.species)
-                .append('\t')
-
-                .append(checkNull(checkNull(id.oldGeneRgdId)))
-                .append('\t')
-                .append(checkNull(id.oldGeneSymbol))
-                .append('\t')
-                .append(checkNull(id.oldGeneStatus))
-                .append('\t')
-                .append(checkNull(id.oldGeneType))
-                .append('\t')
-
-                .append(checkNull(id.newGeneRgdId))
-                .append('\t')
-                .append(checkNull(id.newGeneSymbol))
-                .append('\t')
-                .append(checkNull(id.newGeneStatus))
-                .append('\t')
-                .append(checkNull(id.newGeneType))
-                .append('\t')
-                .append(checkNull(id.dateObsoleted))
-                .append('\n');
-        }
-        writer.close();
-
-        return outputFileName;
-    }
 
     public void setMapKeys(java.util.Map<String,List<String>> mapKeys) {
         this.mapKeys = mapKeys;

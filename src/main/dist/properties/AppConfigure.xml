@@ -370,4 +370,8 @@
         <property name="version" value="Sequence Extractor  -- build Jan 27, 2022"/>
     </bean>
 
+    <bean id="obsoleteIdExtractor" class="edu.mcw.rgd.ObsoleteIdExtractor" scope="prototype">
+        <property name="version" value="ObsoleteIdExtractor  -- build Feb 19, 2024"/>
+    </bean>
+
 </beans>
