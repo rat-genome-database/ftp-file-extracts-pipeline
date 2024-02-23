@@ -21,6 +21,7 @@ $APPHOME/annotationsExtract.sh
 $APPHOME/annotationsDafExtract.sh
 $APPHOME/annotationsGafExtract.sh
 $APPHOME/annotationsUniProtExtract.sh
+$APPHOME/obsoleteIdExtract.sh
 
 echo "copy all files to staging area (just in case the remaining parts of script fail)"
 rsync -rt $APPHOME/data/ /home/rgddata/data_release
