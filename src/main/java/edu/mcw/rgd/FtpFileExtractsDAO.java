@@ -279,7 +279,7 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         return genes;
     }
 
-    private Map<String, List<Gene>> _cacheActiveGenes = new HashMap<>();
+    private final Map<String, List<Gene>> _cacheActiveGenes = new HashMap<>();
 
     /**
      * get a gene object given marker key
@@ -378,8 +378,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
         // get object type from rgd_ids table
         RgdId rgdId = getRgdId(markerRgdId);
-        if (rgdId == null)
+        if (rgdId == null) {
+            System.out.println(" !!! warning !!! invalid marker rgd id: RGD:"+markerRgdId);
             return null;
+        }
 
         switch (rgdId.getObjectKey()) {
             case 1: // GENES
@@ -391,8 +393,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
             default:
                 GenomicElement ge = genomicElementDAO.getElement(rgdId.getRgdId());
-                if (ge == null)
+                if (ge == null) {
+                    System.out.println(" !!! warning !!! no genomic element for RGD:"+rgdId.getRgdId());
                     return null;
+                }
                 if (ge.getSymbol() != null)
                     return ge.getSymbol();
                 return ge.getName();

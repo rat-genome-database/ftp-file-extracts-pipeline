@@ -17,93 +17,101 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GeneExtractor extends BaseExtractor {
 
-    final String HEADER_RAT =
-     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: genes  build 2023-03-10\n"
-    +"# GENERATED-ON: #DATE#\n"
-    +"# PURPOSE: information about active #SPECIES# genes extracted from RGD database\n"
-    +"# SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#\n"
-    +"# CONTACT: rgd.data@mcw.edu\n"
-    +"# FORMAT: tab delimited text\n"
-    +"# NOTES: multiple values in a single column are separated by ';'\n"
-    +"#\n"
-    +"### Apr  1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.\n"
-    +"### Apr 15, 2011 GENE_REFSEQ_STATUS column is provided.\n"
-    +"### Jul  1, 2011 fixed generation of CURATED_REF_PUBMED_IDs and UNCURATED_PUBMED_IDs\n"
-    +"### Nov 23, 2011 no format changes (UniGene Ids are extracted from db in different way).\n"
-    +"### Dec 19, 2011 fixed documentation in header to be consistent with column names.\n"
-    +"### Jul  6, 2012 added generation of file GENES_RAT_5.0.\n"
-    +"### Oct 23, 2012 obsoleted column 23 'UNCURATED_REF_MEDLINE_ID' - changed to '(UNUSED)'.\n"
-    +"### Aug 19, 2013 gene descriptions made consistent with gene report pages from RGD website.\n"
-    +"### Oct  2, 2014 genes files refactored:\n"
-    +"###   GENES_RAT_5.0.txt and GENES_RAT_6.0.txt retired -- added new columns to GENES_RAT.txt to accommodate positions for Rnor_5.0 and Rnor_6.0.\n"
-    +"### May 25, 2017 GENE_REFSEQ_STATUS is now published in column 23 for all species\n"
-    +"###   during transition period, for rat, mouse and human, GENE_REFSEQ_STATUS will continue to be also published in columns 39, 41 and 42 respectively\n"
-    +"### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL\n"
-    +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
-    +"### Mar 11 2020  added Ensembl map positions\n"
-    +"### Jan 18 2021  discontinued column 27 UNIGENE ID\n"
-    +"### Feb 12 2021  added export of positions on assembly mRatBN7.2; discontinued export of positions on assembly RGSCv3.1 (columns 6,12,13,14)\n"
-    +"### Jan 25 2022  rat Ensembl positions exported for mRatBN7.2 assembly\n"
-    +"### Apr 18 2022  added export of canonical proteins in column 27\n"
-    +"### Mar 10 2023  no more 'protein_coding' gene types: 'protein-coding' used instead\n"
-    +"#\n"
-    +"#COLUMN INFORMATION:\n"
-    +"# (First 38 columns are in common between all species)\n"
-    +"#\n"
-    +"#1   GENE_RGD_ID	      the RGD_ID of the gene\n"
-    +"#2   SYMBOL             official gene symbol\n"
-    +"#3   NAME    	          gene name\n"
-    +"#4   GENE_DESC          gene description (if available)\n"
-    +"#5   CHROMOSOME_CELERA  chromosome for Celera assembly\n"
-    +"#6   CHROMOSOME_#REF1# chromosome for reference assembly #REF1#\n"
-    +"#7   CHROMOSOME_#REF2# chromosome for reference assembly #REF2#\n"
-    +"#8   FISH_BAND          fish band information\n"
-    +"#9   START_POS_CELERA   start position for Celera assembly\n"
-    +"#10  STOP_POS_CELERA    stop position for Celera assembly\n"
-    +"#11  STRAND_CELERA      strand information for Celera assembly\n"
-    +"#12  START_POS_#REF1#   start position for reference assembly #REF1#\n"
-    +"#13  STOP_POS_#REF1#    stop position for reference assembly #REF1#\n"
-    +"#14  STRAND_#REF1#      strand information for reference assembly #REF1#\n"
-    +"#15  START_POS_#REF2#   start position for reference assembly #REF2#\n"
-    +"#16  STOP_POS_#REF2#    stop position for reference assembly #REF2#\n"
-    +"#17  STRAND_#REF2#      strand information for reference assembly #REF2#\n"
-    +"#18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene\n"
-    +"#19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene\n"
-    +"#20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation\n"
-    +"#21  NCBI_GENE_ID           NCBI Gene ID\n"
-    +"#22  UNIPROT_ID             UniProtKB id(s)\n"
-    +"#23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)\n"
-    +"#24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)\n"
-    +"#25  TIGR_ID                TIGR ID(s)\n"
-    +"#26  GENBANK_PROTEIN        GenBank Protein ID(s)\n"
-    +"#27  CANONICAL_PROTEIN      UniProt canonical protein(s)\n"
-    +"#28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene\n"
-    +"#29  MARKER_SYMBOL          marker symbol\n"
-    +"#30  OLD_SYMBOL             old symbol alias(es)\n"
-    +"#31  OLD_NAME               old name alias(es)\n"
-    +"#32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene\n"
-    +"#33  QTL_SYMBOL             QTL symbol\n"
-    +"#34  NOMENCLATURE_STATUS    nomenclature status\n"
-    +"#35  SPLICE_RGD_ID          RGD_IDs for gene splices\n"
-    +"#36  SPLICE_SYMBOL          symbol for gene \n"
-    +"#37  GENE_TYPE              gene type\n"
-    +"#38  ENSEMBL_ID             Ensembl Gene ID\n"
-    +"#39  (UNUSED)               blank\n"
-    +"#40  CHROMOSOME_#REF3#      chromosome for #REF3# reference assembly\n"
-    +"#41  START_POS_#REF3#       start position for #REF3# reference assembly\n"
-    +"#42  STOP_POS_#REF3#        stop position for #REF3# reference assembly\n"
-    +"#43  STRAND_#REF3#          strand information for #REF3# reference assembly\n"
-    +"#44  CHROMOSOME_#REF4#      chromosome for #REF4# reference assembly\n"
-    +"#45  START_POS_#REF4#       start position for #REF4# reference assembly\n"
-    +"#46  STOP_POS_#REF4#        stop position for #REF4# reference assembly\n"
-    +"#47  STRAND_#REF4#          strand information for #REF4# reference assembly\n"
-    +"#48  CHROMOSOME_ENSEMBL     chromosome for mRatBN7.2 Ensembl assembly\n"
-    +"#49  START_POS_ENSEMBL      start position for mRatBN7.2 Ensembl assembly\n"
-    +"#50  STOP_POS_ENSEMBL       stop position for mRatBN7.2 Ensembl assembly\n"
-    +"#51  STRAND_ENSEMBL         strand information for mRatBN7.2 Ensembl assembly\n"
-    +"#\n"
-    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
+    final String HEADER_RAT_PART1 = """
+    # RGD-PIPELINE: ftp-file-extracts
+    # MODULE: genes  build 2024-03-11
+    # GENERATED-ON: #DATE#
+    # PURPOSE: information about active #SPECIES# genes extracted from RGD database
+    # SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#
+    # CONTACT: rgd.data@mcw.edu
+    # FORMAT: tab delimited text
+    # NOTES: multiple values in a single column are separated by ';'
+    #
+    ### Apr  1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.
+    ### Apr 15, 2011 GENE_REFSEQ_STATUS column is provided.
+    ### Jul  1, 2011 fixed generation of CURATED_REF_PUBMED_IDs and UNCURATED_PUBMED_IDs
+    ### Nov 23, 2011 no format changes (UniGene Ids are extracted from db in different way)
+    ### Dec 19, 2011 fixed documentation in header to be consistent with column names
+    ### Jul  6, 2012 added generation of file GENES_RAT_5.0
+    ### Oct 23, 2012 obsoleted column 23 'UNCURATED_REF_MEDLINE_ID' - changed to '(UNUSED)'
+    ### Aug 19, 2013 gene descriptions made consistent with gene report pages from RGD website
+    ### Oct  2, 2014 genes files refactored:
+    ###   GENES_RAT_5.0.txt and GENES_RAT_6.0.txt retired -- added new columns to GENES_RAT.txt to accommodate positions for Rnor_5.0 and Rnor_6.0.
+    ### May 25, 2017 GENE_REFSEQ_STATUS is now published in column 23 for all species
+    ###   during transition period, for rat, mouse and human, GENE_REFSEQ_STATUS will continue to be also published in columns 39, 41 and 42 respectively
+    ### Nov 1, 2018  renamed columns: SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL
+    ### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories
+    ### Mar 11 2020  added Ensembl map positions
+    ### Jan 18 2021  discontinued column 27 UNIGENE ID
+    ### Feb 12 2021  added export of positions on assembly mRatBN7.2; discontinued export of positions on assembly RGSCv3.1 (columns 6,12,13,14)
+    ### Jan 25 2022  rat Ensembl positions exported for mRatBN7.2 assembly
+    ### Apr 18 2022  added export of canonical proteins in column 27
+    ### Mar 10 2023  no more 'protein_coding' gene types: 'protein-coding' used instead
+    ### Mar 11 2024  added export of positions on assembly GRCr8
+    #
+    #COLUMN INFORMATION:
+    # (First 38 columns are in common between all species)
+    #
+    #1   GENE_RGD_ID	      the RGD_ID of the gene
+    #2   SYMBOL             official gene symbol
+    #3   NAME    	          gene name
+    #4   GENE_DESC          gene description (if available)
+    #5   CHROMOSOME_CELERA  chromosome for Celera assembly
+    #6   CHROMOSOME_#REF1# chromosome for reference assembly #REF1#
+    #7   CHROMOSOME_#REF2# chromosome for reference assembly #REF2#
+    #8   FISH_BAND          fish band information
+    #9   START_POS_CELERA   start position for Celera assembly
+    #10  STOP_POS_CELERA    stop position for Celera assembly
+    #11  STRAND_CELERA      strand information for Celera assembly
+    #12  START_POS_#REF1#   start position for reference assembly #REF1#
+    #13  STOP_POS_#REF1#    stop position for reference assembly #REF1#
+    #14  STRAND_#REF1#      strand information for reference assembly #REF1#
+    #15  START_POS_#REF2#   start position for reference assembly #REF2#
+    #16  STOP_POS_#REF2#    stop position for reference assembly #REF2#
+    #17  STRAND_#REF2#      strand information for reference assembly #REF2#
+    #18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene
+    #19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene
+    #20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation
+    #21  NCBI_GENE_ID           NCBI Gene ID
+    #22  UNIPROT_ID             UniProtKB id(s)
+    #23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)
+    #24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)
+    #25  TIGR_ID                TIGR ID(s)
+    #26  GENBANK_PROTEIN        GenBank Protein ID(s)
+    #27  CANONICAL_PROTEIN      UniProt canonical protein(s)
+    #28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene
+    #29  MARKER_SYMBOL          marker symbol
+    #30  OLD_SYMBOL             old symbol alias(es)
+    #31  OLD_NAME               old name alias(es)
+    #32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene
+    #33  QTL_SYMBOL             QTL symbol
+    #34  NOMENCLATURE_STATUS    nomenclature status
+    #35  SPLICE_RGD_ID          RGD_IDs for gene splices
+    #36  SPLICE_SYMBOL          symbol for gene
+    #37  GENE_TYPE              gene type
+    #38  ENSEMBL_ID             Ensembl Gene ID
+    #39  (UNUSED)               blank
+    #40  CHROMOSOME_#REF3#      chromosome for #REF3# reference assembly
+    #41  START_POS_#REF3#       start position for #REF3# reference assembly
+    #42  STOP_POS_#REF3#        stop position for #REF3# reference assembly
+    #43  STRAND_#REF3#          strand information for #REF3# reference assembly
+    #44  CHROMOSOME_#REF4#      chromosome for #REF4# reference assembly
+    #45  START_POS_#REF4#       start position for #REF4# reference assembly
+    #46  STOP_POS_#REF4#        stop position for #REF4# reference assembly
+    #47  STRAND_#REF4#          strand information for #REF4# reference assembly
+    #48  CHROMOSOME_ENSEMBL     chromosome for mRatBN7.2 Ensembl assembly
+    #49  START_POS_ENSEMBL      start position for mRatBN7.2 Ensembl assembly
+    #50  STOP_POS_ENSEMBL       stop position for mRatBN7.2 Ensembl assembly
+    #51  STRAND_ENSEMBL         strand information for mRatBN7.2 Ensembl assembly
+    #52  CHROMOSOME_#REF5#      chromosome for GRCr8 NCBI assembly
+    #53  START_POS_#REF5#       start position for GRCr8 NCBI assembly
+    #54  STOP_POS_#REF5#        stop position for GRCr8 NCBI assembly
+    #55  STRAND_#REF5#          strand information for GRCr8 NCBI assembly
+    #
+    """;
+
+    final String HEADER_RAT_PART2 =
+     "GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_CELERA\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
     +"FISH_BAND\tSTART_POS_CELERA\tSTOP_POS_CELERA\tSTRAND_CELERA\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\tTIGR_ID\t"
@@ -111,7 +119,10 @@ public class GeneExtractor extends BaseExtractor {
     +"NOMENCLATURE_STATUS\tSPLICE_RGD_ID\tSPLICE_SYMBOL\tGENE_TYPE\tENSEMBL_ID\t(UNUSED)\t"
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
-    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL\t"
+    +"CHROMOSOME_#REF5#\tSTART_POS_#REF5#\tSTOP_POS_#REF5#\tSTRAND_#REF5#";
+
+    final String HEADER_RAT = HEADER_RAT_PART1 + HEADER_RAT_PART2;
 
     final String HEADER_HUMAN =
      "# RGD-PIPELINE: ftp-file-extracts\n"
@@ -865,20 +876,19 @@ public class GeneExtractor extends BaseExtractor {
 
 
         // prepare header common lines
-        String headerLines;
-        switch( speciesType ) {
-            case SpeciesType.HUMAN: headerLines=HEADER_HUMAN; break;
-            case SpeciesType.MOUSE: headerLines=HEADER_MOUSE; break;
-            case SpeciesType.RAT: headerLines=HEADER_RAT; break;
-            case SpeciesType.CHINCHILLA: headerLines=HEADER_CHINCHILLA; break;
-            case SpeciesType.BONOBO: headerLines=HEADER_BONOBO; break;
-            case SpeciesType.DOG: headerLines=HEADER_DOG; break;
-            case SpeciesType.SQUIRREL: headerLines=HEADER_SQUIRREL; break;
-            case SpeciesType.VERVET: headerLines=HEADER_VERVET; break;
-            case SpeciesType.NAKED_MOLE_RAT: headerLines=HEADER_MOLERAT; break;
-            case SpeciesType.PIG: headerLines=HEADER_PIG; break;
-            default: headerLines = null;
-        }
+        String headerLines = switch (speciesType) {
+            case SpeciesType.HUMAN -> HEADER_HUMAN;
+            case SpeciesType.MOUSE -> HEADER_MOUSE;
+            case SpeciesType.RAT -> HEADER_RAT;
+            case SpeciesType.CHINCHILLA -> HEADER_CHINCHILLA;
+            case SpeciesType.BONOBO -> HEADER_BONOBO;
+            case SpeciesType.DOG -> HEADER_DOG;
+            case SpeciesType.SQUIRREL -> HEADER_SQUIRREL;
+            case SpeciesType.VERVET -> HEADER_VERVET;
+            case SpeciesType.NAKED_MOLE_RAT -> HEADER_MOLERAT;
+            case SpeciesType.PIG -> HEADER_PIG;
+            default -> null;
+        };
 
         if( assembly1!=null )
             headerLines = headerLines.replace("#REF1#", assembly1);
@@ -1063,6 +1073,7 @@ public class GeneExtractor extends BaseExtractor {
             counters.increment("canonical_proteins");
         }
 
+        // SECTION 1: common columns for all species
         StringBuilder buf = new StringBuilder();
         buf.append(rec.getRgdId())
             .append('\t')
@@ -1147,7 +1158,7 @@ public class GeneExtractor extends BaseExtractor {
             .append('\t')
             .append(checkNull(rec.getEnsemblGeneIds()));
 
-        // species specific section
+        // SECTION 2: species specific section: between common section and Ensembl positions
         switch( speciesType ) {
             case SpeciesType.RAT:
                 buf.append('\t')
@@ -1209,6 +1220,7 @@ public class GeneExtractor extends BaseExtractor {
                 break;
         }
 
+        // SECTION 3: Ensembl positions
         buf.append('\t')
             .append(getString(rec.ensemblMap, "getChromosome"))
             .append('\t')
@@ -1218,7 +1230,7 @@ public class GeneExtractor extends BaseExtractor {
             .append('\t')
             .append(getString(rec.ensemblMap, "getStrand"));
 
-        // dog has additional 3 assembly maps
+        // SECTION 4: after Ensembl positions
         if( speciesType==SpeciesType.DOG ) {
             buf.append('\t')
             .append(getString(rec.assembly4Map, "getChromosome"))
@@ -1244,6 +1256,16 @@ public class GeneExtractor extends BaseExtractor {
             .append(getString(rec.assembly6Map, "getStopPos"))
             .append('\t')
             .append(getString(rec.assembly6Map, "getStrand"));
+        }
+        else if( speciesType==SpeciesType.RAT ) {
+            buf.append('\t')
+               .append(getString(rec.assembly5Map, "getChromosome"))
+               .append('\t')
+               .append(getString(rec.assembly5Map, "getStartPos"))
+               .append('\t')
+               .append(getString(rec.assembly5Map, "getStopPos"))
+               .append('\t')
+               .append(getString(rec.assembly5Map, "getStrand"));
         }
 
         buf.append("\n");
