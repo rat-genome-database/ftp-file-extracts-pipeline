@@ -1,4 +1,7 @@
 Mar 11, 2024
+  assembly comparison: added comparison files for GRCr8 assembly
+
+Mar 11, 2024
   genes: added export of GRCr8 assembly positions for rat
 
 Feb 08, 2024
