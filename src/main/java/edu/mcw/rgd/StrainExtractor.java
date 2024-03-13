@@ -18,9 +18,9 @@ public class StrainExtractor extends BaseExtractor {
     String tsvFileName;
     String xmlFileName;
 
-    String TSV_HEADER = """
+    String TSV_HEADER_PART1 = """
         # RGD-PIPELINE: ftp-file-extracts
-        # MODULE: strains   build Feb 08, 2024
+        # MODULE: strains   build Mar 13, 2024
         # GENERATED-ON: #DATE#
         # PURPOSE: information about active rat strains extracted from RGD database
         # CONTACT: rgd.data@mcw.edu
@@ -28,14 +28,18 @@ public class StrainExtractor extends BaseExtractor {
         # NOTES: multiple values in a single column are separated by ';'
         #        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD
         #        as of Feb 08, 2024, column ORIGIN was renamed to ORIGINATION, and new column DESCRIPTION was added
-        RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGINATION\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE"
-        \tALLELES\tALLELE_RGD_IDS"
-        \tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"
-        \tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"
-        \tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"
-        \tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"
-        \tCITATION_ID\tDESCRIPTION\n";
         """;
+
+    String TSV_HEADER_PART2 =
+        "RGD_ID\tSTRAIN_SYMBOL\tFULL_NAME\tORIGINATION\tSOURCE\tSTRAIN_TYPE\tLAST_KNOWN_STATUS\tRESEARCH_USE\tALLELES\tALLELE_RGD_IDS"+
+        "\tRGSC_3.4_CHR\tRGSC_3.4_START_POS\tRGSC_3.4_STOP_POS\tRGSC_3.4_METHOD"+
+        "\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"+
+        "\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"+
+        "\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"+
+        "\tCITATION_ID\tDESCRIPTION\n";
+
+    String TSV_HEADER = TSV_HEADER_PART1 + TSV_HEADER_PART2;
+
 
     /**
      * extract all strains to tab separated file and to xml file
