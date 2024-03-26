@@ -32,8 +32,7 @@ public class ObsoleteIdExtractor extends BaseExtractor{
 
     String generateObsoleteStrainIds() throws Exception{
 
-        String outputFileName = getExtractDir()+"/STRAINS_OBSOLETE_IDS.txt";
-//        String outputFileName = "STRAINS_OBSOLETE_IDS.txt";
+        String outputFileName = "private_data/STRAINS_OBSOLETE_IDS.txt";
         log.info("generating file with obsolete ids for strains: "+outputFileName);
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
         List<ObsoleteStrainId> strainIds = ftpDao.getObsoleteIdsForStrains();

@@ -10,5 +10,5 @@ echo "=== Obsolete Ids ... ==="
 $APPHOME/run.sh -obsolete
 echo "=== Obsolete Ids OK ==="
 echo "copying the STRAINS_OBSOLETE_IDS.txt file"
-scp -p /private_data/STRAINS_OBSOLETE_IDS.txt /data/www/strainFiles
+scp -p private_data/STRAINS_OBSOLETE_IDS.txt /data/www/strainFiles
 echo ""
