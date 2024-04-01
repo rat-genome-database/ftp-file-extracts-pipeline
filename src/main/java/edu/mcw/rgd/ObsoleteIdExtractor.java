@@ -91,7 +91,7 @@ public class ObsoleteIdExtractor extends BaseExtractor{
 
     String generateObsoleteAlleleIds() throws Exception{
 
-        String outputFileName = getExtractDir()+"/ALLELES_OBSOLETE_IDS.txt";
+        String outputFileName = "private_data/ALLELES_OBSOLETE_IDS.txt";
 //        String outputFileName = "Alleles_OBSOLETE_IDS.txt";
         log.info("generating file with obsolete ids for alleles: "+outputFileName);
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
