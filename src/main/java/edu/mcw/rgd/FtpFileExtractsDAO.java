@@ -316,6 +316,10 @@ public class FtpFileExtractsDAO extends AbstractDAO {
         return aliasDAO.getAliases(rgdId);
     }
 
+    public List<Alias> getAliases(int rgdId, String[] aliasTypes) throws Exception {
+        return aliasDAO.getAliases(rgdId, aliasTypes);
+    }
+
     /**
      * get list of all active array id aliases from Ensembl for given object type and species
      *

@@ -279,6 +279,19 @@ public class FtpFileExtractsManager {
         }
     }
 
+    static public boolean isStringAscii7( String s ) {
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            // Check if the character is within the ASCII 7-bit range
+            if( c >= 0 && c <= 127 ) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
     public String getExtractDir() {
         return extractDir;
     }
