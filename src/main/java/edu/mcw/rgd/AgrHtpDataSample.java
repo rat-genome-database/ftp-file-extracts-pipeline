@@ -116,6 +116,7 @@ public class AgrHtpDataSample {
             case "f":
             case "female":
             case "females":
+            case "famale": // typo in the data
                 result = "female";
                 break;
             case "pooled":
