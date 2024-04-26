@@ -8,8 +8,9 @@ APPHOME=/home/rgddata/pipelines/$APPNAME
 
 echo "=== Obsolete Ids ... ==="
 $APPHOME/run.sh -obsolete
-echo "=== Obsolete Ids OK ==="
-echo "copying the STRAINS_OBSOLETE_IDS.txt file"
+echo "copying the STRAINS_OBSOLETE_IDS.txt file to /data/www/strainFiles"
 scp -p $APPHOME/private_data/STRAINS_OBSOLETE_IDS.txt /data/www/strainFiles
+echo "copying the ALLELES_OBSOLETE_IDS.txt file to /data/www/strainFiles"
 scp -p $APPHOME/private_data/ALLELES_OBSOLETE_IDS.txt /data/www/strainFiles
+echo "=== Obsolete Ids OK ==="
 echo ""
