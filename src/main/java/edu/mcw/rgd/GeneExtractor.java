@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GeneExtractor extends BaseExtractor {
 
+    final String[] ALIAS_TYPES = {"old_gene_name", "old_gene_symbol"};
+
     final String HEADER_RAT_PART1 = """
     # RGD-PIPELINE: ftp-file-extracts
     # MODULE: genes  build 2024-03-11
@@ -1024,6 +1026,7 @@ public class GeneExtractor extends BaseExtractor {
                 }
 
                 // get aliases
+                /*
                 for (Alias alias : dao.getAliases(rec.getRgdId())) {
                     if (alias.getTypeName() == null)
                         continue;
@@ -1031,6 +1034,18 @@ public class GeneExtractor extends BaseExtractor {
                         rec.addOldGeneNames(alias.getValue());
                     if (alias.getTypeName().equals("old_gene_symbol"))
                         rec.addOldGeneSymbols(alias.getValue());
+                }*/
+                for (Alias alias : dao.getAliases(rec.getRgdId(), ALIAS_TYPES)) {
+
+                    if( FtpFileExtractsManager.isStringAscii7(alias.getValue()) ) {
+
+                        if (alias.getTypeName().equals("old_gene_name"))
+                            rec.addOldGeneNames(alias.getValue());
+                        if (alias.getTypeName().equals("old_gene_symbol"))
+                            rec.addOldGeneSymbols(alias.getValue());
+                    } else {
+                        counters.increment("alias-not-ascii7");
+                    }
                 }
 
                 // get rgd id and qtl names for associated qtls
@@ -1062,6 +1077,11 @@ public class GeneExtractor extends BaseExtractor {
         log.info("   "+outputFileName+",  data lines written: "+lineMap.size()+"\n"
             +"      canonical proteins written: "+counters.get("canonical_proteins")
             +"      canonical proteins in RGD: "+canonicalProteins.size());
+
+        int nonAscii7Aliases = counters.get("alias-not-ascii7");
+        if( nonAscii7Aliases>0 ) {
+            log.info("      non-ASCII-7 aliases skipped: " + nonAscii7Aliases);
+        }
 
         return outputFileName;
     }

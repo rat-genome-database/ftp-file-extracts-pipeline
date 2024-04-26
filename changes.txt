@@ -1,3 +1,6 @@
+Apr 25, 2024
+  genes: aliases that are not ASCII-7 are skipped
+
 Mar 13, 2024
   strains: fixed tsv header generation
 
