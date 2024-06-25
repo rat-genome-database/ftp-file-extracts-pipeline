@@ -1,3 +1,6 @@
+Jun 24, 2024
+  genes: added export of Peter Dorris assemblies in GENES_RAT.txt file
+
 Apr 26, 2024
   agr htp extractor: now handling gender 'famale' to be mapped as 'female'
 

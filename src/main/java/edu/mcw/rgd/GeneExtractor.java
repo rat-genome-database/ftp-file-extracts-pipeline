@@ -21,7 +21,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_RAT_PART1 = """
     # RGD-PIPELINE: ftp-file-extracts
-    # MODULE: genes  build 2024-03-11
+    # MODULE: genes  build 2024-06-24
     # GENERATED-ON: #DATE#
     # PURPOSE: information about active #SPECIES# genes extracted from RGD database
     # SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#
@@ -50,6 +50,7 @@ public class GeneExtractor extends BaseExtractor {
     ### Apr 18 2022  added export of canonical proteins in column 27
     ### Mar 10 2023  no more 'protein_coding' gene types: 'protein-coding' used instead
     ### Mar 11 2024  added export of positions on assembly GRCr8
+    ### Jun 24 2024  added export of positions on Peter Doris assemblies: SHR, SHRSP and WKY
     #
     #COLUMN INFORMATION:
     # (First 38 columns are in common between all species)
@@ -109,6 +110,18 @@ public class GeneExtractor extends BaseExtractor {
     #53  START_POS_#REF5#       start position for GRCr8 NCBI assembly
     #54  STOP_POS_#REF5#        stop position for GRCr8 NCBI assembly
     #55  STRAND_#REF5#          strand information for GRCr8 NCBI assembly
+    #56  CHROMOSOME_#REF6#      chromosome for UTH_Rnor_SHR_Utx assembly
+    #57  START_POS_#REF6#       start position for UTH_Rnor_SHR_Utx assembly
+    #58  STOP_POS_#REF6#        stop position for UTH_Rnor_SHR_Utx assembly
+    #59  STRAND_#REF6#          strand information for UTH_Rnor_SHR_Utx assembly
+    #60  CHROMOSOME_#REF7#      chromosome for UTH_Rnor_SHRSP_BbbUtx_1.0 assembly
+    #61  START_POS_#REF7#       start position for UTH_Rnor_SHRSP_BbbUtx_1.0 assembly
+    #62  STOP_POS_#REF7#        stop position for UTH_Rnor_SHRSP_BbbUtx_1.0 assembly
+    #63  STRAND_#REF7#          strand information for UTH_Rnor_SHRSP_BbbUtx_1.0 assembly
+    #64  CHROMOSOME_#REF8#      chromosome for UTH_Rnor_WKY_Bbb_1.0 assembly
+    #65  START_POS_#REF8#       start position for UTH_Rnor_WKY_Bbb_1.0 assembly
+    #66  STOP_POS_#REF8#        stop position for UTH_Rnor_WKY_Bbb_1.0 assembly
+    #67  STRAND_#REF8#          strand information for UTH_Rnor_WKY_Bbb_1.0 assembly
     #
     """;
 
@@ -122,7 +135,10 @@ public class GeneExtractor extends BaseExtractor {
     +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#\t"
     +"CHROMOSOME_#REF4#\tSTART_POS_#REF4#\tSTOP_POS_#REF4#\tSTRAND_#REF4#\t"
     +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL\t"
-    +"CHROMOSOME_#REF5#\tSTART_POS_#REF5#\tSTOP_POS_#REF5#\tSTRAND_#REF5#";
+    +"CHROMOSOME_#REF5#\tSTART_POS_#REF5#\tSTOP_POS_#REF5#\tSTRAND_#REF5#\t"
+    +"CHROMOSOME_#REF6#\tSTART_POS_#REF6#\tSTOP_POS_#REF6#\tSTRAND_#REF6#\t"
+    +"CHROMOSOME_#REF7#\tSTART_POS_#REF7#\tSTOP_POS_#REF7#\tSTRAND_#REF7#\t"
+    +"CHROMOSOME_#REF8#\tSTART_POS_#REF8#\tSTOP_POS_#REF8#\tSTRAND_#REF8#";
 
     final String HEADER_RAT = HEADER_RAT_PART1 + HEADER_RAT_PART2;
 
@@ -829,53 +845,21 @@ public class GeneExtractor extends BaseExtractor {
 
         canonicalProteins = dao.getCanonicalProteins(speciesType);
 
-        String assembly1, assembly2, assembly3, assembly4, assembly5, assembly6;
-        final int mapKey1, mapKey2, mapKey3, mapKey4, mapKey5, mapKey6;
+        final int ASSEMBLY_COUNT = 8;
+        String[] assembly = new String[ASSEMBLY_COUNT];
+        final int[] mapKey = new int[ASSEMBLY_COUNT];
 
         List<String> mapInfos = getMapKeys().get(si.getSpeciesName().toLowerCase());
-        if( mapInfos.size()>=1 ) {
-            String mapInfo = mapInfos.get(0);
-            assembly1 = mapInfo.substring(1+mapInfo.indexOf(' '));
-            mapKey1 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
-        } else {
-            assembly1 = null; mapKey1 = 0;
-        }
-        if( mapInfos.size()>=2 ) {
-            String mapInfo = mapInfos.get(1);
-            assembly2 = mapInfo.substring(1+mapInfo.indexOf(' '));
-            mapKey2 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
-        } else {
-            assembly2 = null; mapKey2 = 0;
-        }
-        if( mapInfos.size()>=3 ) {
-            String mapInfo = mapInfos.get(2);
-            assembly3 = mapInfo.substring(1+mapInfo.indexOf(' '));
-            mapKey3 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
-        } else {
-            assembly3 = null; mapKey3 = 0;
-        }
-        if( mapInfos.size()>=4 ) {
-            String mapInfo = mapInfos.get(3);
-            assembly4 = mapInfo.substring(1+mapInfo.indexOf(' '));
-            mapKey4 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
-        } else {
-            assembly4 = null; mapKey4 = 0;
-        }
-        if( mapInfos.size()>=5 ) {
-            String mapInfo = mapInfos.get(4);
-            assembly5 = mapInfo.substring(1+mapInfo.indexOf(' '));
-            mapKey5 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
-        } else {
-            assembly5 = null; mapKey5 = 0;
-        }
-        if( mapInfos.size()>=6 ) {
-            String mapInfo = mapInfos.get(5);
-            assembly6 = mapInfo.substring(1+mapInfo.indexOf(' '));
-            mapKey6 = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
-        } else {
-            assembly6 = null; mapKey6 = 0;
-        }
+        for( int i=0; i<ASSEMBLY_COUNT; i++ ) {
 
+            if( mapInfos.size() > i ) {
+                String mapInfo = mapInfos.get(i);
+                assembly[i] = mapInfo.substring(1+mapInfo.indexOf(' '));
+                mapKey[i] = Integer.parseInt(mapInfo.substring(0, mapInfo.indexOf(' ')));
+            } else {
+                assembly[i] = null; mapKey[i] = 0;
+            }
+        }
 
         // prepare header common lines
         String headerLines = switch (speciesType) {
@@ -892,18 +876,11 @@ public class GeneExtractor extends BaseExtractor {
             default -> null;
         };
 
-        if( assembly1!=null )
-            headerLines = headerLines.replace("#REF1#", assembly1);
-        if( assembly2!=null )
-            headerLines = headerLines.replace("#REF2#", assembly2);
-        if( assembly3!=null )
-            headerLines = headerLines.replace("#REF3#", assembly3);
-        if( assembly4!=null )
-            headerLines = headerLines.replace("#REF4#", assembly4);
-        if( assembly5!=null )
-            headerLines = headerLines.replace("#REF5#", assembly5);
-        if( assembly6!=null )
-            headerLines = headerLines.replace("#REF6#", assembly6);
+        for( int i=0; i<ASSEMBLY_COUNT; i++ ) {
+            if( assembly[i] != null ) {
+                headerLines = headerLines.replace("#REF"+(i+1)+"#", assembly[i]);
+            }
+        }
 
         String taxonomyName = SpeciesType.getTaxonomicName(speciesType);
         String speciesLongName = SpeciesType.getGenebankCommonName(speciesType);
@@ -934,18 +911,22 @@ public class GeneExtractor extends BaseExtractor {
                     if (md.getChromosome() == null || md.getChromosome().trim().length() == 0)
                         continue;
 
-                    if (md.getMapKey() == mapKey1) {
+                    if (md.getMapKey() == mapKey[0]) {
                         rec.assembly1Map.add(md);
-                    } else if (md.getMapKey() == mapKey2) {
+                    } else if (md.getMapKey() == mapKey[1]) {
                         rec.assembly2Map.add(md);
-                    } else if (md.getMapKey() == mapKey3) {
+                    } else if (md.getMapKey() == mapKey[2]) {
                         rec.assembly3Map.add(md);
-                    } else if (md.getMapKey() == mapKey4) {
+                    } else if (md.getMapKey() == mapKey[3]) {
                         rec.assembly4Map.add(md);
-                    } else if (md.getMapKey() == mapKey5) {
+                    } else if (md.getMapKey() == mapKey[4]) {
                         rec.assembly5Map.add(md);
-                    } else if (md.getMapKey() == mapKey6) {
+                    } else if (md.getMapKey() == mapKey[5]) {
                         rec.assembly6Map.add(md);
+                    } else if (md.getMapKey() == mapKey[6]) {
+                        rec.assembly7Map.add(md);
+                    } else if (md.getMapKey() == mapKey[7]) {
+                        rec.assembly8Map.add(md);
                     } else if (md.getMapKey() == si.getCeleraAssemblyMapKey()) {
                         rec.celeraMap.add(md);
                     } else if (md.getMapKey() == si.getEnsemblAssemblyMapKey()) {
@@ -1026,15 +1007,6 @@ public class GeneExtractor extends BaseExtractor {
                 }
 
                 // get aliases
-                /*
-                for (Alias alias : dao.getAliases(rec.getRgdId())) {
-                    if (alias.getTypeName() == null)
-                        continue;
-                    if (alias.getTypeName().equals("old_gene_name"))
-                        rec.addOldGeneNames(alias.getValue());
-                    if (alias.getTypeName().equals("old_gene_symbol"))
-                        rec.addOldGeneSymbols(alias.getValue());
-                }*/
                 for (Alias alias : dao.getAliases(rec.getRgdId(), ALIAS_TYPES)) {
 
                     if( FtpFileExtractsManager.isStringAscii7(alias.getValue()) ) {
@@ -1286,6 +1258,33 @@ public class GeneExtractor extends BaseExtractor {
                .append(getString(rec.assembly5Map, "getStopPos"))
                .append('\t')
                .append(getString(rec.assembly5Map, "getStrand"));
+
+            buf.append('\t')
+                .append(getString(rec.assembly6Map, "getChromosome"))
+                .append('\t')
+                .append(getString(rec.assembly6Map, "getStartPos"))
+                .append('\t')
+                .append(getString(rec.assembly6Map, "getStopPos"))
+                .append('\t')
+                .append(getString(rec.assembly6Map, "getStrand"));
+
+            buf.append('\t')
+                .append(getString(rec.assembly7Map, "getChromosome"))
+                .append('\t')
+                .append(getString(rec.assembly7Map, "getStartPos"))
+                .append('\t')
+                .append(getString(rec.assembly7Map, "getStopPos"))
+                .append('\t')
+                .append(getString(rec.assembly7Map, "getStrand"));
+
+            buf.append('\t')
+                .append(getString(rec.assembly8Map, "getChromosome"))
+                .append('\t')
+                .append(getString(rec.assembly8Map, "getStartPos"))
+                .append('\t')
+                .append(getString(rec.assembly8Map, "getStopPos"))
+                .append('\t')
+                .append(getString(rec.assembly8Map, "getStrand"));
         }
 
         buf.append("\n");
