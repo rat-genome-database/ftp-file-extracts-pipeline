@@ -20,7 +20,7 @@ public class AgrHtpDataset {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Sets, AGR schema 1.0.1.3, build Oct 02, 2020";
+                release = "RGD Htp Extractor for Data Sets, build Oct 15, 2024";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
