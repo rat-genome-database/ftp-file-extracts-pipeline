@@ -1,3 +1,6 @@
+Oct 15, 2024
+  AGR HTP: fixed sql queries
+
 Jun 24, 2024
   genes: added export of Peter Dorris assemblies in GENES_RAT.txt file
 

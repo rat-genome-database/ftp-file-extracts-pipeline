@@ -134,23 +134,27 @@ public class AgrHtpExtractor extends BaseExtractor {
 
         Map<String,Dataset> datasets = new HashMap<>();
 
-        String sql = "SELECT DISTINCT geo_accession_id, study_title, submission_date, pubmed_id, DBMS_LOB.SUBSTR(summary, 4000) summary FROM rna_seq"
-                +" WHERE sample_organism='Rattus norvegicus'";
+        String sql = """
+            SELECT DISTINCT geo_accession_id, study_title, submission_date, pubmed_id, DBMS_LOB.SUBSTR(summary, 3900) summary FROM rna_seq
+            WHERE sample_organism='Rattus norvegicus'
+            """;
 
-        Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection();
-        Statement ps = conn.createStatement();
-        ResultSet rs = ps.executeQuery(sql);
-        while( rs.next() ) {
-            Dataset rec = new Dataset();
-            rec.geoId = rs.getString(1);
-            rec.studyTitle = rs.getString(2);
-            rec.submissionDate = rs.getString(3);
-            rec.pubmedId = rs.getString(4);
-            rec.summary = rs.getString(5);
+        try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ) {
+            Statement ps = conn.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+            while (rs.next()) {
+                Dataset rec = new Dataset();
+                rec.geoId = rs.getString(1);
+                rec.studyTitle = rs.getString(2);
+                rec.submissionDate = rs.getString(3);
+                rec.pubmedId = rs.getString(4);
+                rec.summary = rs.getString(5);
 
-            datasets.put(rec.geoId, rec);
+                datasets.put(rec.geoId, rec);
+            }
+        } catch( Exception e ) {
+            throw e;
         }
-        conn.close();
 
         return datasets;
     }
@@ -170,24 +174,26 @@ public class AgrHtpExtractor extends BaseExtractor {
         //    }
         //}
 
-        Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection();
-        Statement ps = conn.createStatement();
-        ResultSet rs = ps.executeQuery(sql);
-        while( rs.next() ) {
+        try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ) {
+            Statement ps = conn.createStatement();
+            ResultSet rs = ps.executeQuery(sql);
+            while (rs.next()) {
 
-            String sampleAge = rs.getString("sample_age");
-            String stageName = rs.getString("stage");
-            String stageSlim = rs.getString("stage_slim");
+                String sampleAge = rs.getString("sample_age");
+                String stageName = rs.getString("stage");
+                String stageSlim = rs.getString("stage_slim");
 
-            HashMap stage = new HashMap();
-            stage.put("stageName", stageName);
-            HashMap stageUberonSlimTerm = new HashMap();
-            stageUberonSlimTerm.put("uberonTerm", stageSlim);
-            stage.put("stageUberonSlimTerm", stageUberonSlimTerm);
+                HashMap stage = new HashMap();
+                stage.put("stageName", stageName);
+                HashMap stageUberonSlimTerm = new HashMap();
+                stageUberonSlimTerm.put("uberonTerm", stageSlim);
+                stage.put("stageUberonSlimTerm", stageUberonSlimTerm);
 
-            stages.put(sampleAge, stage);
+                stages.put(sampleAge, stage);
+            }
+        } catch( Exception e ) {
+            throw e;
         }
-        conn.close();
 
         return stages;
     }
@@ -199,39 +205,41 @@ public class AgrHtpExtractor extends BaseExtractor {
         String sql = "SELECT sample_accession_id,sample_title,sample_age,sample_gender,sample_tissue,rgd_tissue_term_acc,platform_name FROM rna_seq"
                 +" WHERE geo_accession_id=? AND sample_organism='Rattus norvegicus'";
 
-        Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection();
+        try( Connection conn = DataSourceFactory.getInstance().getDataSource().getConnection() ) {
 
-        String sql2 = "SELECT assay_type_acc FROM rna_seq_assays WHERE platform_name=?";
-        PreparedStatement ps2 = conn.prepareStatement(sql2);
+            String sql2 = "SELECT assay_type_acc FROM rna_seq_assays WHERE platform_name=?";
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
 
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, geoId);
-        ResultSet rs = ps.executeQuery();
-        while( rs.next() ) {
-            DataSample rec = new DataSample();
-            rec.geoId = geoId;
-            rec.sampleId = rs.getString(1);
-            rec.sampleTitle = rs.getString(2);
-            rec.sampleAge = rs.getString(3);
-            rec.gender = rs.getString(4);
-            rec.tissue = rs.getString(5);
-            rec.tissueUberonId = rs.getString(6);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, geoId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                DataSample rec = new DataSample();
+                rec.geoId = geoId;
+                rec.sampleId = rs.getString(1);
+                rec.sampleTitle = rs.getString(2);
+                rec.sampleAge = rs.getString(3);
+                rec.gender = rs.getString(4);
+                rec.tissue = rs.getString(5);
+                rec.tissueUberonId = rs.getString(6);
 
-            String platformName = rs.getString(7);
-            ps2.setString(1, platformName);
-            ResultSet rs2 = ps2.executeQuery();
-            String assayTypeAcc = "MMO:0000000";
-            if( rs2.next() ) {
-                assayTypeAcc = rs2.getString(1);
-            } else {
-                platformsWithoutMMO.add(platformName);
+                String platformName = rs.getString(7);
+                ps2.setString(1, platformName);
+                ResultSet rs2 = ps2.executeQuery();
+                String assayTypeAcc = "MMO:0000000";
+                if (rs2.next()) {
+                    assayTypeAcc = rs2.getString(1);
+                } else {
+                    platformsWithoutMMO.add(platformName);
+                }
+                rs2.close();
+                rec.assayType = assayTypeAcc;
+
+                dataSamples.add(rec);
             }
-            rs2.close();
-            rec.assayType = assayTypeAcc;
-
-            dataSamples.add(rec);
+        } catch( Exception e ) {
+            throw e;
         }
-        conn.close();
 
         return dataSamples;
     }
