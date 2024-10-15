@@ -18,7 +18,7 @@ public class AgrHtpDataSample {
         public Metadata() {
             synchronized(DafExport.class) {
                 dataProvider = getDataProviderForMetaData();
-                release = "RGD Htp Extractor for Data Samples, build  Oct 02, 2023";
+                release = "RGD Htp Extractor for Data Samples, build  Oct 15, 2024";
 
                 SimpleDateFormat sdf_agr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
                 dateProduced = sdf_agr.format(new Date());
@@ -133,6 +133,7 @@ public class AgrHtpDataSample {
             case "not known":
             case "not provided":
             case "unsexed":
+            case "unknown":
                 result = "unknown";
                 break;
             default:
