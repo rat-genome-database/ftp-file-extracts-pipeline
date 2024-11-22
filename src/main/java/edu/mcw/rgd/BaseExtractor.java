@@ -61,7 +61,7 @@ public abstract class BaseExtractor {
     }
 
     public String getSpeciesSpecificExtractDir(SpeciesRecord si) {
-        String outputDir = getExtractDir()+'/'+si.getSpeciesName().toUpperCase();
+        String outputDir = getExtractDir()+'/'+si.getSpeciesShortName().toUpperCase();
         new File(outputDir).mkdirs(); // ensure the species specific directory does exist
         return outputDir;
     }

@@ -239,7 +239,7 @@ public class FtpFileExtractsManager {
                         ((AnnotGafExtractor)extractor).setGenerateForAgr(true);
                     }
 
-                    extractor.go(getSpeciesInfo().get(SpeciesType.getCommonName(key).toLowerCase()));
+                    extractor.go(getSpeciesInfo().get(SpeciesType.getShortName(key).toLowerCase()));
                 } catch(Exception e) {
                     throw new RuntimeException(e);
                 }

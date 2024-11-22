@@ -38,6 +38,10 @@ public class SpeciesRecord {
         return SpeciesType.getCommonName(speciesType);
     }
 
+    public String getSpeciesShortName() {
+        return SpeciesType.getShortName(speciesType);
+    }
+
     public int getSpeciesType() {
         return speciesType;
     }

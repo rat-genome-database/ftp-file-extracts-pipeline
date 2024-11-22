@@ -1,3 +1,6 @@
+Nov 22, 2024
+  species: fixed directory names for vervet & molerat
+
 Oct 15, 2024
   AGR HTP: fixed sql queries
 
