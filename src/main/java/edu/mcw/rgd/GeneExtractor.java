@@ -837,7 +837,8 @@ public class GeneExtractor extends BaseExtractor {
 
     String generate(final SpeciesRecord si) throws Exception {
 
-        String outputFileName = getSpeciesSpecificExtractDir(si)+'/'+getFileNamePrefix()+si.getSpeciesName().toUpperCase()+".txt";
+        String speciesName = si.getSpeciesShortName();
+        String outputFileName = getSpeciesSpecificExtractDir(si)+'/'+getFileNamePrefix()+speciesName.toUpperCase()+".txt";
 
         final FtpFileExtractsDAO dao = getDao();
         final int speciesType = si.getSpeciesType();
@@ -849,7 +850,7 @@ public class GeneExtractor extends BaseExtractor {
         String[] assembly = new String[ASSEMBLY_COUNT];
         final int[] mapKey = new int[ASSEMBLY_COUNT];
 
-        List<String> mapInfos = getMapKeys().get(si.getSpeciesName().toLowerCase());
+        List<String> mapInfos = getMapKeys().get(speciesName.toLowerCase());
         for( int i=0; i<ASSEMBLY_COUNT; i++ ) {
 
             if( mapInfos.size() > i ) {
