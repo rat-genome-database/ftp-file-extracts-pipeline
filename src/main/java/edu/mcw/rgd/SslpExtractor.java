@@ -15,61 +15,60 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SslpExtractor extends BaseExtractor {
 
-    final String HEADER_COMMON_LINES =
-     "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: markers  build 2021-04-30\n"
-    +"# GENERATED-ON: #DATE#\n"
-    +"# PURPOSE: information about active #SPECIES# markers extracted from RGD database\n"
-    +"# CONTACT: rgd.developers@mcw.edu\n"
-    +"# FORMAT: tab delimited text\n"
-    +"# NOTES: multiple values in a single column are separated by ';'\n"
-    +"#\n"
-    +"#  Where a marker has multiple positions for a single map/assembly\n"
-    +"#  (f.e. D1Arb36 has positions 78134192..78134522 and 78153000..78153323 on ref assembly)\n"
-    +"#   is how it is presented in the columns CHROMOSOME_3.4, START_POS_3.4 and STOP_POS_3.4:\n"
-    +"#   1;1  <tab>   78134192;78153000   <tab>  78134522;78153323\n"
-    +"#\n"
-    +"### Apr 1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.\n"
-    +"### Jul 1, 2011 fixed generation of UNCURATED_REF_PUBMED_IDs.\n"
-    +"### Nov 23, 2011 no format changes (UniGene Ids are extracted from db in different way).\n"
-    +"### Dec 19 2011 no data changes; improved internal QC.\n"
-    +"### May 31 2012 no data changes; (optimized retrieval of maps data from database)\n"
-    +"### Oct 22 2012 fixed export of positional information for mouse (positions on assembly build 38 were exported as positions on assembly 37).\n"
-    +"### Nov 20 2012 rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported.\n"
-    +"### Dec 26 2013 no data changes; improved internal QC.\n"
-    +"### Sep 8 2014 rat: available positions on assembly Rnor_6.0.\n"
-    +"### Oct 29 2018 discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows marker type.\n"
-    +"### Nov 1 2018 renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.\n"
-    +"### Jun 17 2019 data sorted by RGD ID; files exported into species specific directories\n"
-    +"### Jan 19 2021 discontinued column 15 with UniGene IDs\n"
-    +"### Apr 30 2021 added export of positions for new rat assembly mRatBN7.2\n"
-    +"#\n"
-    +"#COLUMN INFORMATION:\n"
-    +"# (First 23 columns are in common between rat, mouse and human)\n"
-    +"#\n"
-    +"#1   MARKER_RGD_ID	       RGD_ID of the marker\n"
-    +"#2   SPECIES                 species name\n"
-    +"#3   MARKER_SYMBOL           marker symbol\n"
-    +"#4   EXPECTED_SIZE           marker expected size (PCR product size)\n"
-    +"#5   CURATED_REF_RGD_ID      RGD_ID of paper(s) about marker\n"
-    +"#6   CURATED_REF_PUBMED_ID   PUBMED_ID of paper(s) about marker\n"
-    +"#7   UNCURATED_REF_PUBMED_ID other PUBMED_IDs\n"
-    +"#8   MARKER_TYPE             marker type, if available\n"
-    +"#9   CLONE_SEQUENCE          clone sequence itself\n"
-    +"#10  (UNUSED)\n"
-    +"#11  FORWARD_SEQ             forward sequence\n"
-    +"#12  REVERSE_SEQ             reverse sequence\n"
-    +"#13  UNISTS_ID               UniSTS ID\n"
-    +"#14  GENBANK_NUCLEOTIDE      GenBank Nucleotide ID(s)\n"
-    +"#15  (UNUSED)\n"
-    +"#16  ALIAS_VALUE             known aliases for this marker\n"
-    +"#17  ASSOCIATED_GENE_RGD_ID  RGD_IDs for gene associated with this marker\n"
-    +"#18  ASSOCIATED_GENE_SYMBOL  symbol for gene associated with this marker\n"
-    +"#19  CHROMOSOME              chromosome\n"
-    +"#20  FISH_BAND               fish band\n"
-    +"#21  CHROMOSOME_CELERA       chromosome for Celera assembly\n"
-    +"#22  START_POS_CELERA        start position for Celera assembly\n"
-    +"#23  STOP_POS_CELERA         stop position for Celera assembly\n";
+    final String HEADER_COMMON_LINES = """
+    # RGD-PIPELINE: ftp-file-extracts
+    # MODULE: markers  build 2025-01-24
+    # GENERATED-ON: #DATE#
+    # PURPOSE: information about active #SPECIES# markers extracted from RGD database
+    # CONTACT: rgd.developers@mcw.edu
+    # FORMAT: tab delimited text
+    # NOTES: multiple values in a single column are separated by ';'
+    #
+    #  Where a marker has multiple positions for a single map/assembly
+    #  (f.e. D1Arb36 has positions 78134192..78134522 and 78153000..78153323 on ref assembly)
+    #   is how it is presented in the columns CHROMOSOME_3.4, START_POS_3.4 and STOP_POS_3.4:
+    #   1;1  <tab>   78134192;78153000   <tab>  78134522;78153323
+    #
+    ### Apr 1, 2011 RATMAP_IDs and RHDB_IDs are discontinued.
+    ### Jul 1, 2011 fixed generation of UNCURATED_REF_PUBMED_IDs.
+    ### Nov 23, 2011 no format changes (UniGene Ids are extracted from db in different way).
+    ### Oct 22 2012 fixed export of positional information for mouse (positions on assembly build 38 were exported as positions on assembly 37).
+    ### Nov 20 2012 rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported.
+    ### Sep 8 2014 rat: available positions on assembly Rnor_6.0.
+    ### Oct 29 2018 discontinued columns #8 CLONE_SEQ_RGD_ID and #10 PRIMER_SEQ_RGD_ID. Column #8 now shows marker type.
+    ### Nov 1 2018 renamed columns SSLP_RGD_ID => MARKER_RGD_ID, SSLP_SYMBOL => MARKER_SYMBOL, SSLP_TYPE => MARKER_TYPE.
+    ### Jun 17 2019 data sorted by RGD ID; files exported into species specific directories
+    ### Jan 19 2021 discontinued column 15 with UniGene IDs
+    ### Apr 30 2021 added export of positions for new rat assembly mRatBN7.2
+    ### Jan 24 2025 added export of positions for new rat assembly GRCr8
+    #
+    #COLUMN INFORMATION:
+    # (First 23 columns are in common between rat, mouse and human)
+    #
+    #1   MARKER_RGD_ID	       RGD_ID of the marker
+    #2   SPECIES                 species name
+    #3   MARKER_SYMBOL           marker symbol
+    #4   EXPECTED_SIZE           marker expected size (PCR product size)
+    #5   CURATED_REF_RGD_ID      RGD_ID of paper(s) about marker
+    #6   CURATED_REF_PUBMED_ID   PUBMED_ID of paper(s) about marker
+    #7   UNCURATED_REF_PUBMED_ID other PUBMED_IDs
+    #8   MARKER_TYPE             marker type, if available
+    #9   CLONE_SEQUENCE          clone sequence itself
+    #10  (UNUSED)
+    #11  FORWARD_SEQ             forward sequence
+    #12  REVERSE_SEQ             reverse sequence
+    #13  UNISTS_ID               UniSTS ID
+    #14  GENBANK_NUCLEOTIDE      GenBank Nucleotide ID(s)
+    #15  (UNUSED)
+    #16  ALIAS_VALUE             known aliases for this marker
+    #17  ASSOCIATED_GENE_RGD_ID  RGD_IDs for gene associated with this marker
+    #18  ASSOCIATED_GENE_SYMBOL  symbol for gene associated with this marker
+    #19  CHROMOSOME              chromosome
+    #20  FISH_BAND               fish band
+    #21  CHROMOSOME_CELERA       chromosome for Celera assembly
+    #22  START_POS_CELERA        start position for Celera assembly
+    #23  STOP_POS_CELERA         stop position for Celera assembly
+    """;
 
      final String HEADER_LINE_RAT =
      "#24  CHROMOSOME_5.0          chromosome for Rnor_5.0 assembly\n"
@@ -94,6 +93,9 @@ public class SslpExtractor extends BaseExtractor {
     +"#43  CHROMOSOME_7.2          chromosome for mRatBN7.2 assembly\n"
     +"#44  START_POS_7.2           start position for mRatBN7.2 assembly\n"
     +"#45  STOP_POS_7.2            stop position for mRatBN7.2 assembly\n"
+    +"#46  CHROMOSOME_8            chromosome for GRCr8 assembly\n"
+    +"#47  START_POS_8             start position for GRCr8 assembly\n"
+    +"#48  STOP_POS_8              stop position for GRCr8 assembly\n"
     +"#\n"
     +"MARKER_RGD_ID\tSPECIES\tMARKER_SYMBOL\tEXPECTED_SIZE\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\t"
     +"UNCURATED_REF_PUBMED_ID\tMARKER_TYPE\tCLONE_SEQUENCE\t(UNUSED)\tFORWARD_SEQ\tREVERSE_SEQ\t"
@@ -104,7 +106,8 @@ public class SslpExtractor extends BaseExtractor {
     +"CHROMOSOME_3.4\tSTART_POS_3.4\tSTOP_POS_3.4\t"
     +"(UNUSED)\t(UNUSED)\t"
     +"CHR_FHHxACI\tPOS_FHHxACI\tCHR_SHRSPxBN\tPOS_SHRSPxBN\tCHR_RH_2.0\tPOS_RH_2.0\tCHR_RH_3.4\tPOS_RH_3.4\t"
-    +"CHROMOSOME_6.0\tSTART_POS_6.0\tSTOP_POS_6.0\tCHROMOSOME_7.2\tSTART_POS_7.2\tSTOP_POS_7.2";
+    +"CHROMOSOME_6.0\tSTART_POS_6.0\tSTOP_POS_6.0\tCHROMOSOME_7.2\tSTART_POS_7.2\tSTOP_POS_7.2\t"
+    +"CHROMOSOME_8\tSTART_POS_8\tSTOP_POS_8";
 
     final String HEADER_LINE_HUMAN =
     "#24  CHROMOSOME_37          chromosome for the current reference assembly v.37\n"
@@ -165,7 +168,7 @@ public class SslpExtractor extends BaseExtractor {
         String commonLines = HEADER_COMMON_LINES
                 .replace("#SPECIES#", species)
                 .replace("#DATE#", SpeciesRecord.getTodayDate());
-        writer.print(commonLines);
+        writer.println(commonLines);
         writer.println(speciesType== SpeciesType.RAT ? HEADER_LINE_RAT :
                 speciesType==SpeciesType.HUMAN ? HEADER_LINE_HUMAN :
                 HEADER_LINE_MOUSE);
@@ -252,6 +255,11 @@ public class SslpExtractor extends BaseExtractor {
                     mds = rec.getMapData(372);
                     if( mds.size()>0 ) {
                         rec.md7_2 = mds;
+                    }
+
+                    mds = rec.getMapData(380);
+                    if( mds.size()>0 ) {
+                        rec.md8 = mds;
                     }
                 }
                 else if( speciesType==SpeciesType.MOUSE ) {
@@ -407,6 +415,9 @@ public class SslpExtractor extends BaseExtractor {
 
             // print chromosome, start and stop position for mRatBN7.2 assembly
             writeGenomicPositions(rec.md7_2, buf);
+
+            // print chromosome, start and stop position for GRCr8 assembly
+            writeGenomicPositions(rec.md8, buf);
         }
         else if( speciesType==SpeciesType.HUMAN ) {
 
@@ -495,6 +506,7 @@ public class SslpExtractor extends BaseExtractor {
         public List<MapData> mdOldRef;
         public List<MapData> mdRnor6;// Rnor_6.0 for rat
         public List<MapData> md7_2;// mRatBN7.2
+        public List<MapData> md8;// GRCr8
 
         public List<XdbId> xdbIds;
 
@@ -532,19 +544,6 @@ public class SslpExtractor extends BaseExtractor {
             for( XdbId xdbId: xdbIds ) {
                 if( xdbKey == xdbId.getXdbKey() && xdbId.getAccId()!=null )
                     accIds.add(xdbId.getAccId());
-            }
-            return Utils.concatenate(accIds, FtpFileExtractsManager.MULTIVAL_SEPARATOR);
-        }
-
-        public String getLinkText(int xdbKey) {
-
-            if( xdbIds==null || xdbIds.isEmpty() )
-                return "";
-
-            List<String> accIds = new ArrayList<String>();
-            for( XdbId xdbId: xdbIds ) {
-                if( xdbKey == xdbId.getXdbKey() )
-                    accIds.add(xdbId.getLinkText());
             }
             return Utils.concatenate(accIds, FtpFileExtractsManager.MULTIVAL_SEPARATOR);
         }

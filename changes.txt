@@ -1,3 +1,6 @@
+Jan 24, 2025
+  sslps: added rn8 assembly to the file
+
 Nov 22, 2024
   species: fixed directory names for vervet & molerat
 

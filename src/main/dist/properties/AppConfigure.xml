@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build Nov 22, 2024" />
+        <property name="version" value="FtpFileExtractManager  -- build Jan 24, 2025" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -229,7 +229,7 @@
     </bean>
 
     <bean id="markerExtractor" class="edu.mcw.rgd.SslpExtractor" scope="prototype">
-        <property name="version" value="MarkerExtractor  build 2021-04-30" />
+        <property name="version" value="MarkerExtractor  build Jan 24, 2025" />
     </bean>
 
     <bean id="markerAlleleExtractor" class="edu.mcw.rgd.SslpAlleleExtractor" scope="prototype">
