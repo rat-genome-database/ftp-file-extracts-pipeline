@@ -34,57 +34,74 @@ public class QtlExtractor  extends BaseExtractor {
         run(speciesRec, getSpeciesSpecificExtractDir(speciesRec));
     }
 
-    final String HEADER_COMMON_LINES =
-        "# RGD-PIPELINE: ftp-file-extracts\n"
-        +"# MODULE: qtls  build 2022-10-26\n"
-        +"# GENERATED-ON: #DATE#\n"
-        +"# PURPOSE: information about active #SPECIES# qtls extracted from RGD database\n"
-        +"# CONTACT: rgd.developers@mcw.edu\n"
-        +"# FORMAT: tab delimited text\n"
-        +"# NOTES: multiple values in a single column are separated by ';'\n"
-        +"#\n"
-        +"### Apr  1 2011  RATMAP_IDs and RHDB_IDs are discontinued\n"
-        +"### Oct 22 2012  fixed export of positional information for mouse qtls (positions on assembly build 38 were exported as positions on assembly 37)\n"
-        +"### Oct 23 2012  fixed description of columns for human qtls\n"
-        +"### Nov 20 2012  rat: positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported\n"
-        +"### Apr 18 2013  rat: crossed strains are reported in separate columns for easier sorting\n"
-        +"### Jul 16 2014  mouse: added generation of file QTLS_MOUSE_B38.txt with positions on assemblies 38 and 37\n"
-        +"### Sep 09 2014  rat: added positions on Rnor_6.0 assembly\n"
-        +"### Sep 09 2014  mouse: QTLS_MOUSE_B38.txt discontinued; 4 columns added to QTLS_MOUSE.txt file to accommodate assembly 38 positions\n"
-        +"### Jan 08 2016  TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE\n"
-        +"### Jan 11 2016  rat: added columns STRAIN_RGD_ID3 and STRAIN_RGD_SYMBOL3 for qtls that have 3+ crossed strains\n"
-        +"### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories\n"
-        +"### Oct 26 2022  added generation of positions on rn7 assembly\n"
-        +"#\n"
-        +"#COLUMN INFORMATION:\n"
-        +"# (First 25 columns are in common between rat, mouse and human)\n"
-        +"#\n"
-        +"#1  QTL_RGD_ID             the RGD_ID of the QTL\n"
-        +"#2  SPECIES                species name\n"
-        +"#3  QTL_SYMBOL             official qtl symbol\n"
-        +"#4  QTL_NAME               current qtl name\n"
-        +"#5  CHROMOSOME_FROM_REF    the chromosome from the original paper\n"
-        +"#6  LOD                    maximum LOD score if given in paper\n"
-        +"#7  P_VALUE                p-value for QTL if given in paper\n"
-        +"#8  VARIANCE               variance if given in paper\n"
-        +"#9  FLANK_1_RGD_ID         RGD_ID for flank marker 1, if in paper\n"
-        +"#10 FLANK_1_SYMBOL         symbol for flank marker 1, if in paper\n"
-        +"#11 FLANK_2_RGD_ID         RGD_ID for flank marker 2, if in paper\n"
-        +"#12 FLANK_2_SYMBOL         symbol for flank marker 2, if in paper\n"
-        +"#13 PEAK_RGD_ID            RGD_ID for peak marker, if in paper\n"
-        +"#14 PEAK_MARKER_SYMBOL     symbol for peak marker, if in paper\n"
-        +"#15 TRAIT_NAME             trait created for QTL\n"
-        +"#16 MEASUREMENT_TYPE       measurement type for QTL\n"
-        +"#17 (UNUSED)\n"
-        +"#18 PHENOTYPES             phenotype ontology annotation\n"
-        +"#19 ASSOCIATED_DISEASES    diseases ontology annotation\n"
-        +"#20 CURATED_REF_RGD_ID     RGD_ID of paper(s) on QTL\n"
-        +"#21 CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) on QTL\n"
-        +"#22 CANDIDATE_GENE_RGD_IDS RGD_IDS for genes mentioned by paper author\n"
-        +"#23 CANDIDATE_GENE_SYMBOLS symbols for genes mentioned by paper author\n"
-        +"#24 INHERITANCE_TYPE       dominant, recessive etc.\n"
-        +"#25 RELATED_QTLS	         symbols of related QTLS\n"
-        ;
+    final String HEADER_COMMON_LINES = """
+        # RGD-PIPELINE: ftp-file-extracts
+        # MODULE: qtls  build Jan 24, 2025
+        # GENERATED-ON: #DATE#
+        # PURPOSE: information about active #SPECIES# qtls extracted from RGD database
+        # CONTACT: rgd.developers@mcw.edu
+        # FORMAT: tab delimited text
+        # NOTES: multiple values in a single column are separated by ';'
+        #
+        #CHANGELOG#
+        #
+        #COLUMN INFORMATION:
+        # (First 25 columns are in common between rat, mouse and human)
+        #
+        #1  QTL_RGD_ID             the RGD_ID of the QTL
+        #2  SPECIES                species name
+        #3  QTL_SYMBOL             official qtl symbol
+        #4  QTL_NAME               current qtl name
+        #5  CHROMOSOME_FROM_REF    the chromosome from the original paper
+        #6  LOD                    maximum LOD score if given in paper
+        #7  P_VALUE                p-value for QTL if given in paper
+        #8  VARIANCE               variance if given in paper
+        #9  FLANK_1_RGD_ID         RGD_ID for flank marker 1, if in paper
+        #10 FLANK_1_SYMBOL         symbol for flank marker 1, if in paper
+        #11 FLANK_2_RGD_ID         RGD_ID for flank marker 2, if in paper
+        #12 FLANK_2_SYMBOL         symbol for flank marker 2, if in paper
+        #13 PEAK_RGD_ID            RGD_ID for peak marker, if in paper
+        #14 PEAK_MARKER_SYMBOL     symbol for peak marker, if in paper
+        #15 TRAIT_NAME             trait created for QTL
+        #16 MEASUREMENT_TYPE       measurement type for QTL
+        #17 (UNUSED)
+        #18 PHENOTYPES             phenotype ontology annotation
+        #19 ASSOCIATED_DISEASES    diseases ontology annotation
+        #20 CURATED_REF_RGD_ID     RGD_ID of paper(s) on QTL
+        #21 CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) on QTL
+        #22 CANDIDATE_GENE_RGD_IDS RGD_IDS for genes mentioned by paper author
+        #23 CANDIDATE_GENE_SYMBOLS symbols for genes mentioned by paper author
+        #24 INHERITANCE_TYPE       dominant, recessive etc.
+        #25 RELATED_QTLS	       symbols of related QTLS
+        """;
+
+    final String HEADER_RAT_CHANGELOG = """
+        ### Apr  1 2011  RATMAP_IDs and RHDB_IDs are discontinued
+        ### Nov 20 2012  positions on assembly map 3.1 are no longer exported; instead position on assembly 5.0 are exported
+        ### Apr 18 2013  crossed strains are reported in separate columns for easier sorting
+        ### Sep 09 2014  added positions on Rnor_6.0 assembly
+        ### Jan 08 2016  TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE
+        ### Jan 11 2016  added columns STRAIN_RGD_ID3 and STRAIN_RGD_SYMBOL3 for qtls that have 3+ crossed strains
+        ### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories
+        ### Oct 26 2022  added positions on rn7 assembly
+        ### Jan 24 2025  added positions on GRCr8 assembly
+        """;
+
+    final String HEADER_MOUSE_CHANGELOG = """
+        ### Oct 22 2012  fixed export of positional information (positions on assembly build 38 were exported as positions on assembly 37)
+        ### Jul 16 2014  added generation of file QTLS_MOUSE_B38.txt with positions on assemblies 38 and 37
+        ### Sep 09 2014  QTLS_MOUSE_B38.txt discontinued; 4 columns added to QTLS_MOUSE.txt file to accommodate assembly 38 positions
+        ### Jan 08 2016  TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE
+        ### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories
+        ### Jan 24 2025  positions of assembly 34 discontinued; instead positions on GRCm39 assembly are exported
+        """;
+
+    final String HEADER_HUMAN_CHANGELOG = """
+        ### Oct 23 2012  fixed description of columns for human qtls
+        ### Jan 08 2016  TRAIT_METHODOLOGY column discontinued; column #16 SUBTRAIT_NAME is now called MEASUREMENT_TYPE
+        ### Jun 17 2019  data sorted by RGD ID; files exported into species specific directories
+        ### Jan 24 2025  added positions on GRCh8 assembly
+        """;
 
     // column common for all species
     final String HEADER_COMMON = "QTL_RGD_ID\tSPECIES\tQTL_SYMBOL\tQTL_NAME\tCHROMOSOME_FROM_REF"
@@ -120,50 +137,60 @@ public class QtlExtractor  extends BaseExtractor {
         +"#48 7.2_MAP_POS_START   start position for assembly mRatBN7.2\n"
         +"#49 7.2_MAP_POS_STOP    stop position for assembly mRatBN7.2\n"
         +"#50 7.2_MAP_POS_METHOD  qtl positioning method for assembly mRatBN7.2\n"
+        +"#51 8_MAP_POS_CHR       chromosome for assembly GRCr8\n"
+        +"#52 8_MAP_POS_START     start position for assembly GRCr8\n"
+        +"#53 8_MAP_POS_STOP      stop position for assembly GRCr8\n"
+        +"#54 8_MAP_POS_METHOD    qtl positioning method for assembly GRCr8\n"
         +"#\n#COLUMNS#"
         +"\t(UNUSED)\t5.0_MAP_POS_CHR\t5.0_MAP_POS_START\t5.0_MAP_POS_STOP\t5.0_MAP_POS_METHOD"
         +"\t3.4_MAP_POS_CHR\t3.4_MAP_POS_START\t3.4_MAP_POS_STOP\t3.4_MAP_POS_METHOD"
         +"\tCROSS_TYPE\tCROSS_PAIR\tSTRAIN_RGD_ID1\tSTRAIN_RGD_ID2\tSTRAIN_RGD_SYMBOL1\tSTRAIN_RGD_SYMBOL2"
         +"\t6.0_MAP_POS_CHR\t6.0_MAP_POS_START\t6.0_MAP_POS_STOP\t6.0_MAP_POS_METHOD\tSTRAIN_RGD_ID3\tSTRAIN_RGD_SYMBOL3"
-        +"\t7.2_MAP_POS_CHR\t7.2_MAP_POS_START\t7.2_MAP_POS_STOP\t7.2_MAP_POS_METHOD";
+        +"\t7.2_MAP_POS_CHR\t7.2_MAP_POS_START\t7.2_MAP_POS_STOP\t7.2_MAP_POS_METHOD\t"
+        +"\t8_MAP_POS_CHR\t8_MAP_POS_START\t8_MAP_POS_STOP\t8_MAP_POS_METHOD";
 
     // additional columns for mouse
     final String HEADER_MOUSE =
         "#26 MGI_ID             MGI ID\n"
-        +"#27 37_MAP_POS_CHR     chromosome for previous assembly 37\n"
-        +"#28 37_MAP_POS_START   start position for previous assembly 37\n"
-        +"#29 37_MAP_POS_STOP    stop position for previous assembly 37\n"
-        +"#30 37_MAP_POS_METHOD  qtl positioning method for previous assembly 37\n"
-        +"#31 34_MAP_POS_CHR     chromosome for old assembly 34\n"
-        +"#32 34_MAP_POS_START   start position for old assembly 34\n"
-        +"#33 34_MAP_POS_STOP    stop position for old assembly 34\n"
-        +"#34 34_MAP_POS_METHOD  qtl positioning method for old assembly 34\n"
+        +"#27 37_MAP_POS_CHR     chromosome for assembly MGSCv37\n"
+        +"#28 37_MAP_POS_START   start position for assembly MGSCv37\n"
+        +"#29 37_MAP_POS_STOP    stop position for assembly MGSCv37\n"
+        +"#30 37_MAP_POS_METHOD  qtl positioning method for assembly MGSCv37\n"
+        +"#31 39_MAP_POS_CHR     chromosome for old assembly GRCm39\n"
+        +"#32 39_MAP_POS_START   start position for old assembly GRCm39\n"
+        +"#33 39_MAP_POS_STOP    stop position for old assembly GRCm39\n"
+        +"#34 39_MAP_POS_METHOD  qtl positioning method for GRCm39\n"
         +"#35 CM_MAP_CHR         chromosome on cM map\n"
         +"#36 CM_MAP_POS         absolute position on cM map\n"
-        +"#37 38_MAP_POS_CHR     chromosome for current assembly 38\n"
-        +"#38 38_MAP_POS_START   start position for current assembly 38\n"
-        +"#39 38_MAP_POS_STOP    stop position for current assembly 38\n"
-        +"#40 38_MAP_POS_METHOD  qtl positioning method for current assembly 38\n"
+        +"#37 38_MAP_POS_CHR     chromosome for assembly GRCm38\n"
+        +"#38 38_MAP_POS_START   start position for assembly GRCm38\n"
+        +"#39 38_MAP_POS_STOP    stop position for assembly GRCm38\n"
+        +"#40 38_MAP_POS_METHOD  qtl positioning method for assembly GRCm38\n"
         +"#\n#COLUMNS#"
         +"\tMGI_ID\t37_MAP_POS_CHR\t37_MAP_POS_START\t37_MAP_POS_STOP\t37_MAP_POS_METHOD"
-        +"\t34_MAP_POS_CHR\t34_MAP_POS_START\t34_MAP_POS_STOP\t34_MAP_POS_METHOD"
+        +"\t39_MAP_POS_CHR\t39_MAP_POS_START\t39_MAP_POS_STOP\t39_MAP_POS_METHOD"
         +"\tCM_MAP_CHR\tCM_MAP_POS"
         +"\t38_MAP_POS_CHR\t38_MAP_POS_START\t38_MAP_POS_STOP\t38_MAP_POS_METHOD";
 
     // additional columns for human
     final String HEADER_HUMAN =
         "#26 OMIM_ID            OMIM ID\n"
-        +"#27 37_MAP_POS_CHR     chromosome for current assembly 37\n"
-        +"#28 37_MAP_POS_START   start position for current assembly 37\n"
-        +"#29 37_MAP_POS_STOP    stop position for current assembly 37\n"
-        +"#30 37_MAP_POS_METHOD  qtl positioning method for current assembly 37\n"
-        +"#31 36_MAP_POS_CHR     chromosome for old assembly 36\n"
-        +"#32 36_MAP_POS_START   start position for old assembly 36\n"
-        +"#33 36_MAP_POS_STOP    stop position for old assembly 36\n"
-        +"#34 36_MAP_POS_METHOD  qtl positioning method for old assembly 36\n"
+        +"#27 37_MAP_POS_CHR     chromosome for current assembly GRCh37\n"
+        +"#28 37_MAP_POS_START   start position for current assembly GRCh37\n"
+        +"#29 37_MAP_POS_STOP    stop position for current assembly GRCh37\n"
+        +"#30 37_MAP_POS_METHOD  qtl positioning method for current assembly GRCh37\n"
+        +"#31 36_MAP_POS_CHR     chromosome for assembly NCBI36\n"
+        +"#32 36_MAP_POS_START   start position for assembly NCBI36\n"
+        +"#33 36_MAP_POS_STOP    stop position for assembly NCBI36\n"
+        +"#34 36_MAP_POS_METHOD  qtl positioning method for assembly NCBI36\n"
+        +"#35 38_MAP_POS_CHR     chromosome for assembly GRCh38\n"
+        +"#36 38_MAP_POS_START   start position for assembly GRCh38\n"
+        +"#37 38_MAP_POS_STOP    stop position for assembly GRCh38\n"
+        +"#38 38_MAP_POS_METHOD  qtl positioning method for assembly GRCh38\n"
         +"#\n#COLUMNS#"
         +"\tOMIM_ID\t37_MAP_POS_CHR\t37_MAP_POS_START\t37_MAP_POS_STOP\t37_MAP_POS_METHOD"
-        +"\t36_MAP_POS_CHR\t36_MAP_POS_START\t36_MAP_POS_STOP\t36_MAP_POS_METHOD";
+        +"\t36_MAP_POS_CHR\t36_MAP_POS_START\t36_MAP_POS_STOP\t36_MAP_POS_METHOD"
+        +"\t38_MAP_POS_CHR\t38_MAP_POS_START\t38_MAP_POS_STOP\t38_MAP_POS_METHOD";
 
     FtpFileExtractsDAO dao;
     SpeciesRecord species;
@@ -187,27 +214,33 @@ public class QtlExtractor  extends BaseExtractor {
         String fileName = tmpDir+'/'+species.getQtlFileName();
         final PrintWriter writer = new PrintWriter(fileName);
 
+        String header, speciesSpecificChangeLog;
+        switch (speciesType) {
+            case SpeciesType.HUMAN -> {
+                header = HEADER_HUMAN;
+                speciesSpecificChangeLog = HEADER_HUMAN_CHANGELOG;
+            }
+            case SpeciesType.MOUSE -> {
+                header = HEADER_MOUSE;
+                speciesSpecificChangeLog = HEADER_MOUSE_CHANGELOG;
+            }
+            case SpeciesType.RAT -> {
+                header = HEADER_RAT;
+                speciesSpecificChangeLog = HEADER_RAT_CHANGELOG;
+            }
+            default -> {
+                header = "";
+                speciesSpecificChangeLog = "";
+            }
+        }
+
         // write the header
         String commonLines = HEADER_COMMON_LINES
                 .replace("#SPECIES#", species.getSpeciesName())
-                .replace("#DATE#", SpeciesRecord.getTodayDate());
-        writer.print(commonLines);
+                .replace("#DATE#", SpeciesRecord.getTodayDate())
+                .replace("#CHANGELOG#", speciesSpecificChangeLog);
+        writer.println(commonLines);
 
-        String header;
-        switch(speciesType) {
-            case SpeciesType.HUMAN:
-                header = HEADER_HUMAN;
-                break;
-            case SpeciesType.MOUSE:
-                header = HEADER_MOUSE;
-                break;
-            case SpeciesType.RAT:
-                header = HEADER_RAT;
-                break;
-            default:
-                header = "";
-                break;
-        }
         writer.println(header.replace("#COLUMNS#", HEADER_COMMON));
 
         List<QTL> inRgdQtls = dao.getActiveQtls(speciesType);
@@ -250,16 +283,18 @@ public class QtlExtractor  extends BaseExtractor {
                     rec.mapData2 = dao.getMapData(qtl.getRgdId(), 60); // RGSC 3.4
                     rec.mapData3 = dao.getMapData(qtl.getRgdId(), 360);// Rnor_6.0
                     rec.mapData4 = dao.getMapData(qtl.getRgdId(), 372);// mRatBN7.2
+                    rec.mapData5 = dao.getMapData(qtl.getRgdId(), 380);// GRCr8
                 }
                 else if( speciesType==SpeciesType.MOUSE ) {
                     rec.mapData1 = dao.getMapData(qtl.getRgdId(), 18);
-                    rec.mapData2 = dao.getMapData(qtl.getRgdId(), 7);
+                    rec.mapData2 = dao.getMapData(qtl.getRgdId(), 239);
                     rec.mapData3 = dao.getMapData(qtl.getRgdId(), 35);
                     rec.mapData4 = dao.getMapData(qtl.getRgdId(), 31); // 31: mouse cM map key
                 }
                 else if( speciesType==SpeciesType.HUMAN ) {
                     rec.mapData1 = dao.getMapData(qtl.getRgdId(), 17);
                     rec.mapData2 = dao.getMapData(qtl.getRgdId(), 13);
+                    rec.mapData3 = dao.getMapData(qtl.getRgdId(), 38);
                 }
 
                 // cross compare notes of type "qtl_related_qtls"
@@ -454,7 +489,7 @@ public class QtlExtractor  extends BaseExtractor {
 
         // 31-34 for rat, 3.4 assembly position
         // 31-34 for human, 36 assembly position
-        // 31-34 for mouse, 36 assembly position
+        // 31-34 for mouse, GRCm39 assembly position
         writeMapData(buf, rec.mapData2);
 
         String[] strains = rec.strains;
@@ -496,10 +531,11 @@ public class QtlExtractor  extends BaseExtractor {
 
         // rat, Rnor_6.0 assembly position
         // mouse, 38 assembly position
+        // human, 38 assembly position
         if( rec.mapData3!=null )
             writeMapData(buf, rec.mapData3);
 
-        // rat: RGD_ID and symbol of 3rd strain crossed, and rn7 positions
+        // rat: RGD_ID and symbol of 3rd strain crossed, rn7 and rn8 positions
         if( speciesType==SpeciesType.RAT ) {
             // 45. STRAIN_RGD_ID3 RGD_ID of third strain crossed
             buf.append(checkNull(strains[2]));
@@ -509,6 +545,7 @@ public class QtlExtractor  extends BaseExtractor {
             buf.append('\t');
 
             writeMapData(buf, rec.mapData4);
+            writeMapData(buf, rec.mapData5);
         }
 
         // terminate the line
@@ -716,6 +753,7 @@ public class QtlExtractor  extends BaseExtractor {
         public List<MapData> mapData2;
         public List<MapData> mapData3;
         public List<MapData> mapData4;
+        public List<MapData> mapData5;
         public String[] strains;
     }
 }

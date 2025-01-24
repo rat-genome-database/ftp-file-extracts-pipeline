@@ -1,5 +1,6 @@
 Jan 24, 2025
   sslps: added rn8 assembly to the file
+  qtls: added exprt of GRCr8, GRCm39 and GRCh38 assemblies; discontinued export of mouse assembly 34
 
 Nov 22, 2024
   species: fixed directory names for vervet & molerat

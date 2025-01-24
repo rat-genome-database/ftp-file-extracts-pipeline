@@ -196,7 +196,7 @@
 
 
     <bean id="qtlExtractor" class="edu.mcw.rgd.QtlExtractor" scope="prototype">
-        <property name="version" value="Qtl Extractor  build Oct 26, 2022"/>
+        <property name="version" value="Qtl Extractor  build Jan 24, 2025"/>
     </bean>
 
     <bean id="dbSnpExtractor" class="edu.mcw.rgd.DbSnpExtractor" scope="prototype">
