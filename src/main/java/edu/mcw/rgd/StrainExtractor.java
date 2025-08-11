@@ -5,7 +5,6 @@ import edu.mcw.rgd.process.Utils;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class StrainExtractor extends BaseExtractor {
 
     String TSV_HEADER_PART1 = """
         # RGD-PIPELINE: ftp-file-extracts
-        # MODULE: strains   build Mar 13, 2024
+        # MODULE: strains   build Aug 11, 2025
         # GENERATED-ON: #DATE#
         # PURPOSE: information about active rat strains extracted from RGD database
         # CONTACT: rgd.data@mcw.edu
@@ -28,6 +27,7 @@ public class StrainExtractor extends BaseExtractor {
         # NOTES: multiple values in a single column are separated by ';'
         #        as of Oct 15, 2021, new columns were added: CITATION_ID, MRATBN_7.2_CHR, MRATBN_7.2_START_POS, MRATBN_7.2_STOP_POS, MRATBN_7.2_METHOD
         #        as of Feb 08, 2024, column ORIGIN was renamed to ORIGINATION, and new column DESCRIPTION was added
+        #        as of Aug 11, 2025, positions on assembly GRCR8 are added
         """;
 
     String TSV_HEADER_PART2 =
@@ -36,6 +36,7 @@ public class StrainExtractor extends BaseExtractor {
         "\tRNOR_5.0_CHR\tRNOR_5.0_START_POS\tRNOR_5.0_STOP_POS\tRNOR_5.0_METHOD"+
         "\tRNOR_6.0_CHR\tRNOR_6.0_START_POS\tRNOR_6.0_STOP_POS\tRNOR_6.0_METHOD"+
         "\tMRATBN_7.2_CHR\tMRATBN_7.2_START_POS\tMRATBN_7.2_STOP_POS\tMRATBN_7.2_METHOD"+
+        "\tGRCR8_CHR\tGRCR8_START_POS\tGRCR8_STOP_POS\tGRCR8_METHOD"+
         "\tCITATION_ID\tDESCRIPTION\n";
 
     String TSV_HEADER = TSV_HEADER_PART1 + TSV_HEADER_PART2;
@@ -83,6 +84,7 @@ public class StrainExtractor extends BaseExtractor {
             List<MapData> positions5_0 = getPositionsForAssembly(positions, 70);
             List<MapData> positions6_0 = getPositionsForAssembly(positions, 360);
             List<MapData> positions7_2 = getPositionsForAssembly(positions, 372);
+            List<MapData> positions8 = getPositionsForAssembly(positions, 380);
 
             // dump columns in tsv format
             tsvWriter.print(strain.getRgdId());
@@ -108,6 +110,7 @@ public class StrainExtractor extends BaseExtractor {
             printTsvPositions(positions5_0, tsvWriter);
             printTsvPositions(positions6_0, tsvWriter);
             printTsvPositions(positions7_2, tsvWriter);
+            printTsvPositions(positions8, tsvWriter);
             tsvWriter.print('\t');
             tsvWriter.print(checkWhiteSpace(citationId));
             tsvWriter.print('\t');
@@ -156,7 +159,7 @@ public class StrainExtractor extends BaseExtractor {
 
         List<Strain> strainsInRgd = getDao().getActiveStrains();
 
-        Collections.sort(strainsInRgd, new Comparator<Strain>() {
+        strainsInRgd.sort(new Comparator<Strain>() {
             @Override
             public int compare(Strain o1, Strain o2) {
                 return o1.getRgdId() - o2.getRgdId();
@@ -179,6 +182,8 @@ public class StrainExtractor extends BaseExtractor {
                 assembly="Rnor_6.0";
             else if( md.getMapKey()==372 )
                 assembly="mRatBN7.2";
+            else if( md.getMapKey()==380 )
+                assembly="GRCr8";
 
             xmlWriter.println("      <POSITION ASSEMBLY=\""+assembly+"\" CHR=\""+md.getChromosome()
                     +"\" START_POS=\""+md.getStartPos()+"\" STOP_POS=\""+md.getStopPos()
