@@ -109,7 +109,7 @@
     </bean>
 
     <bean id="strainExtractor" class="edu.mcw.rgd.StrainExtractor" scope="prototype">
-        <property name="version" value="Strain Extractor  build Mar 13, 2024"/>
+        <property name="version" value="Strain Extractor  build Aug 11, 2025"/>
         <property name="tsvFileName" value="STRAINS.txt"/>
         <property name="xmlFileName" value="STRAINS.xml"/>
     </bean>
