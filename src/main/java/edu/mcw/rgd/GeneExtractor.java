@@ -818,6 +818,75 @@ public class GeneExtractor extends BaseExtractor {
     +"CHROMOSOME_#REF5#\tSTART_POS_#REF5#\tSTOP_POS_#REF5#\tSTRAND_#REF5#\t"
     +"CHROMOSOME_#REF6#\tSTART_POS_#REF6#\tSTOP_POS_#REF6#\tSTRAND_#REF6#";
 
+
+    final String HEADER_BLACKRAT_PART1 = """
+        # RGD-PIPELINE: ftp-file-extracts
+        # MODULE: genes  build 2025-08-22
+        # GENERATED-ON: #DATE#
+        # PURPOSE: information about active #SPECIES# genes extracted from RGD database
+        # SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#
+        # CONTACT: rgd.data@mcw.edu
+        # FORMAT: tab delimited text
+        # NOTES: multiple values in a single column are separated by ';'
+        #
+        #COLUMN INFORMATION:
+        # (First 38 columns are in common between all species)
+        #
+        #1   GENE_RGD_ID	    the RGD_ID of the gene
+        #2   SYMBOL             official gene symbol
+        #3   NAME    	        gene name
+        #4   GENE_DESC          gene description (if available)
+        #5   (UNUSED)           blank
+        #6   CHROMOSOME_#REF1# chromosome for reference assembly build #REF1#
+        #7   (UNUSED)           blank
+        #8   FISH_BAND          fish band information
+        #9   (UNUSED)           blank
+        #10  (UNUSED)           blank
+        #11  (UNUSED)           blank
+        #12  START_POS_#REF1#   start position for reference assembly build #REF1#
+        #13  STOP_POS_#REF1#    stop position for reference assembly build #REF1#
+        #14  STRAND_#REF1#      strand information for reference assembly build #REF1#
+        #15  (UNUSED)           blank
+        #16  (UNUSED)           blank
+        #17  (UNUSED)           blank
+        #18  CURATED_REF_RGD_ID     RGD_ID of paper(s) used to curate gene
+        #19  CURATED_REF_PUBMED_ID  PUBMED_ID of paper(s) used to curate gene
+        #20  UNCURATED_PUBMED_ID    PUBMED ids of papers associated with the gene at NCBI but not used for curation
+        #21  NCBI_GENE_ID           NCBI Gene ID
+        #22  UNIPROT_ID             UniProtKB id(s)
+        #23  GENE_REFSEQ_STATUS     gene RefSeq Status (from NCBI)
+        #24  GENBANK_NUCLEOTIDE     GenBank Nucleotide ID(s)
+        #25  (UNUSED)               blank
+        #26  GENBANK_PROTEIN        GenBank Protein ID(s)
+        #27  CANONICAL_PROTEIN      UniProt canonical protein(s)
+        #28  MARKER_RGD_ID          RGD_ID(s) of markers associated with given gene
+        #29  MARKER_SYMBOL          marker symbol
+        #30  OLD_SYMBOL             old symbol alias(es)
+        #31  OLD_NAME               old name alias(es)
+        #32  QTL_RGD_ID             RGD_ID(s) of QTLs associated with given gene
+        #33  QTL_SYMBOL             QTL symbol
+        #34  NOMENCLATURE_STATUS    nomenclature status
+        #35  (UNUSED)               blank
+        #36  (UNUSED)               blank
+        #37  GENE_TYPE              gene type
+        #38  ENSEMBL_ID             Ensembl Gene ID
+        #39  CHROMOSOME_ENSEMBL     chromosome for primary Ensembl assembly
+        #40  START_POS_ENSEMBL      start position for primary Ensembl assembly
+        #41  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly
+        #42  STRAND_ENSEMBL         strand information for primary Ensembl assembly
+        """;
+
+    final String HEADER_BLACKRAT_PART2 = ""
+        +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\t(UNUSED)\t"
+        +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
+        +"(UNUSED)\t(UNUSED)\t(UNUSED)\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
+        +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
+        +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
+        +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\t"
+        +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
+
+    final String HEADER_BLACKRAT = HEADER_BLACKRAT_PART1 + HEADER_BLACKRAT_PART2;
+
     Logger log = LogManager.getLogger("gene");
     private java.util.Map<String,List<String>> mapKeys;
     private String fileNamePrefix;
@@ -874,6 +943,7 @@ public class GeneExtractor extends BaseExtractor {
             case SpeciesType.VERVET -> HEADER_VERVET;
             case SpeciesType.NAKED_MOLE_RAT -> HEADER_MOLERAT;
             case SpeciesType.PIG -> HEADER_PIG;
+            case SpeciesType.BLACK_RAT -> HEADER_BLACKRAT;
             default -> null;
         };
 
