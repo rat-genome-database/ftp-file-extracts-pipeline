@@ -26,14 +26,16 @@ public class InteractionsExtractor extends BaseExtractor {
     Map<Integer, List<Gene>> geneProteinMap=new HashMap<>();
     Set<String> unresolvedMIs = new HashSet<>();
 
-    static boolean versionPrintedOut = false;
+    static Boolean versionPrintedOut = false;
 
     @Override
     public void run(SpeciesRecord speciesInfo) throws Exception {
 
-        if( !versionPrintedOut ) {
-            versionPrintedOut = true;
-            System.out.println(getVersion());
+        synchronized (versionPrintedOut) {
+            if (!versionPrintedOut) {
+                versionPrintedOut = true;
+                System.out.println(getVersion());
+            }
         }
 
         int speciesTypeKey = speciesInfo.getSpeciesType();
