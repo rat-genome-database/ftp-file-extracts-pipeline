@@ -38,6 +38,9 @@ public class InteractionsExtractor extends BaseExtractor {
 
         int speciesTypeKey = speciesInfo.getSpeciesType();
         Collection<String> dataLines = generateDataLines(speciesTypeKey);
+        if( dataLines.isEmpty() ) {
+            return;
+        }
 
         String tsvFilePath = getSpeciesSpecificExtractDir(speciesInfo)+"/"+"INTERACTIONS_"+speciesInfo.getSpeciesName().toUpperCase()+".txt";
 
@@ -45,7 +48,7 @@ public class InteractionsExtractor extends BaseExtractor {
         PrintWriter tsvWriter = new PrintWriter(tsvFilePath);
         tsvWriter.write(
             "# RGD-PIPELINE: ftp-file-extracts\n"
-            +"# MODULE: interactions   build 2021-01-11\n"
+            +"# MODULE: interactions   build Oct 14, 2025\n"
             +"# GENERATED-ON: "+dateFormat.format(new Date())+"\n"
             +"# CONTACT: rgd.data@mcw.edu\n"
             +"# FORMAT: tab delimited text\n"

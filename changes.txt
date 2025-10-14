@@ -1,3 +1,6 @@
+Oct 14, 2025
+  interactions: files are no longer generated for species not having any interactions
+
 Aug 22, 2025
   genes: added black-rat
 
