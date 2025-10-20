@@ -1,3 +1,6 @@
+Oct 20, 2025
+  sequences: minor code refactor for better readability
+
 Oct 14, 2025
   interactions: files are no longer generated for species not having any interactions
 

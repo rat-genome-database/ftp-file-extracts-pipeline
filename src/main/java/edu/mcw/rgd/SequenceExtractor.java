@@ -7,27 +7,27 @@ import edu.mcw.rgd.process.mapping.MapManager;
 
 import java.io.*;
 import java.util.*;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Created by mtutaj on 2/12/2018.
  */
 public class SequenceExtractor extends BaseExtractor {
 
-    final String header =
-        "; RGD-PIPELINE: ftp-file-extracts\n"+
-        "; MODULE: sequence-extractor   build 2022-01-27\n"+
-        "; GENERATED-ON: #DATE#\n"+
-        "; CONTACT: rgd.data@mcw.edu\n"+
-        "; FORMAT: fasta/Pearson sequence format\n"+
-        "; DESCRIPTION:\n"+
-        ";This file contains transcript sequences derived from the genomic reference assembly sequence.\n"+
-        ";For each transcript, the chromosome, start position, stop position and strand for all exons\n"+
-        ";in the transcript are downloaded from NCBI's RefSeq nucleotide database.  Using these boundaries,\n"+
-        ";exon sequences are extracted from the genomic reference and these subsequences are joined to form\n"+
-        ";the corresponding 'reference-derived' transcript sequence.  The RefSeq ID given for each sequence\n"+
-        ";indicates what exon boundaries were used to construct that sequence.  The sequences in this file may contain,\n"+
-        ";and often do contain, differences compared to the corresponding sequences found in the NCBI RefSeq nucleotide database.\n";
+    final String header = """
+        ; RGD-PIPELINE: ftp-file-extracts
+        ; MODULE: sequence-extractor   build Oct 20, 2025
+        ; GENERATED-ON: #DATE#
+        ; CONTACT: rgd.data@mcw.edu
+        ; FORMAT: fasta/Pearson sequence format
+        ; DESCRIPTION:
+        ;This file contains transcript sequences derived from the genomic reference assembly sequence.
+        ;For each transcript, the chromosome, start position, stop position and strand for all exons
+        ;in the transcript are downloaded from NCBI's RefSeq nucleotide database.  Using these boundaries,
+        ;exon sequences are extracted from the genomic reference and these subsequences are joined to form
+        ;the corresponding 'reference-derived' transcript sequence.  The RefSeq ID given for each sequence
+        ;indicates what exon boundaries were used to construct that sequence.  The sequences in this file may contain,
+        ;and often do contain, differences compared to the corresponding sequences found in the NCBI RefSeq nucleotide database.
+        """;
 
     FastaParser fastaParser = new FastaParser();
 
@@ -49,12 +49,7 @@ public class SequenceExtractor extends BaseExtractor {
         out.write(headerWithDate);
 
         List<Gene> genes = getDao().getActiveGenes(speciesInfo.getSpeciesType());
-        Collections.sort(genes, new Comparator<Gene>() {
-            @Override
-            public int compare(Gene o1, Gene o2) {
-                return Utils.stringsCompareToIgnoreCase(o1.getSymbol(), o2.getSymbol());
-            }
-        });
+        Collections.sort(genes, (o1, o2) -> Utils.stringsCompareToIgnoreCase(o1.getSymbol(), o2.getSymbol()));
 
         for( Gene gene: genes ) {
             dumpFastaSeqs(gene, mapKey, out);

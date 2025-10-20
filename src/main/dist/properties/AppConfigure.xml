@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="FtpFileExtractManager  -- build Oct 14, 2025" />
+        <property name="version" value="FtpFileExtractManager  -- build Oct 20, 2025" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -388,7 +388,7 @@
     </bean>
 
     <bean id="seqExtractor" class="edu.mcw.rgd.SequenceExtractor" scope="prototype">
-        <property name="version" value="Sequence Extractor  -- build Jan 27, 2022"/>
+        <property name="version" value="Sequence Extractor  -- build Oct 20, 2025"/>
     </bean>
 
     <bean id="obsoleteIdExtractor" class="edu.mcw.rgd.ObsoleteIdExtractor" scope="prototype">
