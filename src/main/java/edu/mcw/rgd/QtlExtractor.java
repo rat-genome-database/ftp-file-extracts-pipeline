@@ -36,7 +36,7 @@ public class QtlExtractor  extends BaseExtractor {
 
     final String HEADER_COMMON_LINES = """
         # RGD-PIPELINE: ftp-file-extracts
-        # MODULE: qtls  build Jan 24, 2025
+        # MODULE: qtls  build Dec 15, 2025
         # GENERATED-ON: #DATE#
         # PURPOSE: information about active #SPECIES# qtls extracted from RGD database
         # CONTACT: rgd.developers@mcw.edu
@@ -146,7 +146,7 @@ public class QtlExtractor  extends BaseExtractor {
         +"\t3.4_MAP_POS_CHR\t3.4_MAP_POS_START\t3.4_MAP_POS_STOP\t3.4_MAP_POS_METHOD"
         +"\tCROSS_TYPE\tCROSS_PAIR\tSTRAIN_RGD_ID1\tSTRAIN_RGD_ID2\tSTRAIN_RGD_SYMBOL1\tSTRAIN_RGD_SYMBOL2"
         +"\t6.0_MAP_POS_CHR\t6.0_MAP_POS_START\t6.0_MAP_POS_STOP\t6.0_MAP_POS_METHOD\tSTRAIN_RGD_ID3\tSTRAIN_RGD_SYMBOL3"
-        +"\t7.2_MAP_POS_CHR\t7.2_MAP_POS_START\t7.2_MAP_POS_STOP\t7.2_MAP_POS_METHOD\t"
+        +"\t7.2_MAP_POS_CHR\t7.2_MAP_POS_START\t7.2_MAP_POS_STOP\t7.2_MAP_POS_METHOD"
         +"\t8_MAP_POS_CHR\t8_MAP_POS_START\t8_MAP_POS_STOP\t8_MAP_POS_METHOD";
 
     // additional columns for mouse
