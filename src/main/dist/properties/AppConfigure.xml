@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="ftp-file-extracts-pipeline  -- build Dec 15, 2025" />
+        <property name="version" value="ftp-file-extracts-pipeline  -- build Jan 27, 2026" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -192,12 +192,13 @@
                 </entry>
                 <entry key="vervet">
                     <list>
-                        <value>1311 1.1</value>
+                        <value>1311 ChlSab1.1</value>
+                        <value>1315 mChlSab1.0.hap1</value>
                     </list>
                 </entry>
                 <entry key="blackrat">
                     <list>
-                        <value>1701 1</value>
+                        <value>1701 Rrattus_CSIRO_v1</value>
                     </list>
                 </entry>
             </map>
@@ -206,7 +207,7 @@
 
 
     <bean id="qtlExtractor" class="edu.mcw.rgd.QtlExtractor" scope="prototype">
-        <property name="version" value="Qtl Extractor  build Jan 24, 2025"/>
+        <property name="version" value="QTL Extractor  build Dec 15, 2025"/>
     </bean>
 
     <bean id="dbSnpExtractor" class="edu.mcw.rgd.DbSnpExtractor" scope="prototype">
