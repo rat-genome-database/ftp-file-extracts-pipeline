@@ -1,5 +1,5 @@
 Jan 27, 2026
-  genes: added green monkey assembly mChlSab1.0.hap1
+  genes: added green monkey assembly mChlSab1.0.hap1 and squirrel assembly mIctTri1.hap1
 
 Dec 15, 2025
   qtls: fixed header (extra tabs breaking parsing)
