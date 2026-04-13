@@ -461,7 +461,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_SQUIRREL_PART1 = """
     # RGD-PIPELINE: ftp-file-extracts
-    # MODULE: genes  build 2026-01-27
+    # MODULE: genes  build 2026-04-13
     # GENERATED-ON: #DATE#
     # PURPOSE: information about active #SPECIES# genes extracted from RGD database
     # SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#
@@ -472,7 +472,7 @@ public class GeneExtractor extends BaseExtractor {
     ### Mar 11 2020  added Ensembl map positions
     ### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL
     ### Apr 18 2022  added export of canonical proteins in column 27
-    ### Jan 27 2026  added assembly mIctTri1.hap1
+    ### Jan 27 2026  added assemblies HiC_Itri_2 and mIctTri1.hap1
     #
     #COLUMN INFORMATION:
     # (First 38 columns are in common between all species)
@@ -481,13 +481,13 @@ public class GeneExtractor extends BaseExtractor {
     #2   SYMBOL             official gene symbol
     #3   NAME    	        gene name
     #4   GENE_DESC          gene description (if available)
-    #5   (UNUSED)           blank
+    #5   CHROMOSOME_mIctTri1.hap1  chromosome for mIctTri1.hap1 assembly
     #6   CHROMOSOME_#REF1#  chromosome for assembly build #REF1#
     #7   CHROMOSOME_#REF2#  chromosome for assembly build #REF2#
     #8   FISH_BAND          fish band information
-    #9   (UNUSED)           blank
-    #10  (UNUSED)           blank
-    #11  (UNUSED)           blank
+    #9   START_POS_mIctTri1.hap1   start position for mIctTri1.hap1 assembly
+    #10  STOP_POS_mIctTri1.hap1    stop position for mIctTri1.hap1 assembly
+    #11  STRAND_mIctTri1.hap1      strand information for mIctTri1.hap1 assembly
     #12  START_POS_#REF1#   start position for assembly build #REF1#
     #13  STOP_POS_#REF1#    stop position for assembly build #REF1#
     #14  STRAND_#REF1#      strand information for assembly build #REF1#
@@ -523,8 +523,8 @@ public class GeneExtractor extends BaseExtractor {
     """;
 
     final String HEADER_SQUIRREL_PART2 = ""
-    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\t(UNUSED)\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
-    +"FISH_BAND\t(UNUSED)\t(UNUSED)\t(UNUSED)\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
+    +"GENE_RGD_ID\tSYMBOL\tNAME\tGENE_DESC\tCHROMOSOME_mIctTri1.hap1\tCHROMOSOME_#REF1#\tCHROMOSOME_#REF2#\t"
+    +"FISH_BAND\tSTART_POS_mIctTri1.hap1\tSTOP_POS_mIctTri1.hap1\tSTRAND_mIctTri1.hap1\tSTART_POS_#REF1#\tSTOP_POS_#REF1#\tSTRAND_#REF1#\t"
     +"START_POS_#REF2#\tSTOP_POS_#REF2#\tSTRAND_#REF2#\tCURATED_REF_RGD_ID\tCURATED_REF_PUBMED_ID\tUNCURATED_PUBMED_ID\t"
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
     +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"

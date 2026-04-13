@@ -7,6 +7,6 @@ APPNAME="ftp-file-extracts-pipeline"
 APPHOME=/home/rgddata/pipelines/$APPNAME
 
 echo "=== GENES ... ==="
-$APPHOME/run.sh -genes
+$APPHOME/run.sh -genes "$@"
 echo "=== GENES OK ==="
 echo ""

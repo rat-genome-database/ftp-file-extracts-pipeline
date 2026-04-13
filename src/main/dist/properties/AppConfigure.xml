@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="ftp-file-extracts-pipeline  -- build Jan 27, 2026" />
+        <property name="version" value="ftp-file-extracts-pipeline  -- build Apr 13, 2026" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -90,6 +90,7 @@
     <bean id="squirrelInfo" class="edu.mcw.rgd.SpeciesRecord">
         <property name="speciesType" value="7" />
         <property name="ensemblAssemblyMapKey" value="721" />
+        <property name="celeraAssemblyMapKey" value="724" /><!-- export data for this assembly in columns normally reserved for Celera assembly -->
     </bean>
 
     <bean id="pigInfo" class="edu.mcw.rgd.SpeciesRecord">
@@ -176,8 +177,8 @@
                 </entry>
                 <entry key="squirrel">
                     <list>
-                        <value>720 2.0</value>
-                        <value>724 2.0</value>
+                        <value>720 SpeTri2.0</value>
+                        <value>722 HiC_Itri_2</value>
                     </list>
                 </entry>
                 <entry key="pig">

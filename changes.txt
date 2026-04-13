@@ -1,5 +1,9 @@
+Apr 13, 2026
+  genes: squirrel: export data for 3 assemblies: SpeTri2.0, HiC_Itri_2, mIctTri1.hap1
+  genes: geneExtract.sh: allow passing optional arguments to run.sh
+
 Jan 27, 2026
-  genes: added green monkey assembly mChlSab1.0.hap1 and squirrel assembly mIctTri1.hap1
+  genes: added green monkey assembly mChlSab1.0.hap1 and squirrel assemblies HiC_Itri_2, mIctTri1.hap1
 
 Dec 15, 2025
   qtls: fixed header (extra tabs breaking parsing)
