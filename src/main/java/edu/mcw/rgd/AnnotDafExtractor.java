@@ -32,6 +32,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     private String fileJsonPrefix;
     private String fileJsonSuffix;
+    private boolean mapCustomRdoToParent;
 
     // a good place to initialize variables for the species being processed
     boolean onInit() {
@@ -136,13 +137,13 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             }
         }
 
-        // exclude DO+ custom terms (that were added by RGD and are not present in DO ontology)
-        if( rec.termAccId.startsWith("DOID:90") && rec.termAccId.length()==12 ) {
+        // special processing for DO+ custom terms (that were added by RGD and are not present in DO ontology)
+        if( getDao().isCustomRdoTerm(rec.termAccId) ) {
 
-            // see if this term could be mapped to an OMIM PS id
-            String parentTermAcc = null;
+            // see if this term could be mapped to a DO term via OMIM PS id or looking up direct parents up to level 2
+            String parentTermAcc;
             try {
-                parentTermAcc = getDao().getOmimPSTermAccForChildTerm(rec.termAccId);
+                parentTermAcc = getDao().getDoTermReplacementForRdoCustomTerm(rec.termAccId, rec.annot.getTerm(), counters, mapCustomRdoToParent);
             } catch( Exception e ) {
                 throw new RuntimeException(e);
             }
@@ -150,9 +151,7 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
                 return null;
             }
 
-            counters.increment("OMIM:PS conversion OK: " + rec.termAccId + " [" + rec.annot.getTerm() + "]) replaced with " + parentTermAcc);
             rec.termAccId = parentTermAcc;
-            counters.increment("omimPSConversions");
         }
 
         counters.increment("recordsExported");
@@ -377,5 +376,13 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
     public String getFileJsonSuffix() {
         return fileJsonSuffix;
+    }
+
+    public void setMapCustomRdoToParent(boolean mapCustomRdoToParent) {
+        this.mapCustomRdoToParent = mapCustomRdoToParent;
+    }
+
+    public boolean getMapCustomRdoToParent() {
+        return mapCustomRdoToParent;
     }
 }

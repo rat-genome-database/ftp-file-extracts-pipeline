@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="ftp-file-extracts-pipeline  -- build Apr 13, 2026" />
+        <property name="version" value="ftp-file-extracts-pipeline  -- build Apr 27, 2026" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -296,10 +296,13 @@
     </bean>
 
     <bean id="annotDafExtractor" class="edu.mcw.rgd.AnnotDafExtractor" parent="annotBaseExtractor" scope="prototype">
-        <property name="version" value="AnnotDafExtractor  -- build Oct 05, 2022" />
+        <property name="version" value="AnnotDafExtractor  -- build Apr 27, 2026" />
         <property name="annotDir" value="data/agr" />
         <property name="fileJsonPrefix" value="disease." />
         <property name="fileJsonSuffix" value=".daf.json" />
+        <!-- When true, annotations to RDO custom terms (DOID:9xxx, no OMIM:PS mapping) are
+             remapped to the best non-custom DO parent (level 1 or 2) instead of being dropped. -->
+        <property name="mapCustomRdoToParent" value="false" />
     </bean>
 
     <bean id="variantExtractor" class="edu.mcw.rgd.VariantExtractor" scope="prototype">

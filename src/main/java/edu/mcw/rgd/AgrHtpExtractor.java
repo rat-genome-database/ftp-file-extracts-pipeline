@@ -51,6 +51,9 @@ public class AgrHtpExtractor extends BaseExtractor {
         for( Dataset ds: datasets.values() ) {
 
             List<DataSample> samples = loadDataSamples(ds.geoId, platformsWithoutMMO);
+            if( samples.isEmpty() ) {
+                System.out.println("ERROR! NO DATA SAMPLES");
+            }
             for( DataSample s: samples ) {
                 List<String> uberonSlimTermIds = getUberonSlimTermIds(s.tissueUberonId);
                 dataSamplesInJson.addDataObj(s.geoId, s.sampleId, s.sampleTitle, s.sampleAge, s.gender, s.tissueUberonId, uberonSlimTermIds, s.tissue, s.assayType, ageStages);

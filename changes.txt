@@ -1,3 +1,6 @@
+Apr 27, 2026
+  daf: optional remap of RDO custom terms to non-custom DO parents (off by default)
+
 Apr 13, 2026
   genes: squirrel: export data for 3 assemblies: SpeTri2.0, HiC_Itri_2, mIctTri1.hap1
   genes: geneExtract.sh: allow passing optional arguments to run.sh

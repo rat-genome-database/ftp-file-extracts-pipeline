@@ -10,6 +10,7 @@ import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontologyx.Ontology;
 import edu.mcw.rgd.datamodel.ontologyx.Term;
 import edu.mcw.rgd.datamodel.ontologyx.TermSynonym;
+import edu.mcw.rgd.process.CounterPool;
 import edu.mcw.rgd.process.Utils;
 import org.springframework.jdbc.core.*;
 
@@ -624,17 +625,83 @@ public class FtpFileExtractsDAO extends AbstractDAO {
 
     static final Map<String, Boolean> _isForCurationMap = new HashMap<>();
 
-    public String getOmimPSTermAccForChildTerm(String childTermAcc) throws Exception {
+    boolean isCustomRdoTerm(String termAcc) {
+        return termAcc.length() == 12 && termAcc.startsWith("DOID:9");
+    }
+
+    public String getDoTermReplacementForRdoCustomTerm(String childTermAcc, String childTermName, CounterPool counters,
+                                                       boolean useParentFallback) throws Exception {
         String sql = "SELECT parent_term_acc FROM omim_ps_custom_do WHERE child_term_acc=?";
         List<String> termAccIds = StringListQuery.execute(ontologyDAO, sql, childTermAcc);
 
         // remove custom DO terms from the results
-        termAccIds.removeIf(termAccId -> termAccId.length() == 12 && termAccId.startsWith("DOID:9"));
+        termAccIds.removeIf(termAccId -> isCustomRdoTerm(termAccId));
 
-        if( termAccIds.isEmpty() ) {
+        // PS parent term acc found
+        if( !termAccIds.isEmpty() ) {
+            String psParentTermAcc = termAccIds.get(0);
+
+            counters.increment("OMIM:PS conversion OK: " + childTermAcc + " [" + childTermName + "]) replaced with " + psParentTermAcc);
+            counters.increment("omimPSConversions");
+            return psParentTermAcc;
+        }
+
+        // no PS parent term acc found; optionally fall back to ontology parent lookup
+        if( !useParentFallback ) {
             return null;
         }
-        return termAccIds.get(0);
+
+        int[] parentLevel = new int[1];
+        Term bestMatchParentTerm = getBestMatchParentTerm(childTermAcc, parentLevel);
+        if( bestMatchParentTerm!=null ) {
+            counters.increment("custom term replacement, parent level " + parentLevel[0] + ": " + childTermAcc + " [" + childTermName +
+                    "]) replaced with " + bestMatchParentTerm.getAccId() + " ["+bestMatchParentTerm.getTerm()+"]");
+            counters.increment("customTermReplacementsParentLevel"+parentLevel[0]);
+            return bestMatchParentTerm.getAccId();
+        }
+        return null;
+    }
+
+    Term getBestMatchParentTerm(String childTermAcc, int[] parentLevel) throws Exception {
+
+        List<Term> parentTerms = ontologyDAO.getParentTerm(childTermAcc);
+        parentLevel[0] = 1;
+        List<Term> doParentTerms = new ArrayList<>(parentTerms.size());
+        for( Term parentTerm: parentTerms ) {
+            if( !isCustomRdoTerm(parentTerm.getAccId()) ) {
+                doParentTerms.add(parentTerm);
+            }
+        }
+        if( doParentTerms.isEmpty() ) {
+            parentLevel[0] = 2;
+            for( Term term: parentTerms ) {
+                List<Term> parentTermsLevel2 = ontologyDAO.getParentTerm(term.getAccId());
+                for( Term parentTermLevel2: parentTermsLevel2 ) {
+                    if( !isCustomRdoTerm(parentTermLevel2.getAccId()) ) {
+                        doParentTerms.add(parentTermLevel2);
+                    }
+                }
+            }
+        }
+
+        Term bestMatchParentTerm = null;
+        if( doParentTerms.isEmpty() ) {
+            // no non-custom parent terms found
+        }
+        else if( doParentTerms.size()==1 ) {
+            bestMatchParentTerm = doParentTerms.get(0);
+
+        } else {
+            int annotCunt = 0;
+            for( Term t: doParentTerms ) {
+                int termAnnotCount = ontologyDAO.getTermWithStatsCached(t.getAccId()).getAnnotObjectCountForTerm();
+                if( termAnnotCount > annotCunt ) {
+                    annotCunt = termAnnotCount;
+                    bestMatchParentTerm = t;
+                }
+            }
+        }
+        return bestMatchParentTerm;
     }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesType) throws Exception {
