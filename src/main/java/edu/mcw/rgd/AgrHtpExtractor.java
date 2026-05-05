@@ -1,7 +1,9 @@
 package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import edu.mcw.rgd.dao.DataSourceFactory;
 import edu.mcw.rgd.dao.impl.OntologyXDAO;
 
@@ -76,24 +78,16 @@ public class AgrHtpExtractor extends BaseExtractor {
 
     void dumpDataSamplesToJson(AgrHtpDataSample dataSamplesInJson) throws ParseException {
 
-        // setup a JSON object array to collect all DafAnnotation objects
-        ObjectMapper json = new ObjectMapper();
-        // do not export fields with NULL values
-        json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectMapper json = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .build();
 
-        // sort data
         dataSamplesInJson.sort();
 
-        // dump DafAnnotation records to a file in JSON format
         try {
-            String jsonFileName = "data/agr/HTPDATASAMPLES_RGD.json";
-            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileName), "UTF8");
-            BufferedWriter jsonWriter = new BufferedWriter(out);
-
-            jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(dataSamplesInJson));
-
-            jsonWriter.close();
-        } catch(IOException ignore) {
+            json.writeValue(new File("data/agr/HTPDATASAMPLES_RGD.json"), dataSamplesInJson);
+        } catch(Exception ignore) {
         }
     }
 
@@ -101,24 +95,16 @@ public class AgrHtpExtractor extends BaseExtractor {
 
         AgrHtpDataset jsonDatasets = normalizeDatasets(datasets);
 
-        // setup a JSON object array to collect all DafAnnotation objects
-        ObjectMapper json = new ObjectMapper();
-        // do not export fields with NULL values
-        json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectMapper json = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .build();
 
-        // sort data
         jsonDatasets.sort();
 
-        // dump DafAnnotation records to a file in JSON format
         try {
-            String jsonFileName = "data/agr/HTPDATASET_RGD.json";
-            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileName), "UTF8");
-            BufferedWriter jsonWriter = new BufferedWriter(out);
-
-            jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(jsonDatasets));
-
-            jsonWriter.close();
-        } catch(IOException ignore) {
+            json.writeValue(new File("data/agr/HTPDATASET_RGD.json"), jsonDatasets);
+        } catch(Exception ignore) {
         }
     }
 

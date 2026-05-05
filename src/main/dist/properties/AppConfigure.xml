@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="ftp-file-extracts-pipeline  -- build Apr 27, 2026" />
+        <property name="version" value="ftp-file-extracts-pipeline  -- build May 05, 2026" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>

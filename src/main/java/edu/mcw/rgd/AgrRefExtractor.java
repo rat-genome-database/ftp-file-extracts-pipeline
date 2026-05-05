@@ -1,7 +1,9 @@
 package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import edu.mcw.rgd.datamodel.Reference;
 import edu.mcw.rgd.datamodel.RgdId;
 import edu.mcw.rgd.process.Utils;
@@ -111,21 +113,16 @@ public class AgrRefExtractor extends BaseExtractor {
 
     void dumpReferencesToJson(AgrRefs agrRefs) throws ParseException, IOException {
 
-        // setup a JSON object array to collect all DafAnnotation objects
-        ObjectMapper json = new ObjectMapper();
-        // do not export fields with NULL values
-        json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectMapper json = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .build();
 
         // dump records to a file in JSON format
         String jsonFileNameTmp = "data/agr/REFERENCE_RGD.json.tmp";
         try {
-            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileNameTmp), "UTF8");
-            BufferedWriter jsonWriter = new BufferedWriter(out);
-
-            jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(agrRefs));
-
-            jsonWriter.close();
-        } catch(IOException ignore) {
+            json.writeValue(new File(jsonFileNameTmp), agrRefs);
+        } catch(Exception ignore) {
         }
 
         // replace field 'ZBASTRACTZ' with 'abstract'
@@ -174,21 +171,14 @@ public class AgrRefExtractor extends BaseExtractor {
 
     void dumpRefExchangeToJson(AgrRefExchange agrRefs) throws ParseException, IOException {
 
-        // setup a JSON object array to collect all DafAnnotation objects
-        ObjectMapper json = new ObjectMapper();
-        // do not export fields with NULL values
-        json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectMapper json = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .build();
 
-        // dump records to a file in JSON format
-        String jsonFileName = "data/agr/REF-EXCHANGE_RGD.json";
         try {
-            OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(jsonFileName), "UTF8");
-            BufferedWriter jsonWriter = new BufferedWriter(out);
-
-            jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(agrRefs));
-
-            jsonWriter.close();
-        } catch(IOException ignore) {
+            json.writeValue(new File("data/agr/REF-EXCHANGE_RGD.json"), agrRefs);
+        } catch(Exception ignore) {
         }
     }
 }

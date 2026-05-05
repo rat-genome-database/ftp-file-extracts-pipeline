@@ -1,7 +1,9 @@
 package edu.mcw.rgd;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import edu.mcw.rgd.datamodel.*;
 import edu.mcw.rgd.datamodel.ontology.Annotation;
 import edu.mcw.rgd.datamodel.ontology.DafAnnotation;
@@ -10,9 +12,7 @@ import edu.mcw.rgd.process.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.File;
 import java.util.*;
 
 
@@ -48,10 +48,10 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
 
         dafExport = new DafExport();
 
-        // setup a JSON object array to collect all DafAnnotation objects
-        json = new ObjectMapper();
-        // do not export fields with NULL values
-        json.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        json = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(v -> v.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .build();
 
         return true;
     }
@@ -328,12 +328,8 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
         // dump DafAnnotation records to a file in JSON format
         try {
             String jsonFileName = getAnnotDir()+ "/" + getOutputFileNamePrefix(getSpeciesTypeKey());
-            BufferedWriter jsonWriter = new BufferedWriter(new FileWriter(jsonFileName));
-
-            jsonWriter.write(json.writerWithDefaultPrettyPrinter().writeValueAsString(dafExport));
-
-            jsonWriter.close();
-        } catch(IOException ignore) {
+            json.writeValue(new File(jsonFileName), dafExport);
+        } catch(Exception ignore) {
         }
         log.info("");
     }

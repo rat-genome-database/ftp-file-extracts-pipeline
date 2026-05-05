@@ -1,3 +1,6 @@
+May 05, 2026
+  updated jackson-databind to new library: tools.jackson.core:jackson-databind
+
 Apr 27, 2026
   daf: optional remap of RDO custom terms to non-custom DO parents (off by default)
 
