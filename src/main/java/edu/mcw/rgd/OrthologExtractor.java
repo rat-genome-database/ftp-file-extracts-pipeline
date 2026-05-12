@@ -16,7 +16,6 @@ import java.util.Map;
 public class OrthologExtractor extends BaseExtractor {
 
     private String fileName;
-    private String fileNameRatMine;
 
     final String HEADER =
         "# RGD-PIPELINE: ftp-file-extracts\n"+
@@ -86,16 +85,15 @@ public class OrthologExtractor extends BaseExtractor {
             return;
         System.out.println(getVersion());
 
-        // initialize static members
-        GeneInfo.dao = getDao();
+        final FtpFileExtractsDAO dao = getDao();
         final Map<Integer,HomologyRecord> map = new HashMap<>();
 
         // build map of all orthologs -- all entries of any SRC_RGD_ID
-        for( Ortholog ortholog: getDao().getOrthologs(SpeciesType.RAT) ) {
+        for( Ortholog ortholog: dao.getOrthologs(SpeciesType.RAT) ) {
             int srcRgdId = ortholog.getSrcRgdId();
             HomologyRecord rec = map.get(srcRgdId);
             if( rec==null ) {
-                rec = new HomologyRecord(srcRgdId);
+                rec = new HomologyRecord(srcRgdId, dao);
                 map.put(srcRgdId, rec);
             }
             rec.orthologs.add(ortholog);
@@ -131,10 +129,9 @@ public class OrthologExtractor extends BaseExtractor {
 
         // print standard report file and copy it to staging area
         printReport(getFileName(), records, false);
-        // print detailed report file and copy it to staging area
-        printReport(getFileNameRatMine(), records, true);
 
-        splitOrthologFilesForRatmine();
+        // write per-source split files directly from in-memory detailed records
+        splitOrthologFilesForRatmine(records);
     }
 
     void printReport(String fileName, Object[] records, boolean detailMode) throws Exception {
@@ -174,43 +171,30 @@ public class OrthologExtractor extends BaseExtractor {
         this.fileName = fileName;
     }
 
-    public void setFileNameRatMine(String fileNameRatMine) {
-        this.fileNameRatMine = fileNameRatMine;
-    }
+    public void splitOrthologFilesForRatmine(Object[] records) throws Exception {
 
-    public String getFileNameRatMine() {
-        return fileNameRatMine;
-    }
-
-    public void splitOrthologFilesForRatmine() throws Exception {
-
-        String fname = getOutputDir()+"/RGD_ORTHOLOGS_RATMINE.txt";
-        String line;
+        String header = HEADER.replace("#DATE#", SpeciesRecord.getTodayDate());
         Map<String, BufferedWriter> writers = new HashMap<>();
 
-        BufferedReader reader = new BufferedReader(new FileReader(fname));
-        String header = "";
-        while( (line=reader.readLine())!=null ) {
-            header += line + '\n';
-            if( !line.startsWith("#") ) {
-                break;
+        for( Object record: records ) {
+            HomologyRecord rec = (HomologyRecord) record;
+            if( rec.detailedLines==null ) continue;
+            String[] lines = rec.detailedLines.split("\n");
+            for( String line: lines ) {
+                if( line.isEmpty() ) continue;
+                String[] cols = line.split("\t");
+                if( cols.length < 7 ) continue;
+                String src = cols[6];
+                BufferedWriter out = writers.get(src);
+                if( out==null ) {
+                    out = new BufferedWriter(new FileWriter(getOutputDir()+"/RGD_ORTHOLOGS_"+src+".txt"));
+                    out.write(header);
+                    writers.put(src, out);
+                }
+                out.write(line);
+                out.write('\n');
             }
         }
-
-        while( (line=reader.readLine())!=null ) {
-            String[] cols = line.split("[\\t]");
-            String src = cols[6];
-            BufferedWriter out = writers.get(src);
-            if( out==null ) {
-                out = new BufferedWriter(new FileWriter(getOutputDir()+"/RGD_ORTHOLOGS_"+src+".txt"));
-                out.write(header);
-                writers.put(src, out);
-            }
-
-            out.write(line+'\n');
-        }
-
-        reader.close();
 
         for( BufferedWriter out: writers.values() ) {
             out.close();
@@ -228,6 +212,7 @@ public class OrthologExtractor extends BaseExtractor {
 
 class HomologyRecord implements Comparable<HomologyRecord> {
     public int ratRgdId;
+    public final FtpFileExtractsDAO dao;
     public List<Ortholog> orthologs = new ArrayList<>();
 
     public GeneInfo ratInfo;
@@ -238,23 +223,24 @@ class HomologyRecord implements Comparable<HomologyRecord> {
     public String overviewLine;
     public String detailedLines;
 
-    public HomologyRecord(int ratRgdId) {
+    public HomologyRecord(int ratRgdId, FtpFileExtractsDAO dao) {
         this.ratRgdId = ratRgdId;
+        this.dao = dao;
     }
 
     public void loadRatInfo() throws Exception {
-        this.ratInfo = new GeneInfo(ratRgdId);
+        this.ratInfo = new GeneInfo(ratRgdId, dao);
     }
 
     void addHomolog(int homolRgdID, String src, int species_type_key) throws Exception {
         switch (species_type_key) {
         case SpeciesType.HUMAN:
-            HumanHomolog hh = new HumanHomolog(homolRgdID, src);
+            HumanHomolog hh = new HumanHomolog(homolRgdID, src, dao);
             appendHumanHomolog(hh);
             break;
 
         case SpeciesType.MOUSE:
-            MouseHomolog mh = new MouseHomolog(homolRgdID, src);
+            MouseHomolog mh = new MouseHomolog(homolRgdID, src, dao);
             if( mh.mgiID != null )
                 appendMouseHomolog(mh);
             break;
@@ -441,10 +427,11 @@ class GeneInfo {
     String symbol;
     String egID;
 
-    public static FtpFileExtractsDAO dao;
+    protected final FtpFileExtractsDAO dao;
 
-    public GeneInfo(int rgdID) throws Exception {
+    public GeneInfo(int rgdID, FtpFileExtractsDAO dao) throws Exception {
         this.rgdID = rgdID;
+        this.dao = dao;
         this.symbol = dao.getSymbolForMarker(rgdID);
         initEgID();
     }
@@ -463,8 +450,8 @@ class GeneInfo {
 
 class HomologInfo extends GeneInfo {
     String src;
-    public HomologInfo(int rgdID, String src) throws Exception {
-        super(rgdID);
+    public HomologInfo(int rgdID, String src, FtpFileExtractsDAO dao) throws Exception {
+        super(rgdID, dao);
         this.src = src;
     }
 
@@ -479,8 +466,8 @@ class HomologInfo extends GeneInfo {
 
 class HumanHomolog extends HomologInfo {
     String hgncID;
-    public HumanHomolog(int rgdID, String src) throws Exception {
-        super(rgdID, src);
+    public HumanHomolog(int rgdID, String src, FtpFileExtractsDAO dao) throws Exception {
+        super(rgdID, src, dao);
         initHgncID();
     }
 
@@ -498,8 +485,8 @@ class HumanHomolog extends HomologInfo {
 
 class MouseHomolog extends HomologInfo {
     String mgiID;
-    public MouseHomolog(int rgdID, String src) throws Exception {
-        super(rgdID, src);
+    public MouseHomolog(int rgdID, String src, FtpFileExtractsDAO dao) throws Exception {
+        super(rgdID, src, dao);
         initMgiID();
     }
 

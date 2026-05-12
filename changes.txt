@@ -1,3 +1,7 @@
+May 12, 2026
+  orthologs: DAO threaded through constructors instead of a static singleton; updated dependencies
+  orthologs: stopped writing RGD_ORTHOLOGS_RATMINE.txt; per-source split files now built from in-memory records
+
 May 05, 2026
   updated jackson-databind to new library: tools.jackson.core:jackson-databind
 
