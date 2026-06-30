@@ -1,3 +1,6 @@
+Jun 30, 2026
+  genes: header definitions refactored to text blocks; safer output-file writing; updated dependencies
+
 May 12, 2026
   orthologs: DAO threaded through constructors instead of a static singleton; updated dependencies
   orthologs: stopped writing RGD_ORTHOLOGS_RATMINE.txt; per-source split files now built from in-memory records

@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="ftp-file-extracts-pipeline  -- build May 12, 2026" />
+        <property name="version" value="ftp-file-extracts-pipeline  -- build Jun 30, 2026" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -124,7 +124,7 @@
     </bean>
 
     <bean id="geneExtractor" class="edu.mcw.rgd.GeneExtractor" scope="prototype">
-        <property name="version" value="Gene Extractor  build Jun 24, 2024"/>
+        <property name="version" value="Gene Extractor  build Jun 30, 2026"/>
         <property name="fileNamePrefix" value="GENES_"/> <!-- prefix is followed by common species name, f.e. GENES_RAT -->
         <property name="mapKeys">
             <map>
