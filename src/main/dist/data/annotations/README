@@ -1,0 +1,119 @@
+README for the RGD ontology annotation file ftp directory:
+
+The files found in this directory follow the canonical GAF 2.2 format. The format is strict and does not allow to show additional information frequently wished for by RGD users.  Documentation on the GAF format can be found at the GO Consortium website at http://geneontology.org/docs/go-annotation-file-gaf-format-2.2/
+
+The files found in the 'with_terms' subdirectory provide the same information, but with the following changes:
+    -- A detailed header helps clarify the column contents.
+    -- Additional columns, like ONTOLOGY_TERM_NAME, supply data that is not available in the original gaf-formatted files.
+
+For more information about the RGD ontology annotation files which contain ontology terms (rather than just IDs), see the withTerms "WITHTERMS_README" file at https://download.rgd.mcw.edu/data_release/annotations/with_terms/WITHTERMS_README
+
+
+JULY 2026 MIGRATION:
+
+As of July 2026, these files were moved out of the 'annotated_rgd_objects_by_ontology' directory into this 'annotations' directory, and:
+    -- File names now use the RGD species SHORT NAME instead of the organism genus (f.e. 'rat_genes_go' instead of 'rattus_genes_go'). This also disambiguates rat ('rat') from black rat ('blackrat'), which previously shared the 'rattus' genus prefix.
+    -- GAF files carry a '.gaf' extension; the tab-delimited 'with_terms' files carry a '.txt' extension.
+    -- All files are gzip-compressed and carry a trailing '.gz'.
+See the migration notice left in the old 'annotated_rgd_objects_by_ontology' directory for the full per-species renaming breakdown.
+
+
+FILE NAMING CONVENTIONS:
+
+GAF file names in this folder have three parts, joined by underscores, followed by extensions:
+
+    <species-short-name>_<object>_<ontology>.gaf.gz
+
+1.   the species short name ("human", "mouse", "rat", "blackrat", ...)
+2.   the type of data object to which the annotations are assigned (genes, qtls or strains)
+3.   the ontology abbreviation
+
+The ontology part of every file name denotes the ontology. RGD has annotations for the following ontologies:
+
+- bp: GO Biological Process Ontology
+- cc: GO Cellular Component Ontology
+- ch: CHEBI (Chemical Entities of Biological Interest) Ontology
+- do: Disease/Behavior (see below)
+- mf: GO Molecular Function Ontology
+- mp: Mammalian Phenotype Ontology
+- pw: Pathway Ontology
+- cmo: Clinical Measurement Ontology
+- mmo: Measurement Method Ontology
+- rs: Rat Strain Ontology
+- vt: Vertebrate Trait Ontology
+- xco: Experimental Condition Ontology
+
+(In GAF files the three GO aspects - bp, cc and mf - are combined into a single 'go' file per object type.)
+
+
+CHANGES TO RGD'S DISEASE AND BEHAVIOR ONTOLOGIES:
+
+In the second half of 2011, RGD's original 'do' and 'bo' annotations were replaced by 'ctd/rdo' and 'nbo' annotations.  The original ontologies which RGD used for disease and behavior annotations were subsets of the MeSH (Medical Subject Headings) vocabulary maintained at the National Library of Medicine (https://www.nlm.nih.gov/mesh/meshhome.html).  For a number of reasons including better coverage of conditions found in the literature, the decision was made to migrate to separate ontologies for disease and behavior.  The new ontologies are:
+
+- rdo: "RGD Disease Ontology" imported from the Comparative Toxicogenomics Database (CTD) (originally referred to as "ctd", replaces 'do' ontology).
+- nbo: Neuro Behavioral Ontology (replaces 'bo' ontology)
+
+The CTD/RDO ontology is a combination of terms from MeSH and OMIM (Online Mendelian Inheritance in Man).  For consistency, RGD has assigned arbitrary ID to the terms in the ontology rather than using the "MeSH:xxx" and "OMIM:xxx" IDs as primary identifiers.  Originally, this ID was in the format "CTD:xxx".  As of May 2012, this has been changed to "RDO:xxx".  However, in order to allow for interoperability between RGD's annotations and data found elsewhere, the original MeSH or OMIM ID for the term used in each annotation has been added to column 11 of the _do file.
+
+In this directory, where files follow the GAF format, the disease and behavior annotations have been consolidated into a single file per species and data type, the …_do file.  This contains annotations to both the CTD/RDO and NBO ontologies.  In the "with_terms" subdirectory, each of the two ontologies has its own annotation file:  …_rdo and …_nbo.
+
+For more information about the Comparative Toxicogenomics Database (CTD) and their disease ontology, see http://ctdbase.org/
+For more information about the Neuro Behavioral Ontology, see http://bioportal.bioontology.org/ontologies/NBO
+
+
+GENE ONTOLOGY ANNOTATIONS:
+
+The Gene Ontology annotations for RGD genes are available in this directory as are the annotations for other ontologies.  In addition, these annotations are available in the following locations:
+
+For rat Gene Ontology annotations in GAF format, see the RGD gene_association file at https://download.rgd.mcw.edu/data_release/gene_association.rgd.gz
+
+Gene Ontology annotations for mouse and human are also available from the Gene Ontology Consortium at http://geneontology.org/docs/download-go-annotations/ or from MGI for mouse (http://www.informatics.jax.org/downloads/reports/index.html#go) and the Gene Ontology Annotation (GOA) group at EBI for human (https://www.ebi.ac.uk/GOA/downloads).
+
+
+GAF FILE HEADER INFORMATION:
+
+File header lines in the GAF format begin with an exclamation point (!).  All lines that begin with "!" should be skipped when automatically parsing the file.
+
+
+COLUMN HEADERS (GAF format):
+
+For GO, MP and PW:
+Column		Content
+1		DB
+2		DB Object ID
+3		DB Object Symbol
+4		Qualifier
+5		GO, MP or PW ID
+6		DB:Reference (|DB:Reference)
+7		Evidence Code
+8		With (or) From
+9		Aspect
+10		DB Object Name
+11		DB Object Synonym (|Synonym)
+12		DB Object Type
+13		Taxon(|taxon)
+14		Date
+15		Assigned By
+16		Annotation Extension   (not used at RGD)
+17		Gene Product Form ID  (not used at RGD)
+
+
+For DO (= CTD/RDO + NBO):
+Column		Content
+1		DB
+2		DB Object ID
+3		DB Object Symbol
+4		Qualifier
+5		RDO ID
+6		DB:Reference (|DB:Reference)
+7		Evidence Code
+8		With (or) From
+9		Aspect
+10		DB Object Name
+11		ONTOLOGY TERM SYNONYM (MESH:xxx OR OMIM:xxx)
+12		DB Object Type
+13		Taxon(|taxon)
+14		Date
+15		Assigned By
+16		Annotation Extension   (not used at RGD)
+17		Gene Product Form ID  (not used at RGD)

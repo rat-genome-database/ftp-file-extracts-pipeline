@@ -35,7 +35,7 @@ mailx -s "[$SERVER] null value columns" mtutaj@mcw.edu < $APPHOME/logs/nullColum
 ###      stopped working; apparently GO moved away from svn permanently and it is using git instead
 #
 #echo "postprocessing gp2protein files ..."
-#ANNOTDIR=$APPHOME/data/annotated_rgd_objects_by_ontology
+#ANNOTDIR=$APPHOME/data/annotations
 #scp -p /home/rgddata/data_release/gp2* /home/rgddata/pipelines/goc_annotation/goc_svn/trunk/gp2protein
 #cd /home/rgddata/pipelines/goc_annotation/goc_svn/trunk/gp2protein
 #if [ "$SERVER" == "REED" ]; then

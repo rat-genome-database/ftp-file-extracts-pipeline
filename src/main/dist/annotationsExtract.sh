@@ -7,11 +7,11 @@ APPNAME="ftp-file-extracts-pipeline"
 APPHOME=/home/rgddata/pipelines/$APPNAME
 
 echo "=== ANNOTATIONS ... ==="
-ANNOTDIR=$APPHOME/data/annotated_rgd_objects_by_ontology/with_terms
+ANNOTDIR=$APPHOME/data/annotations/with_terms
 SERVER=`hostname -s | tr '[a-z]' '[A-Z]'`
 EMAILLIST=mtutaj@mcw.edu
 if [ "$SERVER" == "REED" ]; then
-  EMAILLIST=mtutaj@mcw.edu,jrsmith@mcw.edu,slaulederkind@mcw.edu
+  EMAILLIST="mtutaj@mcw.edu jrsmith@mcw.edu"
 fi
 
 $APPHOME/run.sh -annotations

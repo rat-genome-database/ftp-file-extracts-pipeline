@@ -1,3 +1,6 @@
+Jul 27, 2026
+  annotations: output moved to 'annotations' directory; files renamed with species short name, gzip-compressed, with .gaf/.txt extensions; updated dependencies
+
 Jun 30, 2026
   genes: header definitions refactored to text blocks; safer output-file writing; updated dependencies
 

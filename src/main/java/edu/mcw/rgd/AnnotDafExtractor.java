@@ -322,6 +322,15 @@ public class AnnotDafExtractor extends AnnotBaseExtractor {
             }
         }
 
+        counterNames = counters.getCounterNames();
+        while( counterNames.hasMoreElements() ) {
+            String counterName = counterNames.nextElement();
+            if( counterName.startsWith("custom") ) {
+                int value = counters.get(counterName);
+                log.info(counterName + (value>1?("   ["+value+" hits]"):"   [1 hit]"));
+            }
+        }
+
         // sort data, alphabetically by object symbols
         dafExport.sort();
 

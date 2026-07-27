@@ -12,12 +12,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author mtutaj
@@ -35,6 +37,12 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
     abstract String writeLine(AnnotRecord rec);
     abstract boolean processOnlyGenes();
     abstract boolean loadUniProtIds();
+
+    // file extension (including the leading dot) appended to output file names, f.e. ".gaf" or ".txt";
+    // an empty string means no extension is appended
+    String getOutputFileExtension() { return ""; }
+    // when true, output files are gzip-compressed and ".gz" is appended to their file names
+    boolean isGzipOutput() { return false; }
 
     // do not deconsolidate annotations
     // i.e. if annotation has several PMIDs, do not split it into multiple annotations, one PMID per annotation
@@ -675,7 +683,13 @@ abstract public class AnnotBaseExtractor extends BaseExtractor {
         PrintWriter writer = writers.get(ontId);
         if (writer == null) {
             // create a new writer and write header
-            writer = new PrintWriter(filePrefix + ontId);
+            String fileName = filePrefix + ontId + getOutputFileExtension();
+            if( isGzipOutput() ) {
+                fileName += ".gz";
+                writer = new PrintWriter(new GZIPOutputStream(new FileOutputStream(fileName)));
+            } else {
+                writer = new PrintWriter(fileName);
+            }
             writers.put(ontId, writer);
             writer.write(header.replace("#ONT#", ontName));
         }

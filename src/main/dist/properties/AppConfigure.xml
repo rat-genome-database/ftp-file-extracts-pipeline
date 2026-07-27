@@ -279,13 +279,13 @@
     </bean>
 
     <bean id="annotExtractor" class="edu.mcw.rgd.AnnotExtractor" parent="annotBaseExtractor" scope="prototype">
-        <property name="version" value="AnnotExtractor   -- build May 31, 2022" />
-        <property name="annotDir" value="data/annotated_rgd_objects_by_ontology/with_terms" />
+        <property name="version" value="AnnotExtractor   -- build Jul 27, 2026" />
+        <property name="annotDir" value="data/annotations/with_terms" />
     </bean>
 
     <bean id="annotGafExtractor" class="edu.mcw.rgd.AnnotGafExtractor" parent="annotBaseExtractor" scope="prototype">
-        <property name="version" value="AnnotGafExtractor  -- build 2021-06-29" />
-        <property name="annotDir" value="data/annotated_rgd_objects_by_ontology" />
+        <property name="version" value="AnnotGafExtractor  -- build Jul 27, 2026" />
+        <property name="annotDir" value="data/annotations" />
         <property name="annotAgrDir" value="../agr/" />
     </bean>
 
@@ -301,7 +301,7 @@
         <property name="fileJsonSuffix" value=".daf.json" />
         <!-- When true, annotations to RDO custom terms (DOID:9xxx, no OMIM:PS mapping) are
              remapped to the best non-custom DO parent (level 1 or 2) instead of being dropped. -->
-        <property name="mapCustomRdoToParent" value="false" />
+        <property name="mapCustomRdoToParent" value="true" />
     </bean>
 
     <bean id="variantExtractor" class="edu.mcw.rgd.VariantExtractor" scope="prototype">

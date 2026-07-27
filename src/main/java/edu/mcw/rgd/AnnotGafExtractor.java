@@ -31,7 +31,12 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
         "!{ As of December 2016, the gene_association.rgd file only contains 'RGD' in column 1 and RGD gene identifiers in column 2. }\n"+
         "!{ The gene_protein_association.rgd file (available on the RGD ftp site) contains both RGD gene and UniProt protein IDs. }\n"+
         "!generated-by: RGD\n"+
-        "!date-generated: #DATEX#\n";
+        "!date-generated: #DATEX#\n"+
+        "!\n"+
+        "!migration-note: As of July 2026, RGD ontology annotation files moved from the\n"+
+        "!  'annotated_rgd_objects_by_ontology' directory to the 'annotations' directory. Files are now named\n"+
+        "!  with the RGD species short name (f.e. 'rat_genes_go.gaf.gz' instead of 'rattus_genes_go') and are\n"+
+        "!  gzip-compressed.\n";
     final String AGR_HEADER_COMMON_LINES =
         "!gaf-version: 2.2\n"+
         "!generated-by: RGD\n"+
@@ -49,16 +54,8 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
             return getAnnotAgrDir()+"9606_";
         }
 
-        // taxonomy name is two words separated by space, f.e 'Rattus norvegicus'
-        // we take only the first word
-        String taxName = SpeciesType.getTaxonomicName(speciesTypeKey).toLowerCase();
-        String prefix;
-        int spacePos = taxName.indexOf(' ');
-        if( spacePos>0 )
-            prefix = taxName.substring(0, spacePos)+"_";
-        else
-            prefix = taxName;
-        return prefix;
+        // f.e. for rat, return 'rat_'
+        return SpeciesType.getShortName(speciesTypeKey).toLowerCase()+"_";
     }
 
     String getOutputFileNameSuffix(String ontId, int objectKey) {
@@ -73,6 +70,16 @@ public class AnnotGafExtractor extends AnnotBaseExtractor {
             suffix += ".gaf";
         }
         return suffix;
+    }
+
+    // regular RGD FTP GAF files get a '.gaf' extension and are gzip-compressed;
+    // AGR files keep their AGR-mandated naming (the '.gaf' is already part of the suffix) and stay uncompressed
+    String getOutputFileExtension() {
+        return isGenerateForAgr() ? "" : ".gaf";
+    }
+
+    boolean isGzipOutput() {
+        return !isGenerateForAgr();
     }
 
     static SimpleDateFormat _gafDateFormat = new SimpleDateFormat("yyyy-MM-dd");

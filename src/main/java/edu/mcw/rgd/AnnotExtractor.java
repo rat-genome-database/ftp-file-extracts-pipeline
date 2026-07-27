@@ -14,13 +14,18 @@ public class AnnotExtractor extends AnnotBaseExtractor {
 
     final String HEADER_COMMON_LINES =
      "# RGD-PIPELINE: ftp-file-extracts\n"
-    +"# MODULE: annotations-version-1.1.9 (Oct 10, 2019)\n"
+    +"# MODULE: annotations-version-1.2.0 (Jul 27, 2026)\n"
     +"# GENERATED-ON: #DATE#\n"
     +"# PURPOSE: annotations about active #SPECIES# objects extracted from RGD database\n"
     +"# ONTOLOGY: #ONT#\n"
     +"# CONTACT: rgd.data@mcw.edu\n"
     +"# FORMAT: tab delimited text\n"
     +"# NOTES: multiple values in a single column are separated by '|'\n"
+    +"#\n"
+    +"# MIGRATION NOTE (July 2026): these files were previously located in the\n"
+    +"#   'annotated_rgd_objects_by_ontology/with_terms' directory and named using the organism\n"
+    +"#   genus (f.e. 'rattus_terms_go'). They are now located in the 'annotations/with_terms' directory,\n"
+    +"#   named with the RGD species short name (f.e. 'rat_terms_go.txt.gz'), and gzip-compressed.\n"
     +"#\n"
     +"#COLUMN INFORMATION:\n"
     +"#\n"
@@ -44,18 +49,20 @@ public class AnnotExtractor extends AnnotBaseExtractor {
     +"RGD_ID\tOBJECT_SYMBOL\tOBJECT_NAME\tOBJECT_TYPE\tTERM_ACC_ID\tTERM_NAME\tQUALIFIER\tEVIDENCE\tWITH\tASPECT\tREFERENCES\tCREATED_DATE\tASSIGNED_BY\tMESH_OMIM_ID\tCURATION_NOTES\tORIGINAL_REFERENCE\n";
 
     String getOutputFileNamePrefix(int speciesTypeKey) {
-
-        String taxName = SpeciesType.getTaxonomicName(speciesTypeKey);
-        int spacePos = taxName.indexOf(' ');
-        if( spacePos>0 ) {
-            // f.e. for rat, return 'rattus_terms_';
-            return taxName.substring(0, spacePos).toLowerCase()+"_terms_";
-        }
-        return "terms_";
+        // f.e. for rat, return 'rat_terms_'
+        return SpeciesType.getShortName(speciesTypeKey).toLowerCase()+"_terms_";
     }
 
     String getOutputFileNameSuffix(String ontId, int objectKey) {
         return ontId.toLowerCase();
+    }
+
+    String getOutputFileExtension() {
+        return ".txt";
+    }
+
+    boolean isGzipOutput() {
+        return true;
     }
 
     String getHeaderCommonLines() {
