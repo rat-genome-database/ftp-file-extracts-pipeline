@@ -704,7 +704,7 @@ public class GeneExtractor extends BaseExtractor {
 
     final String HEADER_PIG_PART1 = """
     # RGD-PIPELINE: ftp-file-extracts
-    # MODULE: genes  build 2022-04-18
+    # MODULE: genes  build 2026-10-06
     # GENERATED-ON: #DATE#
     # PURPOSE: information about active #SPECIES# genes extracted from RGD database
     # SPECIES: #TAXONOMY_NAME# (#SPECIES_LONGNAME#) NCBI:txid#TAXONID#
@@ -715,6 +715,7 @@ public class GeneExtractor extends BaseExtractor {
     ### Mar 11 2020  added Ensembl map positions and VGNC IDs
     ### Jan 18 2021  discontinued columns: UNIGENE_ID, TIGR_ID, SPLICE_RGD_ID, SPLICE_SYMBOL
     ### Apr 18 2022  added export of canonical proteins in column 27
+    ### Oct 06 2026  added positions on assembly #REF3# (NCBI reference assembly since 2026) in columns 44-47
     #
     #COLUMN INFORMATION:
     # (First 38 columns are in common between all species)
@@ -762,6 +763,10 @@ public class GeneExtractor extends BaseExtractor {
     #41  START_POS_ENSEMBL      start position for primary Ensembl assembly
     #42  STOP_POS_ENSEMBL       stop position for primary Ensembl assembly
     #43  STRAND_ENSEMBL         strand information for primary Ensembl assembly
+    #44  CHROMOSOME_#REF3#      chromosome for #REF3# assembly
+    #45  START_POS_#REF3#       start position for #REF3# assembly
+    #46  STOP_POS_#REF3#        stop position for #REF3# assembly
+    #47  STRAND_#REF3#          strand information for #REF3# assembly
     #
     """;
 
@@ -772,7 +777,8 @@ public class GeneExtractor extends BaseExtractor {
     +"NCBI_GENE_ID\tUNIPROT_ID\tGENE_REFSEQ_STATUS\tGENBANK_NUCLEOTIDE\t(UNUSED)\t"
     +"GENBANK_PROTEIN\tCANONICAL_PROTEIN\tMARKER_RGD_ID\tMARKER_SYMBOL\tOLD_SYMBOL\tOLD_NAME\tQTL_RGD_ID\tQTL_SYMBOL\t"
     +"NOMENCLATURE_STATUS\t(UNUSED)\t(UNUSED)\tGENE_TYPE\tENSEMBL_ID\tVGNC_ID\t"
-    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL";
+    +"CHROMOSOME_ENSEMBL\tSTART_POS_ENSEMBL\tSTOP_POS_ENSEMBL\tSTRAND_ENSEMBL\t"
+    +"CHROMOSOME_#REF3#\tSTART_POS_#REF3#\tSTOP_POS_#REF3#\tSTRAND_#REF3#";
 
     final String HEADER_PIG = HEADER_PIG_PART1 + HEADER_PIG_PART2;
 
@@ -1368,6 +1374,17 @@ public class GeneExtractor extends BaseExtractor {
             .append(getString(rec.assembly6Map, "getStopPos"))
             .append('\t')
             .append(getString(rec.assembly6Map, "getStrand"));
+        }
+        else if( speciesType==SpeciesType.PIG ) {
+            // columns 44-47: Sscrofa_HxYL_maternal_Yorkshire_Landrace_v2.0 (NCBI reference assembly since 2026)
+            buf.append('\t')
+               .append(getString(rec.assembly3Map, "getChromosome"))
+               .append('\t')
+               .append(getString(rec.assembly3Map, "getStartPos"))
+               .append('\t')
+               .append(getString(rec.assembly3Map, "getStopPos"))
+               .append('\t')
+               .append(getString(rec.assembly3Map, "getStrand"));
         }
         else if( speciesType==SpeciesType.RAT ) {
             buf.append('\t')

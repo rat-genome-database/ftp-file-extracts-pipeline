@@ -1,3 +1,6 @@
+Oct 6, 2026
+  genes: GENES_PIG.txt has positions on the new NCBI reference assembly Sscrofa_HxYL_maternal_Yorkshire_Landrace_v2.0 (map key 913) in columns 44-47
+
 Jul 27, 2026
   annotations: output moved to 'annotations' directory; files renamed with species short name, gzip-compressed, with .gaf/.txt extensions; updated dependencies
 
