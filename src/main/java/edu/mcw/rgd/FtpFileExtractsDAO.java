@@ -750,11 +750,13 @@ public class FtpFileExtractsDAO extends AbstractDAO {
             "r.object_status old_gene_status, g.gene_type_lc old_gene_type, new_rgd_id new_gene_rgd_id,\n"+
             "gh.gene_symbol new_gene_symbol, gh.gene_type_lc new_gene_type, r2.object_status new_gene_status,\n"+
             "TO_CHAR(r.last_modified_date,'YYYY-MM-DD')\n" +
-            "FROM genes g,rgd_ids r,species_types s,rgd_id_history h,genes gh,rgd_ids r2\n" +
-            "WHERE r.rgd_id=g.rgd_id AND r.object_status<>'ACTIVE' AND s.species_type_key=r.species_type_key\n" +
-            "AND g.rgd_id=h.old_rgd_id(+) AND h.new_rgd_id=gh.rgd_id(+)\n" +
-            "AND h.new_rgd_id=r2.rgd_id(+)\n" +
-            "AND NVL(g.gene_type_lc,'?') NOT IN('splice','allele')\n" +
+            "FROM genes g JOIN rgd_ids r ON r.rgd_id=g.rgd_id\n" +
+            "JOIN species_types s ON s.species_type_key=r.species_type_key\n" +
+            "LEFT JOIN rgd_id_history h ON h.old_rgd_id=g.rgd_id\n" +
+            "LEFT JOIN genes gh ON gh.rgd_id=h.new_rgd_id\n" +
+            "LEFT JOIN rgd_ids r2 ON r2.rgd_id=h.new_rgd_id\n" +
+            "WHERE r.object_status<>'ACTIVE'\n" +
+            "AND COALESCE(g.gene_type_lc,'?') NOT IN('splice','allele')\n" +
             "ORDER BY g.rgd_id";
 
         JdbcTemplate jt = new JdbcTemplate(this.getDataSource());
@@ -828,16 +830,18 @@ public class FtpFileExtractsDAO extends AbstractDAO {
                 "    TO_CHAR(r.LAST_MODIFIED_DATE,'YYYY-MM-DD') as allele_last_modified,\n" +
                 "    g.RGD_ID as parent_gene_rgdid,\n" +
                 "    g.GENE_SYMBOL as parent_gene_symbol,\n" +
-                "    DECODE(md.MAP_KEY,null,'',60,'RGSC 3.4',70,'Rnor_5.0',360,'Rnor_6.0','?') as map_name,\n" +
+                "    CASE WHEN md.map_key IS NULL THEN NULL WHEN md.map_key=60 THEN 'RGSC 3.4' WHEN md.map_key=70 THEN 'Rnor_5.0' WHEN md.map_key=360 THEN 'Rnor_6.0' ELSE '?' END as map_name,\n" +
                 "    md.CHROMOSOME as gene_chr,\n" +
                 "    md.START_POS as gene_start,\n" +
                 "    md.STOP_POS as gene_stop,\n" +
                 "    md.STRAND as gene_strand,\n" +
                 "    NULL AS allele_synonyms\n" +
-                "from GENES a,RGD_IDS r,GENES_VARIATIONS gv, GENES g, MAPS_DATA md  \n" +
-                "where a.GENE_TYPE_LC='allele' and r.RGD_ID=a.RGD_ID and gv.VARIATION_KEY=a.GENE_KEY\n" +
+                "from GENES a JOIN RGD_IDS r ON r.RGD_ID=a.RGD_ID\n" +
+                " JOIN GENES_VARIATIONS gv ON gv.VARIATION_KEY=a.GENE_KEY\n" +
+                " JOIN GENES g ON g.gene_key=gv.gene_key\n" +
+                " LEFT JOIN MAPS_DATA md ON md.rgd_id=g.rgd_id AND md.map_key IN(60,70,360)\n" +
+                "where a.GENE_TYPE_LC='allele'\n" +
                 " AND r.object_status='ACTIVE' AND r.species_type_key=3\n" +
-                " AND g.gene_key=gv.gene_key AND md.rgd_id(+)=g.rgd_id AND md.map_key(+) IN(60,70,360)\n" +
                 "ORDER BY parent_gene_symbol, allele_symbol, map_name";
 
         String[] colNames = new String[]{"ALLELE_RGDID","ALLELE_SYMBOL","ALLELE_NAME","ALLELE_DESCRIPTION","ALLELE_CREATED",
@@ -869,16 +873,18 @@ public class FtpFileExtractsDAO extends AbstractDAO {
                 "    TO_CHAR(r.LAST_MODIFIED_DATE,'YYYY-MM-DD') AS splice_last_modified,\n" +
                 "    g.RGD_ID as parent_gene_rgdid,\n" +
                 "    g.GENE_SYMBOL as parent_gene_symbol,\n" +
-                "    DECODE(md.map_key,null,'',60,'RGSC 3.4',70,'Rnor_5.0',360,'Rnor_6.0','?') AS map_name,\n" +
+                "    CASE WHEN md.map_key IS NULL THEN NULL WHEN md.map_key=60 THEN 'RGSC 3.4' WHEN md.map_key=70 THEN 'Rnor_5.0' WHEN md.map_key=360 THEN 'Rnor_6.0' ELSE '?' END AS map_name,\n" +
                 "    md.CHROMOSOME as gene_chr,\n" +
                 "    md.START_POS as gene_start,\n" +
                 "    md.STOP_POS as gene_stop,\n" +
                 "    md.strand AS gene_strand,\n" +
                 "    NULL AS splice_synonyms\n" +
-                "FROM genes a,rgd_ids r,genes_variations gv, genes g, maps_data md \n" +
-                "WHERE a.gene_type_lc='splice' AND r.rgd_id=a.rgd_id AND gv.variation_key=a.gene_key\n" +
+                "FROM genes a JOIN rgd_ids r ON r.rgd_id=a.rgd_id\n" +
+                " JOIN genes_variations gv ON gv.variation_key=a.gene_key\n" +
+                " JOIN genes g ON g.gene_key=gv.gene_key\n" +
+                " LEFT JOIN maps_data md ON md.rgd_id=g.rgd_id AND md.map_key IN(60,70,360)\n" +
+                "WHERE a.gene_type_lc='splice'\n" +
                 " AND r.object_status='ACTIVE' AND r.species_type_key=3\n" +
-                " AND g.gene_key=gv.gene_key AND md.rgd_id(+)=g.rgd_id AND md.map_key(+) IN(60,70,360)\n" +
                 "ORDER BY parent_gene_symbol, splice_symbol, map_name";
 
         String[] colNames = new String[]{"SPLICE_RGDID","SPLICE_SYMBOL","SPLICE_NAME","SPLICE_DESCRIPTION","SPLICE_CREATED",
@@ -925,10 +931,12 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     r.object_status old_strain_status, new_rgd_id new_strain_rgd_id,
     str2.strain_symbol new_strain_symbol, r2.object_status new_strain_status,
     TO_CHAR(r.last_modified_date, 'YYYY-MM-DD')
-    FROM strains str1, rgd_ids r, species_types s, rgd_id_history h, strains str2, rgd_ids r2
-    WHERE r.rgd_id = str1.rgd_id AND r.object_status <> 'ACTIVE' AND s.species_type_key = r.species_type_key
-    AND str1.rgd_id = h.old_rgd_id(+) AND h.new_rgd_id = str2.rgd_id(+)
-    AND h.new_rgd_id = r2.rgd_id(+)
+    FROM strains str1 JOIN rgd_ids r ON r.rgd_id = str1.rgd_id
+    JOIN species_types s ON s.species_type_key = r.species_type_key
+    LEFT JOIN rgd_id_history h ON h.old_rgd_id = str1.rgd_id
+    LEFT JOIN strains str2 ON str2.rgd_id = h.new_rgd_id
+    LEFT JOIN rgd_ids r2 ON r2.rgd_id = h.new_rgd_id
+    WHERE r.object_status <> 'ACTIVE'
     ORDER BY str1.rgd_id
     """;
         JdbcTemplate jt = new JdbcTemplate(this.getDataSource());
@@ -954,11 +962,13 @@ public class FtpFileExtractsDAO extends AbstractDAO {
                  r.object_status old_gene_status, g.gene_type_lc old_gene_type, new_rgd_id new_gene_rgd_id,
                  gh.gene_symbol new_gene_symbol, gh.gene_type_lc new_gene_type, r2.object_status new_gene_status,
                  TO_CHAR(r.last_modified_date,'YYYY-MM-DD')
-                 FROM genes g,rgd_ids r,species_types s,rgd_id_history h,genes gh,rgd_ids r2
-                 WHERE r.rgd_id=g.rgd_id AND r.object_status<>'ACTIVE' AND s.species_type_key=r.species_type_key
-                 AND g.rgd_id=h.old_rgd_id(+) AND h.new_rgd_id=gh.rgd_id(+)
-                 AND h.new_rgd_id=r2.rgd_id(+)
-                 AND NVL(g.gene_type_lc,'?') IN('splice','allele')
+                 FROM genes g JOIN rgd_ids r ON r.rgd_id=g.rgd_id
+                 JOIN species_types s ON s.species_type_key=r.species_type_key
+                 LEFT JOIN rgd_id_history h ON h.old_rgd_id=g.rgd_id
+                 LEFT JOIN genes gh ON gh.rgd_id=h.new_rgd_id
+                 LEFT JOIN rgd_ids r2 ON r2.rgd_id=h.new_rgd_id
+                 WHERE r.object_status<>'ACTIVE'
+                 AND COALESCE(g.gene_type_lc,'?') IN('splice','allele')
                  ORDER BY g.rgd_id
                  """;
         JdbcTemplate jt = new JdbcTemplate(this.getDataSource());

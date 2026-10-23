@@ -2,7 +2,7 @@
 
 <beans>
 	<bean id="manager" class="edu.mcw.rgd.FtpFileExtractsManager">
-        <property name="version" value="ftp-file-extracts-pipeline  -- build Oct 6, 2026" />
+        <property name="version" value="ftp-file-extracts-pipeline  -- build Oct 23, 2026" />
         <property name="extractDir" value="data"/><!-- directory where the files will be generated -->
         <property name="speciesInfo">
             <map>
@@ -214,7 +214,7 @@
     </bean>
 
     <bean id="dbSnpExtractor" class="edu.mcw.rgd.DbSnpExtractor" scope="prototype">
-        <property name="version" value="DbSnpExtractor build 1.0.2 as of Feb 21, 2017" />
+        <property name="version" value="DbSnpExtractor  -- build Oct 23, 2026" />
         <property name="qcThreadCount" value="1" />
         <property name="ratConfig">
             <map>
@@ -319,7 +319,7 @@
     </bean>
 
     <bean id="agrHtpExtractor" class="edu.mcw.rgd.AgrHtpExtractor" scope="prototype">
-        <property name="version" value="AgrHtpExtractor  -- build Apr 26, 2024" />
+        <property name="version" value="AgrHtpExtractor  -- build Oct 23, 2026" />
     </bean>
 
     <bean id="agrRefExtractor" class="edu.mcw.rgd.AgrRefExtractor" scope="prototype">

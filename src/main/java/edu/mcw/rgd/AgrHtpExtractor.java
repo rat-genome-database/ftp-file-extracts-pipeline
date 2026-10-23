@@ -124,7 +124,7 @@ public class AgrHtpExtractor extends BaseExtractor {
         Map<String,Dataset> datasets = new HashMap<>();
 
         String sql = """
-            SELECT DISTINCT geo_accession_id, study_title, submission_date, pubmed_id, DBMS_LOB.SUBSTR(summary, 3900) summary FROM rna_seq
+            SELECT DISTINCT geo_accession_id, study_title, submission_date, pubmed_id, SUBSTR(summary, 1, 3900) summary FROM rna_seq
             WHERE sample_organism='Rattus norvegicus'
             """;
 

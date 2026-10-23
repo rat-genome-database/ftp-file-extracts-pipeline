@@ -103,7 +103,10 @@ public class DbSnpExtractor extends BaseExtractor {
                 Connection conn = null;
                 try {
                     conn =  getDao().getConnection();
+                    // postgres driver streams rows only when autocommit is off and fetch size is set
+                    conn.setAutoCommit(false);
                     PreparedStatement ps = conn.prepareStatement(query);
+                    ps.setFetchSize(10000);
                     ps.setString(1, source);
                     ps.setInt(2, mapKey);
 
