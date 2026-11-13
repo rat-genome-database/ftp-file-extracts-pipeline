@@ -11,8 +11,9 @@ set -e
 APPDIR=/home/rgddata/pipelines/$APPNAME
 cd $APPDIR
 
-# some modules, like annotations, require a lot of RAM to run; so we set it to 16GB, as of Oct 2019
+# some modules, like annotations, require a lot of RAM to run;
+# 31G, not 32G: from 32G up the JVM turns off compressed object pointers and every reference doubles in size
 java -Dspring.config=$APPDIR/../properties/default_db2.xml \
     -Dlog4j.configurationFile=file://$APPDIR/properties/log4j2.xml \
-    -Xmx32G \
+    -Xmx31G \
     -jar lib/$APPNAME.jar "$@" 2>&1

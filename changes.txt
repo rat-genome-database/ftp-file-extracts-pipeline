@@ -1,3 +1,6 @@
+Nov 13, 2026
+  annotations: stream annotations from the database to fix out-of-memory errors on Postgres; heap set to 31G; updated rgdcore
+
 Oct 23, 2026
   migrated to postgres; updated dependencies
 

@@ -2,6 +2,7 @@ package edu.mcw.rgd;
 
 import edu.mcw.rgd.dao.AbstractDAO;
 import edu.mcw.rgd.dao.impl.*;
+import edu.mcw.rgd.dao.spring.AnnotationQuery;
 import edu.mcw.rgd.dao.spring.GeneQuery;
 import edu.mcw.rgd.dao.spring.IntStringMapQuery;
 import edu.mcw.rgd.dao.spring.StringListQuery;
@@ -705,11 +706,58 @@ public class FtpFileExtractsDAO extends AbstractDAO {
     }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesType) throws Exception {
-        return annotationDAO.getAnnotationsBySpecies(speciesType);
+        String sql = """
+            SELECT a.*,r.species_type_key FROM full_annot a,rgd_ids r
+            WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND species_type_key=?
+            """;
+        return getAnnotationsStreamed(sql, speciesType);
     }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesType, int objectKey) throws Exception {
-        return annotationDAO.getAnnotationsBySpecies(speciesType, objectKey);
+        String sql = """
+            SELECT a.*,r.species_type_key FROM full_annot a,rgd_ids r
+            WHERE annotated_object_rgd_id=rgd_id AND object_status='ACTIVE' AND species_type_key=? AND object_key=?
+            """;
+        return getAnnotationsStreamed(sql, speciesType, objectKey);
+    }
+
+    // rat has over 11 million annotations: rows must be mapped as they arrive;
+    // postgres driver honors fetch size only when autocommit is off, otherwise it loads the whole result set into memory
+    List<Annotation> getAnnotationsStreamed(String sql, int... params) throws Exception {
+
+        StreamingAnnotationQuery q = new StreamingAnnotationQuery(sql);
+        List<Annotation> annots = new ArrayList<>();
+
+        try( Connection conn = this.getConnection() ) {
+            conn.setAutoCommit(false);
+            try( PreparedStatement ps = conn.prepareStatement(sql) ) {
+                ps.setFetchSize(10000);
+                for( int i=0; i<params.length; i++ ) {
+                    ps.setInt(i+1, params[i]);
+                }
+                try( ResultSet rs = ps.executeQuery() ) {
+                    while( rs.next() ) {
+                        annots.add(q.map(rs));
+                    }
+                }
+            } finally {
+                conn.rollback();
+                conn.setAutoCommit(true);
+            }
+        }
+        return annots;
+    }
+
+    // exposes rgdcore's Annotation row mapping for plain JDBC result sets
+    class StreamingAnnotationQuery extends AnnotationQuery {
+
+        StreamingAnnotationQuery(String sql) throws Exception {
+            super(getDataSource(), sql);
+        }
+
+        Annotation map(ResultSet rs) throws SQLException {
+            return (Annotation) mapRow(rs, 0);
+        }
     }
 
     public List<Annotation> getAnnotationsBySpecies(int speciesTypeKey, String aspect, String source) throws Exception {
